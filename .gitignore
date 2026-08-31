@@ -5,6 +5,12 @@ build/
 dist/
 wheels/
 *.egg-info
+# Ignore dataset folders
+Supervised/cdata/
+Supervised/data/
+
+# Optional: ignore all CSV files anywhere
+*.csv
 
 # Virtual environments
 .venv
