@@ -4,341 +4,374 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>E-Commerce ML Project Dashboard</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- ONNX Runtime Web -->
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased p-4 md:p-10">
+<div class="max-w-6xl mx-auto space-y-8">
+    
+    <header class="text-center py-6">
+        <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Brazilian E-Commerce Machine Learning</h1>
+        <p class="text-slate-600 mt-2 text-lg">Predictive satisfaction modeling & analytics powered by LightGBM and ONNX Web.</p>
+        <div class="mt-4 flex justify-center items-center gap-3">
+            <a href="https://github.com/Mayank170906/mlProjects/tree/master/Supervised" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-semibold hover:bg-slate-800 transition shadow-sm">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                View Repository on GitHub
+            </a>
+        </div>
+    </header>
 
-    <div class="max-w-6xl mx-auto space-y-8">
-        
-        <!-- Header -->
-        <header class="text-center py-6">
-            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Brazilian E-Commerce Machine Learning</h1>
-            <p class="text-slate-600 mt-2 text-lg">Predictive satisfaction modeling & analytics powered by LightGBM and ONNX Web.</p>
-        </header>
-
-        <!-- Project Links & Artifacts -->
-        <section>
-            <h2 class="text-xl font-bold text-slate-800 mb-4">Project Artifacts & Notebooks</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <a href="./ecommerce_dashboard.html" class="p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-500 hover:shadow-md transition">
+    <section>
+        <h2 class="text-xl font-bold text-slate-800 mb-4">Project Artifacts & Notebooks</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            
+            <a href="./ecommerce_dashboard.html" class="p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-500 hover:shadow-md transition flex flex-col justify-between">
+                <div>
                     <span class="text-2xl">📊</span>
                     <h3 class="font-semibold text-slate-900 mt-2">Analytics Dashboard</h3>
-                    <p class="text-xs text-slate-500 mt-1">Interactive operational & sales dashboard.</p>
-                </a>
-                <a href="./merge_data.html" class="p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-500 hover:shadow-md transition">
+                    <p class="text-xs text-slate-500 mt-1">Operational & sales performance.</p>
+                </div>
+                <span class="text-[11px] font-semibold text-blue-600 mt-3 block">Dashboard &rarr;</span>
+            </a>
+
+            <a href="./merge_data.html" class="p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-500 hover:shadow-md transition flex flex-col justify-between">
+                <div>
                     <span class="text-2xl">🔗</span>
                     <h3 class="font-semibold text-slate-900 mt-2">Data Merging</h3>
-                    <p class="text-xs text-slate-500 mt-1">Multi-table relational data pipeline.</p>
-                </a>
-                <a href="./data-analysys.html" class="p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-500 hover:shadow-md transition">
+                    <p class="text-xs text-slate-500 mt-1">Multi-table pipeline consolidation.</p>
+                </div>
+                <span class="text-[11px] font-semibold text-blue-600 mt-3 block">Data Pipeline &rarr;</span>
+            </a>
+
+            <a href="./data-analysys.html" class="p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-500 hover:shadow-md transition flex flex-col justify-between">
+                <div>
                     <span class="text-2xl">📈</span>
                     <h3 class="font-semibold text-slate-900 mt-2">EDA & Cleaning</h3>
-                    <p class="text-xs text-slate-500 mt-1">Feature engineering & distributions.</p>
-                </a>
-                <a href="./lgbm_model.onnx" download class="p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-500 hover:shadow-md transition">
+                    <p class="text-xs text-slate-500 mt-1">Feature distributions & cleaning.</p>
+                </div>
+                <span class="text-[11px] font-semibold text-blue-600 mt-3 block">View EDA &rarr;</span>
+            </a>
+
+            <a href="./nl.html" class="p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-500 hover:shadow-md transition flex flex-col justify-between">
+                <div>
+                    <span class="text-2xl">⚙️</span>
+                    <h3 class="font-semibold text-slate-900 mt-2">Training Pipeline</h3>
+                    <p class="text-xs text-slate-500 mt-1">LightGBM & Optuna notebook.</p>
+                </div>
+                <span class="text-[11px] font-semibold text-blue-600 mt-3 block">Notebook &rarr;</span>
+            </a>
+
+            <a href="./report.html" class="p-5 bg-white rounded-xl border border-indigo-200 bg-indigo-50/20 shadow-sm hover:border-indigo-500 hover:shadow-md transition flex flex-col justify-between">
+                <div>
+                    <span class="text-2xl">📝</span>
+                    <h3 class="font-semibold text-slate-900 mt-2">ONNX Report</h3>
+                    <p class="text-xs text-slate-500 mt-1">Conversion, ZipMap removal & metrics.</p>
+                </div>
+                <span class="text-[11px] font-semibold text-indigo-600 mt-3 block">View Report &rarr;</span>
+            </a>
+
+            <a href="./lgbm_model.onnx" download class="p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-emerald-500 hover:shadow-md transition flex flex-col justify-between">
+                <div>
                     <span class="text-2xl">🧠</span>
                     <h3 class="font-semibold text-slate-900 mt-2">ONNX Weights</h3>
-                    <p class="text-xs text-slate-500 mt-1">Download trained LightGBM model.</p>
-                </a>
+                    <p class="text-xs text-slate-500 mt-1">Trained model (No ZipMap format).</p>
+                </div>
+                <span class="text-[11px] font-semibold text-emerald-600 mt-3 block">Download .onnx &darr;</span>
+            </a>
+
+        </div>
+    </section>
+
+    <section class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
+        <h2 class="text-xl font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">Model Pipeline & Performance</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+            <div>
+                <h4 class="font-semibold text-slate-900 mb-1">1. Relational Engineering</h4>
+                <p class="text-slate-600">Unified 9 Olist datasets (~117k records) into 34 predictive features spanning logistical, product, and temporal parameters.</p>
             </div>
-        </section>
-
-        <!-- Training Summary Report -->
-        <section class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
-            <h2 class="text-xl font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">Model Pipeline & Performance</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-                <div>
-                    <h4 class="font-semibold text-slate-900 mb-1">1. Relational Engineering</h4>
-                    <p class="text-slate-600">Unified 9 Olist datasets (~117k records) into 34 predictive features spanning logistical, product, and temporal parameters.</p>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-slate-900 mb-1">2. LightGBM & Optuna</h4>
-                    <p class="text-slate-600">GBDT binary classifier optimized via Optuna (694 estimators, 127 leaves, depth 10, learning rate 0.062) for ROC-AUC.</p>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-slate-900 mb-1">3. Precision-Recall Calibration</h4>
-                    <p class="text-slate-600">Optimized F1 decision thresholding on un-leaked test sets to reliably capture satisfied and unsatisfied customer sentiment.</p>
-                </div>
+            <div>
+                <h4 class="font-semibold text-slate-900 mb-1">2. LightGBM & Optuna</h4>
+                <p class="text-slate-600">GBDT binary classifier optimized via Optuna (694 estimators, 127 leaves, depth 10, learning rate 0.062) for ROC-AUC.</p>
             </div>
-        </section>
+            <div>
+                <h4 class="font-semibold text-slate-900 mb-1">3. Precision-Recall Calibration</h4>
+                <p class="text-slate-600">Exported to ONNX with <code>zipmap=False</code>. Decision threshold calibrated at <strong>0.6656</strong> for optimal F1-score classification.</p>
+            </div>
+        </div>
+    </section>
 
-        <!-- Live Browser Prediction Tool -->
-        <section class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
-                <div>
-                    <h2 class="text-xl font-bold text-slate-900">Run Direct ONNX Inference</h2>
-                    <p class="text-sm text-slate-500">Evaluates customer satisfaction directly on all 34 raw model inputs.</p>
-                </div>
-                <!-- Manual Model Loader Section -->
-                <div class="flex items-center gap-3">
-                    <span id="model-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
-                        ● Model Not Loaded
-                    </span>
-                    <button type="button" onclick="loadModelExplicitly()" id="load-btn" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold py-2 px-3.5 rounded-lg transition shadow-sm">
-                        📥 Load Model
-                    </button>
-                </div>
+    <section class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+            <div>
+                <h2 class="text-xl font-bold text-slate-900">Run Direct ONNX Inference</h2>
+                <p class="text-sm text-slate-500">Evaluates customer satisfaction directly across all 34 model input features.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <span id="model-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                    ● Model Not Loaded
+                </span>
+                <button type="button" onclick="loadModelExplicitly()" id="load-btn" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold py-2 px-3.5 rounded-lg transition shadow-sm">
+                    📥 Load Model
+                </button>
+            </div>
+        </div>
+
+        <form id="prediction-form" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">0. customer_state</label>
+                <input type="number" step="any" id="f_0" value="0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">1. order_status</label>
+                <input type="number" step="any" id="f_1" value="0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">2. price</label>
+                <input type="number" step="any" id="f_2" value="120.53" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">3. freight_value</label>
+                <input type="number" step="any" id="f_3" value="20.03" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">4. product_category_name</label>
+                <input type="number" step="any" id="f_4" value="0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">5. product_name_lenght</label>
+                <input type="number" step="any" id="f_5" value="48.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">6. product_description_lenght</label>
+                <input type="number" step="any" id="f_6" value="770.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">7. product_photos_qty</label>
+                <input type="number" step="any" id="f_7" value="2.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">8. product_weight_g</label>
+                <input type="number" step="any" id="f_8" value="2100.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">9. product_length_cm</label>
+                <input type="number" step="any" id="f_9" value="30.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">10. product_height_cm</label>
+                <input type="number" step="any" id="f_10" value="16.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">11. product_width_cm</label>
+                <input type="number" step="any" id="f_11" value="23.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">12. seller_state</label>
+                <input type="number" step="any" id="f_12" value="0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">13. payment_sequential</label>
+                <input type="number" step="any" id="f_13" value="1" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">14. payment_type</label>
+                <input type="number" step="any" id="f_14" value="0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">15. payment_installments</label>
+                <input type="number" step="any" id="f_15" value="2.9" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">16. payment_value</label>
+                <input type="number" step="any" id="f_16" value="172.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">17. delivery_delay_days</label>
+                <input type="number" step="any" id="f_17" value="0.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">18. estimated_delivery_days</label>
+                <input type="number" step="any" id="f_18" value="24.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">19. actual_delivery_days</label>
+                <input type="number" step="any" id="f_19" value="12.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">20. freight_ratio</label>
+                <input type="number" step="any" id="f_20" value="0.16" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">21. product_volume_cm3</label>
+                <input type="number" step="any" id="f_21" value="11040.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">22. same_state</label>
+                <input type="number" step="any" id="f_22" value="1" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">23. purchase_hour</label>
+                <input type="number" step="any" id="f_23" value="14" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">24. purchase_dayofweek</label>
+                <input type="number" step="any" id="f_24" value="2" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">25. purchase_month</label>
+                <input type="number" step="any" id="f_25" value="6" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">26. is_delayed</label>
+                <input type="number" step="any" id="f_26" value="0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">27. delay_severity</label>
+                <input type="number" step="any" id="f_27" value="0.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">28. freight_per_gram</label>
+                <input type="number" step="any" id="f_28" value="0.009" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">29. price_per_volume</label>
+                <input type="number" step="any" id="f_29" value="0.01" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">30. seller_avg_delay</label>
+                <input type="number" step="any" id="f_30" value="0.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">31. seller_order_count</label>
+                <input type="number" step="any" id="f_31" value="38.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">32. cat_avg_delay</label>
+                <input type="number" step="any" id="f_32" value="0.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">33. cat_avg_freight</label>
+                <input type="number" step="any" id="f_33" value="20.03" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
             </div>
 
-            <form id="prediction-form" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">0. customer_state</label>
-                    <input type="number" step="any" id="f_0" value="0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">1. order_status</label>
-                    <input type="number" step="any" id="f_1" value="0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">2. price</label>
-                    <input type="number" step="any" id="f_2" value="120.53" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">3. freight_value</label>
-                    <input type="number" step="any" id="f_3" value="20.03" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">4. product_category_name</label>
-                    <input type="number" step="any" id="f_4" value="0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">5. product_name_lenght</label>
-                    <input type="number" step="any" id="f_5" value="48.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">6. product_description_lenght</label>
-                    <input type="number" step="any" id="f_6" value="770.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">7. product_photos_qty</label>
-                    <input type="number" step="any" id="f_7" value="2.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">8. product_weight_g</label>
-                    <input type="number" step="any" id="f_8" value="2100.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">9. product_length_cm</label>
-                    <input type="number" step="any" id="f_9" value="30.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">10. product_height_cm</label>
-                    <input type="number" step="any" id="f_10" value="16.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">11. product_width_cm</label>
-                    <input type="number" step="any" id="f_11" value="23.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">12. seller_state</label>
-                    <input type="number" step="any" id="f_12" value="0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">13. payment_sequential</label>
-                    <input type="number" step="any" id="f_13" value="1" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">14. payment_type</label>
-                    <input type="number" step="any" id="f_14" value="0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">15. payment_installments</label>
-                    <input type="number" step="any" id="f_15" value="2.9" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">16. payment_value</label>
-                    <input type="number" step="any" id="f_16" value="172.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">17. delivery_delay_days</label>
-                    <input type="number" step="any" id="f_17" value="0.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">18. estimated_delivery_days</label>
-                    <input type="number" step="any" id="f_18" value="24.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">19. actual_delivery_days</label>
-                    <input type="number" step="any" id="f_19" value="12.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">20. freight_ratio</label>
-                    <input type="number" step="any" id="f_20" value="0.16" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">21. product_volume_cm3</label>
-                    <input type="number" step="any" id="f_21" value="11040.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">22. same_state</label>
-                    <input type="number" step="any" id="f_22" value="1" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">23. purchase_hour</label>
-                    <input type="number" step="any" id="f_23" value="14" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">24. purchase_dayofweek</label>
-                    <input type="number" step="any" id="f_24" value="2" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">25. purchase_month</label>
-                    <input type="number" step="any" id="f_25" value="6" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">26. is_delayed</label>
-                    <input type="number" step="any" id="f_26" value="0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">27. delay_severity</label>
-                    <input type="number" step="any" id="f_27" value="0.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">28. freight_per_gram</label>
-                    <input type="number" step="any" id="f_28" value="0.009" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">29. price_per_volume</label>
-                    <input type="number" step="any" id="f_29" value="0.01" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">30. seller_avg_delay</label>
-                    <input type="number" step="any" id="f_30" value="0.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">31. seller_order_count</label>
-                    <input type="number" step="any" id="f_31" value="38.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">32. cat_avg_delay</label>
-                    <input type="number" step="any" id="f_32" value="0.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">33. cat_avg_freight</label>
-                    <input type="number" step="any" id="f_33" value="20.03" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
+            <div class="col-span-full pt-4">
+                <button type="button" onclick="predictSatisfaction()" id="submit-btn" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg transition shadow-sm">
+                    Run Model Prediction
+                </button>
+            </div>
+        </form>
 
-                <div class="col-span-full pt-4">
-                    <button type="button" onclick="predictSatisfaction()" id="submit-btn" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg transition shadow-sm">
-                        Run Model Prediction
-                    </button>
-                </div>
-            </form>
+        <div id="output" class="mt-6 hidden p-4 rounded-xl text-sm font-medium"></div>
+    </section>
 
-            <div id="output" class="mt-6 hidden p-4 rounded-xl text-sm font-medium"></div>
-        </section>
+</div>
 
-    </div>
-
-    <!-- Prediction Script -->
 <script>
-        let session = null;
-        const FEATURE_COUNT = 34;
-        const OPTIMAL_THRESHOLD = 0.6656; // Optuna-tuned decision boundary
+let session = null;
+const FEATURE_COUNT = 34;
+const OPTIMAL_THRESHOLD = 0.6656; // Optuna-tuned decision boundary
 
-        function updateStatusBadge(status) {
-            const badge = document.getElementById('model-badge');
-            if (status === 'loading') {
-                badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-200';
-                badge.textContent = '⏳ Loading Model...';
-            } else if (status === 'ready') {
-                badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200';
-                badge.textContent = '● Model Loaded (34 Features)';
-            } else if (status === 'error') {
-                badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700 border border-rose-200';
-                badge.textContent = '✖ Load Failed';
-            }
+function updateStatusBadge(status) {
+    const badge = document.getElementById('model-badge');
+    if (status === 'loading') {
+        badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-200';
+        badge.textContent = '⏳ Loading Model...';
+    } else if (status === 'ready') {
+        badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200';
+        badge.textContent = '● Model Loaded (34 Features)';
+    } else if (status === 'error') {
+        badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700 border border-rose-200';
+        badge.textContent = '✖ Load Failed';
+    }
+}
+
+async function initModel() {
+    if (!session) {
+        updateStatusBadge('loading');
+        session = await ort.InferenceSession.create('./lgbm_model.onnx');
+        updateStatusBadge('ready');
+    }
+    return session;
+}
+
+async function loadModelExplicitly() {
+    const loadBtn = document.getElementById('load-btn');
+    const outputDiv = document.getElementById('output');
+    loadBtn.disabled = true;
+
+    try {
+        await initModel();
+        outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-emerald-50 border border-emerald-200 text-emerald-900 block';
+        outputDiv.innerHTML = `<strong>Success:</strong> <code>lgbm_model.onnx</code> loaded into WebAssembly memory. Ready for 34-feature inputs.`;
+    } catch (err) {
+        console.error(err);
+        updateStatusBadge('error');
+        outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-rose-50 border border-rose-200 text-rose-800 block';
+        outputDiv.innerHTML = `<strong>Error loading model:</strong> ${err.message}. Ensure <code>lgbm_model.onnx</code> is present in the same directory.`;
+    } finally {
+        loadBtn.disabled = false;
+    }
+}
+
+async function predictSatisfaction() {
+    const outputDiv = document.getElementById('output');
+    const submitBtn = document.getElementById('submit-btn');
+
+    outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-slate-100 text-slate-700 block';
+    outputDiv.innerHTML = "Executing inference on 34-feature input vector...";
+    submitBtn.disabled = true;
+
+    try {
+        const model = await initModel();
+
+        // Read all 34 inputs directly
+        const features = new Float32Array(FEATURE_COUNT);
+        for (let i = 0; i < FEATURE_COUNT; i++) {
+            const inputElem = document.getElementById(`f_${i}`);
+            features[i] = inputElem ? parseFloat(inputElem.value) || 0.0 : 0.0;
         }
 
-        async function initModel() {
-            if (!session) {
-                updateStatusBadge('loading');
-                session = await ort.InferenceSession.create('./lgbm_model.onnx');
-                updateStatusBadge('ready');
-            }
-            return session;
+        const inputTensor = new ort.Tensor('float32', features, [1, FEATURE_COUNT]);
+        const feeds = { float_input: inputTensor };
+
+        // Execute inference across output nodes
+        const results = await model.run(feeds);
+
+        // Probability tensor name is at index 1 (standard ONNX ML pipeline output without ZipMap)
+        const probaOutputName = model.outputNames[1] || model.outputNames[0];
+        const probaData = results[probaOutputName].data;
+        
+        // Probability of Class 1 (Satisfied) vs Class 0 (Unsatisfied)
+        const probaSatisfied = probaData.length > 1 ? probaData[1] : probaData[0];
+        const probaUnsatisfied = probaData.length > 1 ? probaData[0] : (1.0 - probaSatisfied);
+
+        // Decision thresholding against 0.6656
+        if (probaSatisfied >= OPTIMAL_THRESHOLD) {
+            outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-emerald-50 border border-emerald-200 text-emerald-900 block';
+            outputDiv.innerHTML = `
+                <strong>Result:</strong> Satisfied Customer (Class 1)<br>
+                <span class="text-xs text-emerald-700">
+                    Satisfaction Score: <strong>${(probaSatisfied * 100).toFixed(2)}%</strong> (Threshold: ${(OPTIMAL_THRESHOLD * 100).toFixed(2)}%)
+                </span>
+            `;
+        } else {
+            outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-amber-50 border border-amber-200 text-amber-900 block';
+            outputDiv.innerHTML = `
+                <strong>Result:</strong> Unsatisfied Customer (Class 0)<br>
+                <span class="text-xs text-amber-800">
+                    Satisfaction Score: <strong>${(probaSatisfied * 100).toFixed(2)}%</strong> (Threshold: ${(OPTIMAL_THRESHOLD * 100).toFixed(2)}%) | Dissatisfaction Risk: <strong>${(probaUnsatisfied * 100).toFixed(2)}%</strong>
+                </span>
+            `;
         }
 
-        async function loadModelExplicitly() {
-            const loadBtn = document.getElementById('load-btn');
-            const outputDiv = document.getElementById('output');
-            loadBtn.disabled = true;
-
-            try {
-                await initModel();
-                outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-emerald-50 border border-emerald-200 text-emerald-900 block';
-                outputDiv.innerHTML = `<strong>Success:</strong> <code>lgbm_model.onnx</code> loaded into WebAssembly memory. Ready for 34-feature inputs.`;
-            } catch (err) {
-                console.error(err);
-                updateStatusBadge('error');
-                outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-rose-50 border border-rose-200 text-rose-800 block';
-                outputDiv.innerHTML = `<strong>Error loading model:</strong> ${err.message}.`;
-            } finally {
-                loadBtn.disabled = false;
-            }
-        }
-
-        async function predictSatisfaction() {
-            const outputDiv = document.getElementById('output');
-            const submitBtn = document.getElementById('submit-btn');
-
-            outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-slate-100 text-slate-700 block';
-            outputDiv.innerHTML = "Executing inference on 34-feature input vector...";
-            submitBtn.disabled = true;
-
-            try {
-                const model = await initModel();
-
-                // Read all 34 inputs directly
-                const features = new Float32Array(FEATURE_COUNT);
-                for (let i = 0; i < FEATURE_COUNT; i++) {
-                    const inputElem = document.getElementById(`f_${i}`);
-                    features[i] = inputElem ? parseFloat(inputElem.value) || 0.0 : 0.0;
-                }
-
-                const inputTensor = new ort.Tensor('float32', features, [1, FEATURE_COUNT]);
-                const feeds = { float_input: inputTensor };
-
-                // Execute inference across all output nodes
-                const results = await model.run(feeds);
-
-                // Probability tensor name is at index 1
-                const probaOutputName = model.outputNames[1];
-                const probaData = results[probaOutputName].data;
-                const probaSatisfied = probaData[1]; // Probability of Class 1 (Satisfied)
-                const probaUnsatisfied = probaData[0]; // Probability of Class 0 (Unsatisfied)
-
-                // Decision thresholding against 0.6656
-                if (probaSatisfied >= OPTIMAL_THRESHOLD) {
-                    outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-emerald-50 border border-emerald-200 text-emerald-900 block';
-                    outputDiv.innerHTML = `
-                        <strong>Result:</strong> Satisfied Customer (Class 1)<br>
-                        <span class="text-xs text-emerald-700">
-                            Satisfaction Score: <strong>${(probaSatisfied * 100).toFixed(2)}%</strong> (Threshold: ${(OPTIMAL_THRESHOLD * 100).toFixed(2)}%)
-                        </span>
-                    `;
-                } else {
-                    outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-amber-50 border border-amber-200 text-amber-900 block';
-                    outputDiv.innerHTML = `
-                        <strong>Result:</strong> Unsatisfied Customer (Class 0)<br>
-                        <span class="text-xs text-amber-800">
-                            Satisfaction Score: <strong>${(probaSatisfied * 100).toFixed(2)}%</strong> (Threshold: ${(OPTIMAL_THRESHOLD * 100).toFixed(2)}%) | Dissatisfaction Risk: <strong>${(probaUnsatisfied * 100).toFixed(2)}%</strong>
-                        </span>
-                    `;
-                }
-
-            } catch (err) {
-                console.error(err);
-                outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-rose-50 border border-rose-200 text-rose-800 block';
-                outputDiv.innerHTML = `<strong>Inference Error:</strong> ${err.message}`;
-            } finally {
-                submitBtn.disabled = false;
-            }
-        }
-    </script>
+    } catch (err) {
+        console.error(err);
+        outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-rose-50 border border-rose-200 text-rose-800 block';
+        outputDiv.innerHTML = `<strong>Inference Error:</strong> ${err.message}`;
+    } finally {
+        submitBtn.disabled = false;
+    }
+}
+</script>
 </body>
 </html>
