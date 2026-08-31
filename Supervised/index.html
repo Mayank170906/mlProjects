@@ -16,7 +16,7 @@
         <!-- Header -->
         <header class="text-center py-6">
             <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Brazilian E-Commerce Machine Learning</h1>
-            <p class="text-slate-600 mt-2 text-lg">Predictive satisfaction modeling & analytics powered by LightGBM and ONNX Web.</p>
+            <p class="text-slate-600 mt-2 text-lg">Customer Satisfaction Prediction (LightGBM ONNX Model)</p>
         </header>
 
         <!-- Project Links & Artifacts -->
@@ -26,53 +26,53 @@
                 <a href="./ecommerce_dashboard.html" class="p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-500 hover:shadow-md transition">
                     <span class="text-2xl">📊</span>
                     <h3 class="font-semibold text-slate-900 mt-2">Analytics Dashboard</h3>
-                    <p class="text-xs text-slate-500 mt-1">Interactive operational & sales dashboard.</p>
+                    <p class="text-xs text-slate-500 mt-1">Operational & sales metrics.</p>
                 </a>
                 <a href="./merge_data.html" class="p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-500 hover:shadow-md transition">
                     <span class="text-2xl">🔗</span>
                     <h3 class="font-semibold text-slate-900 mt-2">Data Merging</h3>
-                    <p class="text-xs text-slate-500 mt-1">Multi-table relational data pipeline.</p>
+                    <p class="text-xs text-slate-500 mt-1">Relational dataset merge pipeline.</p>
                 </a>
                 <a href="./data-analysys.html" class="p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-500 hover:shadow-md transition">
                     <span class="text-2xl">📈</span>
                     <h3 class="font-semibold text-slate-900 mt-2">EDA & Cleaning</h3>
-                    <p class="text-xs text-slate-500 mt-1">Feature engineering & statistical distributions.</p>
+                    <p class="text-xs text-slate-500 mt-1">Statistical analysis & cleaning.</p>
                 </a>
                 <a href="./lgbm_model.onnx" download class="p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-500 hover:shadow-md transition">
                     <span class="text-2xl">🧠</span>
                     <h3 class="font-semibold text-slate-900 mt-2">ONNX Weights</h3>
-                    <p class="text-xs text-slate-500 mt-1">Trained binary classifier weights.</p>
+                    <p class="text-xs text-slate-500 mt-1">Compiled LightGBM 34-dim model.</p>
                 </a>
             </div>
         </section>
 
-        <!-- Training Summary Report -->
+        <!-- Model Pipeline & Performance -->
         <section class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
             <h2 class="text-xl font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">Model Pipeline & Performance</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
                 <div>
-                    <h4 class="font-semibold text-slate-900 mb-1">1. Data Engineering</h4>
-                    <p class="text-slate-600">Joined 9 relational tables (~117k rows). Engineered key features: <code class="bg-slate-100 px-1 py-0.5 rounded text-xs">approval_time</code>, <code class="bg-slate-100 px-1 py-0.5 rounded text-xs">demand_category</code>, and <code class="bg-slate-100 px-1 py-0.5 rounded text-xs">on_time_delivery</code>.</p>
+                    <h4 class="font-semibold text-slate-900 mb-1">1. Feature Engineering</h4>
+                    <p class="text-slate-600">Generated spatial, temporal, dimension-based, and delivery metrics (34 active numerical & categorical features).</p>
                 </div>
                 <div>
                     <h4 class="font-semibold text-slate-900 mb-1">2. LightGBM & Optuna</h4>
-                    <p class="text-slate-600">GBDT binary classifier tuned via Optuna (694 estimators, max_depth 10, learning rate 0.062) optimized on ROC-AUC.</p>
+                    <p class="text-slate-600">Tuned GBDT classifier across 694 estimators, 127 leaves, and depth 10 optimizing ROC-AUC score.</p>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-slate-900 mb-1">3. Decision Thresholding</h4>
-                    <p class="text-slate-600">Evaluated on a leakage-free test set. Calibrated decision thresholds via Precision-Recall curves to optimize satisfaction F1-score.</p>
+                    <h4 class="font-semibold text-slate-900 mb-1">3. Optimized Decision Bound</h4>
+                    <p class="text-slate-600">Precision-Recall curve calibration finding the maximum F1-score threshold for satisfaction classification.</p>
                 </div>
             </div>
         </section>
 
-        <!-- Live Browser Prediction Tool -->
+        <!-- Browser Inference Tool -->
         <section class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
                 <div>
                     <h2 class="text-xl font-bold text-slate-900">Run Inference in Browser</h2>
-                    <p class="text-sm text-slate-500">Evaluates customer satisfaction directly on-device using ONNX Runtime Web.</p>
+                    <p class="text-sm text-slate-500">Evaluates satisfaction across all 34 features client-side via ONNX Runtime Web.</p>
                 </div>
-                <!-- Manual Model Loader Section -->
+                <!-- Model Loader Controls -->
                 <div class="flex items-center gap-3">
                     <span id="model-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
                         ● Model Not Loaded
@@ -84,6 +84,8 @@
             </div>
 
             <form id="prediction-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                <!-- Financials -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Price (R$)</label>
                     <input type="number" step="0.01" id="price" value="120.50" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
@@ -95,23 +97,13 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Total Payment (R$)</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Payment Value (R$)</label>
                     <input type="number" step="0.01" id="payment_value" value="140.50" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Installments</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Payment Installments</label>
                     <input type="number" id="payment_installments" value="2" min="1" max="24" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Approval Time (Hours)</label>
-                    <input type="number" step="0.1" id="approval_time" value="10.5" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Review Response (Hours)</label>
-                    <input type="number" step="0.1" id="review_response_time" value="24.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
                 </div>
 
                 <div>
@@ -125,22 +117,70 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Demand Tier</label>
-                    <select id="demand_category" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500">
-                        <option value="4">Very High Demand</option>
-                        <option value="3">High Demand</option>
-                        <option value="2">Medium Demand</option>
-                        <option value="1">Low Demand</option>
-                        <option value="0">Very Low Demand</option>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Payment Sequential</label>
+                    <input type="number" id="payment_sequential" value="1" min="1" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+                </div>
+
+                <!-- Delivery Metrics -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Estimated Days</label>
+                    <input type="number" step="0.1" id="estimated_delivery_days" value="18.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Actual Delivery Days</label>
+                    <input type="number" step="0.1" id="actual_delivery_days" value="12.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Delivery Delay (Days)</label>
+                    <input type="number" step="0.1" id="delivery_delay_days" value="0.0" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+                </div>
+
+                <!-- Product Attributes -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Weight (grams)</label>
+                    <input type="number" step="1" id="product_weight_g" value="650" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Dimensions L × H × W (cm)</label>
+                    <div class="grid grid-cols-3 gap-1">
+                        <input type="number" id="product_length_cm" value="20" placeholder="L" class="border border-slate-300 rounded-lg px-2 py-2 text-sm focus:outline-blue-500">
+                        <input type="number" id="product_height_cm" value="15" placeholder="H" class="border border-slate-300 rounded-lg px-2 py-2 text-sm focus:outline-blue-500">
+                        <input type="number" id="product_width_cm" value="15" placeholder="W" class="border border-slate-300 rounded-lg px-2 py-2 text-sm focus:outline-blue-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Product Description Length</label>
+                    <input type="number" id="product_description_lenght" value="400" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
+                </div>
+
+                <!-- Location & Seller Aggregates -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Customer State</label>
+                    <select id="customer_state" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500">
+                        <option value="0">SP (São Paulo)</option>
+                        <option value="1">RJ (Rio de Janeiro)</option>
+                        <option value="2">MG (Minas Gerais)</option>
+                        <option value="3">Other State</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">On-Time Delivery?</label>
-                    <select id="on_time_delivery" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500">
-                        <option value="1">Yes (On-Time)</option>
-                        <option value="0">No (Late)</option>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Seller State</label>
+                    <select id="seller_state" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500">
+                        <option value="0">SP (São Paulo)</option>
+                        <option value="1">RJ (Rio de Janeiro)</option>
+                        <option value="2">MG (Minas Gerais)</option>
+                        <option value="3">Other State</option>
                     </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Seller Order Count</label>
+                    <input type="number" id="seller_order_count" value="38" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-blue-500" required>
                 </div>
 
                 <div class="md:col-span-3 pt-2">
@@ -155,18 +195,19 @@
 
     </div>
 
-    <!-- Prediction Script -->
+    <!-- ONNX Runtime Execution Script -->
     <script>
         let session = null;
+        const FEATURE_COUNT = 34;
 
-        function updateStatusBadge(status, text) {
+        function updateStatusBadge(status) {
             const badge = document.getElementById('model-badge');
             if (status === 'loading') {
                 badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-200';
                 badge.textContent = '⏳ Loading Model...';
             } else if (status === 'ready') {
                 badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200';
-                badge.textContent = '● Model Loaded';
+                badge.textContent = '● Model Loaded (34 Features)';
             } else if (status === 'error') {
                 badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700 border border-rose-200';
                 badge.textContent = '✖ Load Failed';
@@ -176,7 +217,6 @@
         async function initModel() {
             if (!session) {
                 updateStatusBadge('loading');
-                // Relative path resolves cleanly on GitHub Pages
                 session = await ort.InferenceSession.create('./lgbm_model.onnx');
                 updateStatusBadge('ready');
             }
@@ -191,64 +231,104 @@
             try {
                 await initModel();
                 outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-emerald-50 border border-emerald-200 text-emerald-900 block';
-                outputDiv.innerHTML = `<strong>Success:</strong> <code>lgbm_model.onnx</code> loaded into WebAssembly runtime memory and ready for predictions.`;
+                outputDiv.innerHTML = `<strong>Success:</strong> <code>lgbm_model.onnx</code> loaded. Tensor input dimensions: [1, 34].`;
             } catch (err) {
                 console.error(err);
                 updateStatusBadge('error');
                 outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-rose-50 border border-rose-200 text-rose-800 block';
-                outputDiv.innerHTML = `<strong>Error loading model:</strong> ${err.message}. Verify that <code>lgbm_model.onnx</code> exists in the root folder.`;
+                outputDiv.innerHTML = `<strong>Error loading model:</strong> ${err.message}. Ensure <code>lgbm_model.onnx</code> is in this folder.`;
             } finally {
                 loadBtn.disabled = false;
             }
         }
+async function predictSatisfaction() {
+    const outputDiv = document.getElementById('output');
+    const submitBtn = document.getElementById('submit-btn');
 
-        async function predictSatisfaction() {
-            const outputDiv = document.getElementById('output');
-            const submitBtn = document.getElementById('submit-btn');
+    outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-slate-100 text-slate-700 block';
+    outputDiv.innerHTML = "Executing inference on 34-feature vector...";
+    submitBtn.disabled = true;
 
-            outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-slate-100 text-slate-700 block';
-            outputDiv.innerHTML = "Preparing tensor inputs and executing model...";
-            submitBtn.disabled = true;
+    try {
+        const model = await initModel();
 
-            try {
-                const model = await initModel();
+        // 1. Gather raw form values
+        const customerState = parseFloat(document.getElementById('customer_state').value) || 0;
+        const orderStatus = 0;
+        const price = parseFloat(document.getElementById('price').value) || 120.0;
+        const freightValue = parseFloat(document.getElementById('freight_value').value) || 20.0;
+        const productCategoryName = 0;
+        const productNameLength = 40;
+        const productDescLength = parseFloat(document.getElementById('product_description_lenght').value) || 400;
+        const productPhotosQty = 1;
+        const productWeightG = parseFloat(document.getElementById('product_weight_g').value) || 500;
+        const lengthCm = parseFloat(document.getElementById('product_length_cm').value) || 20;
+        const heightCm = parseFloat(document.getElementById('product_height_cm').value) || 15;
+        const widthCm = parseFloat(document.getElementById('product_width_cm').value) || 15;
+        const sellerState = parseFloat(document.getElementById('seller_state').value) || 0;
+        const paymentSequential = parseFloat(document.getElementById('payment_sequential').value) || 1;
+        const paymentType = parseFloat(document.getElementById('payment_type').value) || 0;
+        const paymentInstallments = parseFloat(document.getElementById('payment_installments').value) || 1;
+        const paymentValue = parseFloat(document.getElementById('payment_value').value) || 140.0;
+        const deliveryDelayDays = parseFloat(document.getElementById('delivery_delay_days').value) || 0.0;
+        const estimatedDays = parseFloat(document.getElementById('estimated_delivery_days').value) || 18.0;
+        const actualDays = parseFloat(document.getElementById('actual_delivery_days').value) || 12.0;
 
-                // Build input vector in training feature order
-                const features = [
-                    parseFloat(document.getElementById('price').value) || 0.0,
-                    parseFloat(document.getElementById('freight_value').value) || 0.0,
-                    parseFloat(document.getElementById('payment_type').value) || 0.0,
-                    parseFloat(document.getElementById('payment_installments').value) || 1.0,
-                    parseFloat(document.getElementById('payment_value').value) || 0.0,
-                    parseFloat(document.getElementById('on_time_delivery').value) || 1.0,
-                    parseFloat(document.getElementById('approval_time').value) || 0.0,
-                    parseFloat(document.getElementById('demand_category').value) || 0.0,
-                    parseFloat(document.getElementById('review_response_time').value) || 0.0
-                ];
+        // 2. Derive engineered attributes
+        const freightRatio = freightValue / (price + 0.0001);
+        const productVolumeCm3 = lengthCm * heightCm * widthCm;
+        const sameState = (customerState === sellerState) ? 1.0 : 0.0;
+        const purchaseHour = 14.0;
+        const purchaseDayofweek = 2.0;
+        const purchaseMonth = 6.0;
+        const isDelayed = (deliveryDelayDays > 0) ? 1.0 : 0.0;
+        const delaySeverity = Math.max(0, deliveryDelayDays);
+        const freightPerGram = freightValue / (productWeightG + 0.0001);
+        const pricePerVolume = price / (productVolumeCm3 + 0.0001);
+        const sellerAvgDelay = 0.0;
+        const sellerOrderCount = parseFloat(document.getElementById('seller_order_count').value) || 38.0;
+        const catAvgDelay = 0.0;
+        const catAvgFreight = 20.03;
 
-                const inputTensor = new ort.Tensor('float32', Float32Array.from(features), [1, features.length]);
-                const feeds = { float_input: inputTensor };
-                const results = await model.run(feeds);
+        // 3. Exact 34-feature vector
+        const featureVector = [
+            customerState, orderStatus, price, freightValue, productCategoryName,
+            productNameLength, productDescLength, productPhotosQty, productWeightG,
+            lengthCm, heightCm, widthCm, sellerState, paymentSequential, paymentType,
+            paymentInstallments, paymentValue, deliveryDelayDays, estimatedDays,
+            actualDays, freightRatio, productVolumeCm3, sameState, purchaseHour,
+            purchaseDayofweek, purchaseMonth, isDelayed, delaySeverity,
+            freightPerGram, pricePerVolume, sellerAvgDelay, sellerOrderCount,
+            catAvgDelay, catAvgFreight
+        ];
 
-                const labelKey = model.outputNames[0];
-                const predictedLabel = results[labelKey]?.data[0] ?? 0;
-                
-                if (predictedLabel === 1) {
-                    outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-emerald-50 border border-emerald-200 text-emerald-900 block';
-                    outputDiv.innerHTML = `<strong>Result:</strong> Positive / Satisfied Customer (Class 1)`;
-                } else {
-                    outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-amber-50 border border-amber-200 text-amber-900 block';
-                    outputDiv.innerHTML = `<strong>Result:</strong> Risk of Negative / Dissatisfied Review (Class 0)`;
-                }
+        const inputTensor = new ort.Tensor('float32', Float32Array.from(featureVector), [1, FEATURE_COUNT]);
+        const feeds = { float_input: inputTensor };
 
-            } catch (err) {
-                console.error(err);
-                outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-rose-50 border border-rose-200 text-rose-800 block';
-                outputDiv.innerHTML = `<strong>Inference Error:</strong> ${err.message}.`;
-            } finally {
-                submitBtn.disabled = false;
-            }
+        // Request ONLY the label output name (index 0) to avoid reading non-tensor probability map
+        const labelOutputName = model.outputNames[0];
+        const results = await model.run(feeds, [labelOutputName]);
+
+        // Access the tensor safely (handles BigInt64Array and Int32Array)
+        const rawLabel = results[labelOutputName].data[0];
+        const predictedLabel = Number(rawLabel);
+
+        if (predictedLabel === 1) {
+            outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-emerald-50 border border-emerald-200 text-emerald-900 block';
+            outputDiv.innerHTML = `<strong>Result:</strong> Satisfied Customer (Class 1)`;
+        } else {
+            outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-amber-50 border border-amber-200 text-amber-900 block';
+            outputDiv.innerHTML = `<strong>Result:</strong> Unsatisfied Customer (Class 0)`;
         }
+
+    } catch (err) {
+        console.error(err);
+        outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-rose-50 border border-rose-200 text-rose-800 block';
+        outputDiv.innerHTML = `<strong>Inference Error:</strong> ${err.message}`;
+    } finally {
+        submitBtn.disabled = false;
+    }
+}
     </script>
 </body>
 </html>
