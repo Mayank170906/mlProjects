@@ -235,9 +235,10 @@
     </div>
 
     <!-- Prediction Script -->
-    <script>
+<script>
         let session = null;
         const FEATURE_COUNT = 34;
+        const OPTIMAL_THRESHOLD = 0.6656; // Optuna-tuned decision boundary
 
         function updateStatusBadge(status) {
             const badge = document.getElementById('model-badge');
@@ -302,19 +303,32 @@
                 const inputTensor = new ort.Tensor('float32', features, [1, FEATURE_COUNT]);
                 const feeds = { float_input: inputTensor };
 
-                // Request label output only to avoid non-tensor Map errors on index 1
-                const labelOutputName = model.outputNames[0];
-                const results = await model.run(feeds, [labelOutputName]);
+                // Execute inference across all output nodes
+                const results = await model.run(feeds);
 
-                const rawLabel = results[labelOutputName].data[0];
-                const predictedLabel = Number(rawLabel);
-                
-                if (predictedLabel === 1) {
+                // Probability tensor name is at index 1
+                const probaOutputName = model.outputNames[1];
+                const probaData = results[probaOutputName].data;
+                const probaSatisfied = probaData[1]; // Probability of Class 1 (Satisfied)
+                const probaUnsatisfied = probaData[0]; // Probability of Class 0 (Unsatisfied)
+
+                // Decision thresholding against 0.6656
+                if (probaSatisfied >= OPTIMAL_THRESHOLD) {
                     outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-emerald-50 border border-emerald-200 text-emerald-900 block';
-                    outputDiv.innerHTML = `<strong>Result:</strong> Satisfied Customer (Class 1)`;
+                    outputDiv.innerHTML = `
+                        <strong>Result:</strong> Satisfied Customer (Class 1)<br>
+                        <span class="text-xs text-emerald-700">
+                            Satisfaction Score: <strong>${(probaSatisfied * 100).toFixed(2)}%</strong> (Threshold: ${(OPTIMAL_THRESHOLD * 100).toFixed(2)}%)
+                        </span>
+                    `;
                 } else {
                     outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-amber-50 border border-amber-200 text-amber-900 block';
-                    outputDiv.innerHTML = `<strong>Result:</strong> Unsatisfied Customer (Class 0)`;
+                    outputDiv.innerHTML = `
+                        <strong>Result:</strong> Unsatisfied Customer (Class 0)<br>
+                        <span class="text-xs text-amber-800">
+                            Satisfaction Score: <strong>${(probaSatisfied * 100).toFixed(2)}%</strong> (Threshold: ${(OPTIMAL_THRESHOLD * 100).toFixed(2)}%) | Dissatisfaction Risk: <strong>${(probaUnsatisfied * 100).toFixed(2)}%</strong>
+                        </span>
+                    `;
                 }
 
             } catch (err) {
