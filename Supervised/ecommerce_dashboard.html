@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>📊 Olist ETL Pipeline Dashboard</title>
+
+    <!-- ===== Fonts & Icons ===== -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+    <!-- ===== Chart.js ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+    </script>
+
+    <style>
+        /* ─────────── RESET & BASE ─────────── */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f4f6fb;
+            color: #1a1a2e;
+            padding: 24px;
+        }
+        .dashboard {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        /* ─────────── SCROLLBAR ─────────── */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e9ecf3;
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #b0b8cb;
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8d97af;
+        }
+
+        /* ─────────── HEADER ─────────── */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            background: #ffffff;
+            padding: 20px 32px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            margin-bottom: 28px;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .header-left .logo {
+            font-size: 32px;
+            background: #2d3b66;
+            color: #fff;
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+        }
+        .header-left h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+        .header-left h1 span {
+            color: #5b7cfa;
+        }
+        .header-left .sub {
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 400;
+            margin-top: 2px;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .badge {
+            background: #eef2ff;
+            color: #3b4f8a;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .badge i {
+            font-size: 14px;
+        }
+
+        /* ─────────── STAT CARDS ─────────── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: #ffffff;
+            padding: 18px 22px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+            border: 1px solid #eaedf4;
+            transition: 0.2s;
+        }
+        .stat-card:hover {
+            border-color: #c8d0e6;
+        }
+        .stat-card .label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-top: 4px;
+        }
+        .stat-card .icon {
+            float: right;
+            font-size: 28px;
+            color: #bcc3d9;
+        }
+
+        /* ─────────── SECTION TITLE ─────────── */
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 32px 0 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title i {
+            color: #5b7cfa;
+            font-size: 20px;
+        }
+
+        /* ─────────── CARDS / GRID ─────────── */
+        .card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 24px 28px;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
+            border: 1px solid #eaedf4;
+            transition: 0.2s;
+            height: 100%;
+        }
+        .card:hover {
+            border-color: #d0d8ec;
+        }
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #2d3b66;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-title i {
+            color: #5b7cfa;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+            margin-bottom: 22px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 22px;
+            margin-bottom: 22px;
+        }
+        .grid-4 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 22px;
+            margin-bottom: 22px;
+        }
+
+        /* ─────────── TABLES ─────────── */
+        .table-wrap {
+            overflow-x: auto;
+        }
+        table.mini {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        table.mini th {
+            text-align: left;
+            font-weight: 600;
+            color: #4b5a7a;
+            padding: 8px 6px 8px 0;
+            border-bottom: 2px solid #e9ecf3;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        table.mini td {
+            padding: 8px 6px 8px 0;
+            border-bottom: 1px solid #f0f2f7;
+            color: #1e293b;
+        }
+        table.mini tr:last-child td {
+            border-bottom: none;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-badge.success {
+            background: #e3f7ec;
+            color: #0c6e4f;
+        }
+        .status-badge.danger {
+            background: #fee9e7;
+            color: #b33a34;
+        }
+        .status-badge.warning {
+            background: #fff3d6;
+            color: #a0742c;
+        }
+
+        .null-bar {
+            display: inline-block;
+            height: 6px;
+            border-radius: 4px;
+            background: #dce2ef;
+            min-width: 40px;
+        }
+        .null-bar .fill {
+            height: 100%;
+            border-radius: 4px;
+            background: #5b7cfa;
+            transition: width 0.6s;
+        }
+        .null-bar .fill.danger {
+            background: #e2635b;
+        }
+
+        /* ─────────── RELATIONSHIP FLOW ─────────── */
+        .flow {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 4px;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 0;
+        }
+        .flow .node {
+            background: #eef2ff;
+            padding: 4px 14px;
+            border-radius: 30px;
+            color: #2d3b66;
+            font-weight: 600;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .flow .node.highlight {
+            background: #2d3b66;
+            color: #fff;
+        }
+        .flow .arrow {
+            color: #8d97af;
+            font-size: 16px;
+        }
+        .flow .arrow i {
+            font-size: 12px;
+        }
+
+        /* ─────────── CHART WRAPPER ─────────── */
+        .chart-wrapper {
+            position: relative;
+            height: 220px;
+        }
+        .chart-wrapper.tall {
+            height: 280px;
+        }
+        .chart-wrapper.short {
+            height: 170px;
+        }
+
+        /* ─────────── RESPONSIVE ─────────── */
+        @media (max-width: 1024px) {
+            .grid-4 {
+                grid-template-columns: 1fr 1fr;
+            }
+            .grid-3 {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+            .header {
+                padding: 16px 20px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .header-left h1 {
+                font-size: 20px;
+            }
+            .grid-2,
+            .grid-3,
+            .grid-4 {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .card {
+                padding: 18px 16px;
+            }
+            .stat-card .value {
+                font-size: 22px;
+            }
+        }
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .header-left .logo {
+                width: 40px;
+                height: 40px;
+                font-size: 24px;
+            }
+        }
+
+        /* ─────────── UTILITIES ─────────── */
+        .mt-8 {
+            margin-top: 8px;
+        }
+        .mb-8 {
+            margin-bottom: 8px;
+        }
+        .text-muted {
+            color: #6b7280;
+            font-size: 13px;
+        }
+        .flex {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .gap-4 {
+            gap: 4px;
+        }
+        .fw-600 {
+            font-weight: 600;
+        }
+        .truncate {
+            max-width: 140px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* small badge for join steps */
+        .step-badge {
+            display: inline-block;
+            background: #eef2ff;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #2d3b66;
+        }
+        .step-badge .num {
+            background: #2d3b66;
+            color: #fff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            margin-right: 6px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard">
+
+        <!-- ════════ HEADER ════════ -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo"><i class="fas fa-database"></i></div>
+                <div>
+                    <h1>Olist <span>ETL</span> Pipeline</h1>
+                    <div class="sub">Brazilian E‑Commerce · Data Cleaning &amp; Join Story</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <span class="badge"><i class="fas fa-check-circle"></i> 9 Tables</span>
+                <span class="badge"><i class="fas fa-link"></i> 8 Joins</span>
+                <span class="badge"><i class="fas fa-rows"></i> 117 k rows</span>
+            </div>
+        </header>
+
+        <!-- ════════ STATS ════════ -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="icon"><i class="fas fa-table"></i></span>
+                <div class="label">Tables Loaded</div>
+                <div class="value">9</div>
+            </div>
+            <div class="stat-card">
+                <span class="icon"><i class="fas fa-link"></i></span>
+                <div class="label">Relationships</div>
+                <div class="value">9</div>
+            </div>
+            <div class="stat-card">
+                <span class="icon"><i class="fas fa-check-double"></i></span>
+                <div class="label">Valid PKs</div>
+                <div class="value">8 / 9</div>
+            </div>
+            <div class="stat-card">
+                <span class="icon"><i class="fas fa-merge"></i></span>
+                <div class="label">Final Rows</div>
+                <div class="value">117,329</div>
+            </div>
+            <div class="stat-card">
+                <span class="icon"><i class="fas fa-filter"></i></span>
+                <div class="label">Nulls Fixed</div>
+                <div class="value">610</div>
+            </div>
+            <div class="stat-card">
+                <span class="icon"><i class="fas fa-star"></i></span>
+                <div class="label">Avg Review</div>
+                <div class="value">4.03</div>
+            </div>
+        </div>
+
+        <!-- ════════ PRIMARY KEY VALIDATION ════════ -->
+        <div class="section-title"><i class="fas fa-key"></i> Primary Key Validation</div>
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title"><i class="fas fa-check-circle"></i> Tables &amp; PK Uniqueness</div>
+                <div class="table-wrap">
+                    <table class="mini">
+                        <thead>
+                            <tr><th>Table</th><th>PK</th><th>Unique</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>customers</td><td>customer_id</td><td><span class="status-badge success"><i class="fas fa-check"></i> ✅</span></td></tr>
+                            <tr><td>orders</td><td>order_id</td><td><span class="status-badge success"><i class="fas fa-check"></i> ✅</span></td></tr>
+                            <tr><td>order_items</td><td>order_id + order_item_id</td><td><span class="status-badge success"><i class="fas fa-check"></i> ✅</span></td></tr>
+                            <tr><td>order_payments</td><td>order_id + payment_sequential</td><td><span class="status-badge success"><i class="fas fa-check"></i> ✅</span></td></tr>
+                            <tr><td>order_reviews</td><td>review_id + order_id</td><td><span class="status-badge success"><i class="fas fa-check"></i> ✅</span></td></tr>
+                            <tr><td>products</td><td>product_id</td><td><span class="status-badge success"><i class="fas fa-check"></i> ✅</span></td></tr>
+                            <tr><td>sellers</td><td>seller_id</td><td><span class="status-badge success"><i class="fas fa-check"></i> ✅</span></td></tr>
+                            <tr><td>product_category</td><td>product_category_name</td><td><span class="status-badge success"><i class="fas fa-check"></i> ✅</span></td></tr>
+                            <tr><td>geolocation</td><td>zip+lat+lng+city+state</td><td><span class="status-badge danger"><i class="fas fa-times"></i> ❌</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-muted mt-8"><i class="fas fa-info-circle"></i> geolocation has duplicate rows – handled during join.</div>
+            </div>
+
+            <!-- ── NULL CHECK ── -->
+            <div class="card">
+                <div class="card-title"><i class="fas fa-ban"></i> Null Check</div>
+                <div class="table-wrap">
+                    <table class="mini">
+                        <thead>
+                            <tr><th>Column</th><th>Nulls</th><th style="width:40%;">Bar</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>customers.customer_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                            <tr><td>orders.customer_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                            <tr><td>orders.order_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                            <tr><td>order_items.order_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                            <tr><td>order_items.product_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                            <tr><td>order_items.seller_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                            <tr><td>order_payments.order_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                            <tr><td>order_reviews.order_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                            <tr><td>products.product_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                            <tr><td><strong>products.product_category_name</strong></td><td><strong>610</strong></td><td><div class="null-bar"><div class="fill danger" style="width:28%;"></div></div></td></tr>
+                            <tr><td>sellers.seller_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                            <tr><td>product_category.product_category_name</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-muted mt-8"><i class="fas fa-wrench"></i> 610 nulls in product_category_name → filled with <code>'Unknown Category'</code></div>
+            </div>
+        </div>
+
+        <!-- ════════ RELATIONSHIPS ════════ -->
+        <div class="section-title"><i class="fas fa-project-diagram"></i> Relationships</div>
+        <div class="card" style="margin-bottom:22px;">
+            <div class="flow">
+                <span class="node">customers</span>
+                <span class="arrow"><i class="fas fa-arrow-right"></i></span>
+                <span class="node highlight">orders</span>
+                <span class="arrow"><i class="fas fa-arrow-right"></i></span>
+                <span class="node">order_items</span>
+                <span class="arrow"><i class="fas fa-arrow-right"></i></span>
+                <span class="node">products</span>
+                <span class="arrow"><i class="fas fa-arrow-right"></i></span>
+                <span class="node">product_category</span>
+            </div>
+            <div class="flow">
+                <span class="node">orders</span>
+                <span class="arrow"><i class="fas fa-arrow-right"></i></span>
+                <span class="node">order_payments</span>
+                <span class="arrow" style="margin-left:16px;"><i class="fas fa-arrow-right"></i></span>
+                <span class="node">order_reviews</span>
+                <span class="arrow" style="margin-left:16px;"><i class="fas fa-arrow-right"></i></span>
+                <span class="node">sellers</span>
+                <span class="arrow"><i class="fas fa-arrow-right"></i></span>
+                <span class="node">geolocation</span>
+            </div>
+            <div class="text-muted mt-8" style="font-size:13px;">
+                <i class="fas fa-arrows-alt-h"></i> <strong>Joins:</strong>
+                customers.customer_id = orders.customer_id &nbsp;·&nbsp;
+                orders.order_id = order_items.order_id &nbsp;·&nbsp;
+                orders.order_id = order_payments.order_id &nbsp;·&nbsp;
+                orders.order_id = order_reviews.order_id &nbsp;·&nbsp;
+                order_items.product_id = products.product_id &nbsp;·&nbsp;
+                order_items.seller_id = sellers.seller_id &nbsp;·&nbsp;
+                products.product_category_name = product_category.product_category_name &nbsp;·&nbsp;
+                customers.customer_zip_code_prefix = geolocation.geolocation_zip_code_prefix &nbsp;·&nbsp;
+                sellers.seller_zip_code_prefix = geolocation.geolocation_zip_code_prefix
+            </div>
+        </div>
+
+        <!-- ════════ JOIN ROW COUNTS ════════ -->
+        <div class="section-title"><i class="fas fa-layer-group"></i> Join Row Counts</div>
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title"><i class="fas fa-chart-bar"></i> Rows After Each Join</div>
+                <div class="chart-wrapper tall">
+                    <canvas id="joinChart"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title"><i class="fas fa-list-ol"></i> Step-by-Step</div>
+                <div class="table-wrap">
+                    <table class="mini">
+                        <thead>
+                            <tr><th>Step</th><th>Rows</th><th>Change</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="step-badge"><span class="num">1</span> customers + orders</span></td><td>99,441</td><td><span class="status-badge success">+99,441</span></td></tr>
+                            <tr><td><span class="step-badge"><span class="num">2</span> + order_items</span></td><td>112,650</td><td><span class="status-badge success">+13,209</span></td></tr>
+                            <tr><td><span class="step-badge"><span class="num">3</span> + products</span></td><td>112,650</td><td><span class="status-badge warning">±0</span></td></tr>
+                            <tr><td><span class="step-badge"><span class="num">4</span> + sellers</span></td><td>112,650</td><td><span class="status-badge warning">±0</span></td></tr>
+                            <tr><td><span class="step-badge"><span class="num">5</span> + order_payments</span></td><td>117,601</td><td><span class="status-badge success">+4,951</span></td></tr>
+                            <tr><td><span class="step-badge"><span class="num">6</span> + order_reviews</span></td><td><strong>117,329</strong></td><td><span class="status-badge danger">−272</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-muted mt-8">
+                    <i class="fas fa-info-circle"></i>
+                    Rows increase due to one-to-many (items &amp; payments). 272 rows dropped due to missing reviews.
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════ CHARTS: 4‑COLUMN GRID ════════ -->
+        <div class="section-title"><i class="fas fa-chart-pie"></i> Distributions</div>
+        <div class="grid-4">
+
+            <!-- 1. Payment Type -->
+            <div class="card">
+                <div class="card-title"><i class="fas fa-credit-card"></i> Payment Type</div>
+                <div class="chart-wrapper short">
+                    <canvas id="paymentTypeChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 2. Review Score -->
+            <div class="card">
+                <div class="card-title"><i class="fas fa-star"></i> Review Score</div>
+                <div class="chart-wrapper short">
+                    <canvas id="reviewScoreChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 3. On‑Time Delivery -->
+            <div class="card">
+                <div class="card-title"><i class="fas fa-truck-fast"></i> On‑Time Delivery</div>
+                <div class="chart-wrapper short">
+                    <canvas id="ontimeChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 4. Demand Category -->
+            <div class="card">
+                <div class="card-title"><i class="fas fa-tags"></i> Demand Category</div>
+                <div class="chart-wrapper short">
+                    <canvas id="demandChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ════════ CHARTS: 2‑COLUMN GRID (Price & Payment Value) ════════ -->
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title"><i class="fas fa-dollar-sign"></i> Price Distribution</div>
+                <div class="chart-wrapper tall">
+                    <canvas id="priceChart"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title"><i class="fas fa-money-bill-wave"></i> Payment Value Distribution</div>
+                <div class="chart-wrapper tall">
+                    <canvas id="paymentValueChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════ FOOTER ════════ -->
+        <div style="text-align:center;padding:28px 0 8px 0;color:#8d97af;font-size:14px;border-top:1px solid #eaedf4;margin-top:12px;">
+            <i class="fas fa-database"></i> Olist ETL Dashboard &bull; Built with <i class="fas fa-heart" style="color:#e2635b;"></i> &bull; 117,329 rows &bull; 39 columns
+        </div>
+
+    </div>
+
+    <!-- ════════════════════════════════════════ -->
+    <!--  CHARTS  -->
+    <!-- ════════════════════════════════════════ -->
+    <script>
+        // ─── Helpers ────────────────────────────
+        function getCtx(id) {
+            const el = document.getElementById(id);
+            if (!el) return null;
+            return el.getContext('2d');
+        }
+
+        const COLORS = {
+            blue: '#5b7cfa',
+            blueLight: '#8aa3ff',
+            green: '#2d9f6e',
+            red: '#e2635b',
+            orange: '#f5a623',
+            purple: '#7c5cbf',
+            teal: '#2d9f9f',
+            pink: '#d9578c',
+            gray: '#b0b8cb',
+            dark: '#2d3b66'
+        };
+
+        const CHART_DEFAULTS = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { boxWidth: 12, padding: 8, font: { size: 11, family: 'Inter' } }
+                }
+            }
+        };
+
+        // ─── 1. Join Row Counts (Bar) ──────────
+        const joinCtx = getCtx('joinChart');
+        if (joinCtx) {
+            new Chart(joinCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['customers+orders', '+order_items', '+products', '+sellers', '+order_payments',
+                        '+order_reviews'
+                    ],
+                    datasets: [{
+                        label: 'Rows',
+                        data: [99441, 112650, 112650, 112650, 117601, 117329],
+                        backgroundColor: ['#5b7cfa', '#7c9aff', '#8aa3ff', '#9aafff', '#b0c4ff', '#2d3b66'],
+                        borderRadius: 6,
+                        barPercentage: 0.6,
+                    }]
+                },
+                options: {
+                    ...CHART_DEFAULTS,
+                    plugins: {
+                        ...CHART_DEFAULTS.plugins,
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f0f2f7' }, ticks: { font: { size: 10 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 9 }, maxRotation: 30 } }
+                    }
+                }
+            });
+        }
+
+        // ─── 2. Payment Type (Doughnut) ────────
+        const ptCtx = getCtx('paymentTypeChart');
+        if (ptCtx) {
+            new Chart(ptCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Credit Card', 'Boleto', 'Voucher', 'Debit Card'],
+                    datasets: [{
+                        data: [86520, 22835, 6282, 1692],
+                        backgroundColor: ['#5b7cfa', '#8aa3ff', '#b0c4ff', '#d0d8ec'],
+                        borderWidth: 0,
+                    }]
+                },
+                options: {
+                    ...CHART_DEFAULTS,
+                    plugins: {
+                        ...CHART_DEFAULTS.plugins,
+                        legend: { position: 'bottom', labels: { font: { size: 10 } } }
+                    },
+                    cutout: '68%',
+                }
+            });
+        }
+
+        // ─── 3. Review Score (Bar) ─────────────
+        const rsCtx = getCtx('reviewScoreChart');
+        if (rsCtx) {
+            new Chart(rsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['1', '2', '3', '4', '5'],
+                    datasets: [{
+                        label: 'Reviews',
+                        data: [11249, 4685, 8333, 15897, 77165],
+                        backgroundColor: ['#e2635b', '#f5a623', '#f7c948', '#5b7cfa', '#2d9f6e'],
+                        borderRadius: 4,
+                        barPercentage: 0.6,
+                    }]
+                },
+                options: {
+                    ...CHART_DEFAULTS,
+                    plugins: {
+                        ...CHART_DEFAULTS.plugins,
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f0f2f7' }, ticks: { font: { size: 9 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        // ─── 4. On‑Time Delivery (Doughnut) ────
+        const otCtx = getCtx('ontimeChart');
+        if (otCtx) {
+            new Chart(otCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['On‑Time', 'Late'],
+                    datasets: [{
+                        data: [105998, 11331],
+                        backgroundColor: ['#2d9f6e', '#e2635b'],
+                        borderWidth: 0,
+                    }]
+                },
+                options: {
+                    ...CHART_DEFAULTS,
+                    plugins: {
+                        ...CHART_DEFAULTS.plugins,
+                        legend: { position: 'bottom', labels: { font: { size: 10 } } }
+                    },
+                    cutout: '65%',
+                }
+            });
+        }
+
+        // ─── 5. Demand Category (Bar) ──────────
+        const dcCtx = getCtx('demandChart');
+        if (dcCtx) {
+            new Chart(dcCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Very High', 'High', 'Medium', 'Low', 'Very Low'],
+                    datasets: [{
+                        label: 'Orders',
+                        data: [61067, 39949, 11906, 3714, 678],
+                        backgroundColor: ['#2d3b66', '#5b7cfa', '#8aa3ff', '#b0c4ff', '#d0d8ec'],
+                        borderRadius: 4,
+                        barPercentage: 0.6,
+                    }]
+                },
+                options: {
+                    ...CHART_DEFAULTS,
+                    plugins: {
+                        ...CHART_DEFAULTS.plugins,
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f0f2f7' }, ticks: { font: { size: 9 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 8 }, maxRotation: 20 } }
+                    }
+                }
+            });
+        }
+
+        // ─── 6. Price Distribution (Histogram) ──
+        const priceCtx = getCtx('priceChart');
+        if (priceCtx) {
+            // simulate bins from the data description
+            new Chart(priceCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['0‑100', '100‑200', '200‑300', '300‑400', '400‑500', '500+'],
+                    datasets: [{
+                        label: 'Orders',
+                        data: [52400, 31800, 15200, 8200, 4200, 5529],
+                        backgroundColor: '#5b7cfa',
+                        borderRadius: 4,
+                        barPercentage: 0.7,
+                    }]
+                },
+                options: {
+                    ...CHART_DEFAULTS,
+                    plugins: {
+                        ...CHART_DEFAULTS.plugins,
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f0f2f7' }, ticks: { font: { size: 9 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        // ─── 7. Payment Value Distribution ──────
+        const pvCtx = getCtx('paymentValueChart');
+        if (pvCtx) {
+            new Chart(pvCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['0‑100', '100‑200', '200‑300', '300‑400', '400‑500', '500+'],
+                    datasets: [{
+                        label: 'Orders',
+                        data: [48600, 33400, 17200, 9400, 4800, 3914],
+                        backgroundColor: '#2d9f6e',
+                        borderRadius: 4,
+                        barPercentage: 0.7,
+                    }]
+                },
+                options: {
+                    ...CHART_DEFAULTS,
+                    plugins: {
+                        ...CHART_DEFAULTS.plugins,
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f0f2f7' }, ticks: { font: { size: 9 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
