@@ -6,8 +6,8 @@ dist/
 wheels/
 *.egg-info
 # Ignore dataset folders
-Supervised/cdata/
-Supervised/data/
+*/cdata/
+*/data/
 
 # Optional: ignore all CSV files anywhere
 *.csv
