@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spaceship Titanic Predictor</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #fff;
+      color: #111;
+      padding: 40px 20px;
+    }
+
+    .container {
+      width: min(760px, 100%);
+      margin: auto;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 32px;
+      letter-spacing: -0.8px;
+    }
+
+    .subtitle {
+      margin: 8px 0 28px;
+      color: #666;
+    }
+
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 16px;
+      background: #fff;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .status {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .status.loaded {
+      color: #111;
+    }
+
+    .status.error {
+      color: #900;
+    }
+
+    button {
+      border: 1px solid #111;
+      background: #111;
+      color: #fff;
+      padding: 11px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    button:hover:not(:disabled) {
+      background: #333;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .load-button {
+      width: auto;
+      margin: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    input,
+    select {
+      width: 100%;
+      margin-top: 6px;
+      padding: 10px 11px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #fff;
+      color: #111;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #111;
+    }
+
+    .threshold {
+      margin-top: 20px;
+    }
+
+    .threshold-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .threshold-row input[type="range"] {
+      margin: 0;
+      padding: 0;
+    }
+
+    .threshold-value {
+      width: 45px;
+      text-align: right;
+      font-weight: 700;
+    }
+
+    #result {
+      display: none;
+      text-align: center;
+    }
+
+    #prediction {
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    #probability {
+      margin-top: 8px;
+      color: #666;
+    }
+
+    .details {
+      margin-top: 18px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+      line-height: 1.9;
+      color: #555;
+      font-size: 14px;
+    }
+
+    .debug-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .debug {
+      margin: 0;
+      padding: 13px;
+      min-height: 100px;
+      max-height: 240px;
+      overflow-y: auto;
+      border-radius: 8px;
+      background: #111;
+      color: #eee;
+      font: 12px/1.6 Consolas, monospace;
+      white-space: pre-wrap;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 20px 12px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .status-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .load-button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>Spaceship Titanic</h1>
+
+    <p class="subtitle">
+      Passenger transportation prediction
+    </p>
+
+    <!-- Model -->
+
+    <div class="card">
+      <div class="status-row">
+
+        <div id="status" class="status">
+          Model not loaded
+        </div>
+
+        <button
+          id="loadButton"
+          class="load-button"
+          onclick="loadModel()"
+        >
+          Load Model
+        </button>
+
+      </div>
+    </div>
+
+
+    <!-- Inputs -->
+
+    <div class="card">
+
+      <div class="grid">
+
+        <label>
+          Age
+          <input id="age" type="number" value="26">
+        </label>
+
+        <label>
+          Room Service
+          <input id="room" type="number" value="0">
+        </label>
+
+        <label>
+          Food Court
+          <input id="food" type="number" value="500">
+        </label>
+
+        <label>
+          Shopping Mall
+          <input id="mall" type="number" value="100">
+        </label>
+
+        <label>
+          Spa
+          <input id="spa" type="number" value="0">
+        </label>
+
+        <label>
+          VR Deck
+          <input id="vr" type="number" value="50">
+        </label>
+
+        <label>
+          Home Planet
+          <select id="planet">
+            <option value="europa">Europa</option>
+            <option value="mars">Mars</option>
+            <option value="unknown">Unknown</option>
+          </select>
+        </label>
+
+        <label>
+          CryoSleep
+          <select id="cryo">
+            <option value="false">False</option>
+            <option value="true">True</option>
+            <option value="unknown">Unknown</option>
+          </select>
+        </label>
+
+        <label>
+          Destination
+          <select id="destination">
+            <option value="trappist">TRAPPIST-1e</option>
+            <option value="pso">PSO J318.5-22</option>
+            <option value="unknown">Unknown</option>
+          </select>
+        </label>
+
+        <label>
+          VIP
+          <select id="vip">
+            <option value="false">False</option>
+            <option value="true">True</option>
+            <option value="unknown">Unknown</option>
+          </select>
+        </label>
+
+      </div>
+
+
+      <!-- Threshold -->
+
+      <div class="threshold">
+
+        <label>
+          Classification Threshold
+        </label>
+
+        <div class="threshold-row">
+
+          <input
+            id="threshold"
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value="0.42"
+            oninput="updateThreshold()"
+          >
+
+          <span
+            id="thresholdValue"
+            class="threshold-value"
+          >
+            0.42
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <button
+        id="predictButton"
+        onclick="predict()"
+        disabled
+      >
+        Load model first
+      </button>
+
+    </div>
+
+
+    <!-- Result -->
+
+    <div id="result" class="card">
+
+      <div id="prediction"></div>
+
+      <div id="probability"></div>
+
+      <div class="details">
+
+        <div>
+          Model predicted class:
+          <strong id="modelLabel">-</strong>
+        </div>
+
+        <div>
+          P(False):
+          <strong id="falseProbability">-</strong>
+        </div>
+
+        <div>
+          P(True):
+          <strong id="trueProbability">-</strong>
+        </div>
+
+        <div>
+          Threshold:
+          <strong id="usedThreshold">-</strong>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Debug -->
+
+    <div class="card">
+
+      <div class="debug-title">
+        Debug Console
+      </div>
+
+      <pre id="debug" class="debug">Waiting...</pre>
+
+    </div>
+
+  </div>
+
+
+  <script>
+
+    let session = null;
+
+
+    function log(message) {
+
+      console.log(message);
+
+      const debug =
+        document.getElementById("debug");
+
+      const time =
+        new Date().toLocaleTimeString();
+
+      debug.textContent +=
+        `[${time}] ${message}\n`;
+
+      debug.scrollTop =
+        debug.scrollHeight;
+    }
+
+
+    function logError(error) {
+
+      console.error(error);
+
+      log(
+        "ERROR: " +
+        (
+          error?.stack ||
+          error?.message ||
+          String(error)
+        )
+      );
+    }
+
+
+    window.onerror =
+      function(message, source, line, column, error) {
+
+        logError(error || message);
+
+      };
+
+
+    window.addEventListener(
+      "unhandledrejection",
+      event => logError(event.reason)
+    );
+
+
+    async function loadModel() {
+
+      const status =
+        document.getElementById("status");
+
+      const loadButton =
+        document.getElementById("loadButton");
+
+      const predictButton =
+        document.getElementById("predictButton");
+
+
+      status.textContent =
+        "Loading model...";
+
+      status.className =
+        "status";
+
+      loadButton.disabled =
+        true;
+
+
+      log(
+        "Loading ./models/final_model.onnx"
+      );
+
+
+      try {
+
+        session =
+          await ort.InferenceSession.create(
+            "./models/final_model.onnx"
+          );
+
+
+        log("Model loaded successfully");
+
+        log(
+          "Input: " +
+          session.inputNames.join(", ")
+        );
+
+        log(
+          "Outputs: " +
+          session.outputNames.join(", ")
+        );
+
+
+        status.textContent =
+          "Model loaded successfully";
+
+        status.className =
+          "status loaded";
+
+
+        loadButton.textContent =
+          "Model Loaded";
+
+
+        predictButton.disabled =
+          false;
+
+        predictButton.textContent =
+          "Predict";
+
+
+      } catch (error) {
+
+        status.textContent =
+          "Model failed to load";
+
+        status.className =
+          "status error";
+
+
+        loadButton.disabled =
+          false;
+
+        loadButton.textContent =
+          "Retry Loading Model";
+
+
+        logError(error);
+
+      }
+
+    }
+
+
+    function updateThreshold() {
+
+      const threshold =
+        Number(
+          document.getElementById(
+            "threshold"
+          ).value
+        );
+
+
+      document.getElementById(
+        "thresholdValue"
+      ).textContent =
+        threshold.toFixed(2);
+
+    }
+
+
+    function getNumber(id) {
+
+      return Number(
+        document.getElementById(id).value
+      );
+
+    }
+
+
+    function oneHot(id, value) {
+
+      return document.getElementById(id).value === value
+        ? 1
+        : 0;
+
+    }
+
+
+    async function predict() {
+
+      if (!session) {
+
+        log(
+          "ERROR: Model is not loaded"
+        );
+
+        return;
+
+      }
+
+
+      try {
+
+        const data =
+          new Float32Array([
+
+            // Numeric
+
+            getNumber("age"),
+            getNumber("room"),
+            getNumber("food"),
+            getNumber("mall"),
+            getNumber("spa"),
+            getNumber("vr"),
+
+
+            // Home Planet
+
+            oneHot("planet", "europa"),
+            oneHot("planet", "mars"),
+            oneHot("planet", "unknown"),
+
+
+            // CryoSleep
+
+            oneHot("cryo", "true"),
+            oneHot("cryo", "unknown"),
+
+
+            // Destination
+
+            oneHot("destination", "pso"),
+            oneHot("destination", "trappist"),
+            oneHot("destination", "unknown"),
+
+
+            // VIP
+
+            oneHot("vip", "true"),
+            oneHot("vip", "unknown")
+
+          ]);
+
+
+        log(
+          "Input: " +
+          JSON.stringify(Array.from(data))
+        );
+
+
+        const tensor =
+          new ort.Tensor(
+            "float32",
+            data,
+            [1, 16]
+          );
+
+
+        log("Running model...");
+
+
+        const outputs =
+          await session.run({
+
+            float_input: tensor
+
+          });
+
+
+        const label =
+          outputs.label.data[0];
+
+
+        const probabilities =
+          outputs.probabilities.data;
+
+
+        const pFalse =
+          probabilities[0];
+
+
+        const pTrue =
+          probabilities[1];
+
+
+        const threshold =
+          getNumber("threshold");
+
+
+        const prediction =
+          pTrue >= threshold;
+
+
+        log(
+          "P(False): " +
+          pFalse
+        );
+
+        log(
+          "P(True): " +
+          pTrue
+        );
+
+        log(
+          "Threshold: " +
+          threshold
+        );
+
+        log(
+          "Final prediction: " +
+          prediction
+        );
+
+
+        document.getElementById(
+          "result"
+        ).style.display =
+          "block";
+
+
+        document.getElementById(
+          "prediction"
+        ).textContent =
+          prediction
+            ? "Transported"
+            : "Not Transported";
+
+
+        document.getElementById(
+          "probability"
+        ).textContent =
+          `P(Transported): ${(pTrue * 100).toFixed(2)}%`;
+
+
+        document.getElementById(
+          "modelLabel"
+        ).textContent =
+          label === 1
+            ? "1 (True)"
+            : "0 (False)";
+
+
+        document.getElementById(
+          "falseProbability"
+        ).textContent =
+          `${(pFalse * 100).toFixed(2)}%`;
+
+
+        document.getElementById(
+          "trueProbability"
+        ).textContent =
+          `${(pTrue * 100).toFixed(2)}%`;
+
+
+        document.getElementById(
+          "usedThreshold"
+        ).textContent =
+          threshold.toFixed(2);
+
+
+      } catch (error) {
+
+        logError(error);
+
+      }
+
+    }
+
+  </script>
+
+</body>
+</html>

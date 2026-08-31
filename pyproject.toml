@@ -12,10 +12,12 @@ dependencies = [
     "matplotlib>=3.11.1",
     "numpy>=2.5.2",
     "onnxmltools>=1.16.0",
+    "onnxruntime>=1.29.0",
     "optuna>=4.9.0",
     "pandas>=3.0.5",
     "plotly>=7.0.0",
     "scikit-learn>=1.9.0",
     "skl2onnx>=1.20.0",
     "tensorflow>=2.21.0",
+    "xgboost>=3.4.1",
 ]
