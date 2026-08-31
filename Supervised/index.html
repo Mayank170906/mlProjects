@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Olist ETL · ML Pipeline · ONNX Demo</title>
+
+    <!-- ===== Fonts & Icons ===== -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+    <!-- ===== Chart.js ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+    </script>
+
+    <!-- ===== ONNX Runtime Web ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.14.0/dist/ort.min.js">
+    </script>
+
+    <style>
+        /* ─── RESET & BASE ─── */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8faff;
+            color: #1a1a2e;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ─── SCROLLBAR ─── */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e9ecf3;
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #b0b8cb;
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8d97af;
+        }
+
+        /* ─── HEADER ─── */
+        .header {
+            background: #ffffff;
+            padding: 24px 32px;
+            border-radius: 24px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #eaedf4;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .logo {
+            background: #2d3b66;
+            color: #fff;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .header-left h1 {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+        }
+        .header-left h1 span {
+            color: #5b7cfa;
+        }
+        .header-left .sub {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+        .header-right {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+        .badge {
+            background: #eef2ff;
+            color: #3b4f8a;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .badge a {
+            color: #3b4f8a;
+            text-decoration: none;
+        }
+        .badge a:hover {
+            text-decoration: underline;
+        }
+        .btn-github {
+            background: #2d3b66;
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .btn-github:hover {
+            background: #1f2a4a;
+            transform: translateY(-1px);
+        }
+
+        /* ─── SECTION TITLE ─── */
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 40px 0 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .section-title i {
+            color: #5b7cfa;
+            font-size: 24px;
+        }
+
+        /* ─── CARDS & GRID ─── */
+        .card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 24px 28px;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
+            border: 1px solid #eaedf4;
+            transition: 0.2s;
+            height: 100%;
+        }
+        .card:hover {
+            border-color: #c8d0e6;
+        }
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2d3b66;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-title i {
+            color: #5b7cfa;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        .grid-4 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        /* ─── STATS ─── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: #ffffff;
+            padding: 16px 20px;
+            border-radius: 16px;
+            border: 1px solid #eaedf4;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            transition: 0.2s;
+        }
+        .stat-card:hover {
+            border-color: #bcc3d9;
+        }
+        .stat-card .label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-top: 4px;
+        }
+        .stat-card .icon {
+            float: right;
+            font-size: 24px;
+            color: #bcc3d9;
+        }
+
+        /* ─── TABLES ─── */
+        .table-wrap {
+            overflow-x: auto;
+        }
+        table.mini {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        table.mini th {
+            text-align: left;
+            font-weight: 600;
+            color: #4b5a7a;
+            padding: 8px 6px 8px 0;
+            border-bottom: 2px solid #e9ecf3;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        table.mini td {
+            padding: 8px 6px 8px 0;
+            border-bottom: 1px solid #f0f2f7;
+            color: #1e293b;
+        }
+        table.mini tr:last-child td {
+            border-bottom: none;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-badge.success {
+            background: #e3f7ec;
+            color: #0c6e4f;
+        }
+        .status-badge.danger {
+            background: #fee9e7;
+            color: #b33a34;
+        }
+        .status-badge.warning {
+            background: #fff3d6;
+            color: #a0742c;
+        }
+        .null-bar {
+            display: inline-block;
+            height: 6px;
+            border-radius: 4px;
+            background: #dce2ef;
+            min-width: 40px;
+        }
+        .null-bar .fill {
+            height: 100%;
+            border-radius: 4px;
+            background: #5b7cfa;
+            transition: width 0.6s;
+        }
+        .null-bar .fill.danger {
+            background: #e2635b;
+        }
+
+        /* ─── CHART WRAPPER ─── */
+        .chart-wrapper {
+            position: relative;
+            height: 220px;
+        }
+        .chart-wrapper.tall {
+            height: 260px;
+        }
+        .chart-wrapper.short {
+            height: 170px;
+        }
+
+        /* ─── MODEL TESTER ─── */
+        .tester-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            color: #2d3b66;
+            margin-bottom: 4px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d0d8ec;
+            border-radius: 10px;
+            font-size: 14px;
+            background: #fafbff;
+            transition: 0.2s;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #5b7cfa;
+            box-shadow: 0 0 0 3px rgba(91, 124, 250, 0.15);
+        }
+        .btn {
+            background: #5b7cfa;
+            color: #fff;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background: #3b5ed9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(91, 124, 250, 0.3);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .btn-outline {
+            background: transparent;
+            color: #5b7cfa;
+            border: 2px solid #5b7cfa;
+        }
+        .btn-outline:hover {
+            background: #5b7cfa;
+            color: #fff;
+        }
+        .prediction-box {
+            background: #f0f4ff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 6px solid #5b7cfa;
+        }
+        .prediction-box .label {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        .prediction-box .value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #2d3b66;
+            margin-top: 4px;
+        }
+        .log-box {
+            background: #1e293b;
+            color: #b0c4ff;
+            padding: 16px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-top: 12px;
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 1024px) {
+            .grid-4 {
+                grid-template-columns: 1fr 1fr;
+            }
+            .grid-3 {
+                grid-template-columns: 1fr 1fr;
+            }
+            .tester-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .grid-2,
+            .grid-3,
+            .grid-4 {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .card {
+                padding: 18px 16px;
+            }
+        }
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .header-left h1 {
+                font-size: 20px;
+            }
+        }
+
+        .text-muted {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        .mt-8 {
+            margin-top: 8px;
+        }
+        .mb-8 {
+            margin-bottom: 8px;
+        }
+        .flex {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .fw-600 {
+            font-weight: 600;
+        }
+        .gap-4 {
+            gap: 4px;
+        }
+        .flow {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+        }
+        .flow .node {
+            background: #eef2ff;
+            padding: 4px 14px;
+            border-radius: 30px;
+            color: #2d3b66;
+            font-weight: 600;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .flow .node.highlight {
+            background: #2d3b66;
+            color: #fff;
+        }
+        .flow .arrow {
+            color: #8d97af;
+            font-size: 14px;
+        }
+        .step-badge {
+            display: inline-block;
+            background: #eef2ff;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #2d3b66;
+        }
+        .step-badge .num {
+            background: #2d3b66;
+            color: #fff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            margin-right: 6px;
+        }
+        a {
+            color: #5b7cfa;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- ════════ HEADER ════════ -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo"><i class="fas fa-database"></i></div>
+                <div>
+                    <h1>Olist <span>ETL</span> · ML Pipeline</h1>
+                    <div class="sub">End‑to‑end data engineering &amp; LightGBM inference in the browser</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <span class="badge"><i class="fab fa-github"></i> <a href="https://github.com/Mayank170906/mlProjects" target="_blank">GitHub Repo</a></span>
+                <a href="https://github.com/Mayank170906/mlProjects/blob/master/Supervised/merge_data.html" target="_blank" class="badge"><i class="fas fa-code"></i> merge_data</a>
+                <a href="https://github.com/Mayank170906/mlProjects/blob/master/Supervised/data-analysys.html" target="_blank" class="badge"><i class="fas fa-chart-line"></i> data-analysys</a>
+                <a href="https://github.com/Mayank170906/mlProjects/blob/master/Supervised/lgbm_model.onnx" target="_blank" class="badge"><i class="fas fa-brain"></i> lgbm_model.onnx</a>
+                <!-- ecommerce_dashboard is 404, we'll note later -->
+            </div>
+        </header>
+
+        <!-- ════════ STATS ════════ -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="icon"><i class="fas fa-table"></i></span>
+                <div class="label">Tables Loaded</div>
+                <div class="value">9</div>
+            </div>
+            <div class="stat-card">
+                <span class="icon"><i class="fas fa-link"></i></span>
+                <div class="label">Joins Performed</div>
+                <div class="value">9</div>
+            </div>
+            <div class="stat-card">
+                <span class="icon"><i class="fas fa-check-double"></i></span>
+                <div class="label">Valid PKs</div>
+                <div class="value">8 / 9</div>
+            </div>
+            <div class="stat-card">
+                <span class="icon"><i class="fas fa-rows"></i></span>
+                <div class="label">Final Rows</div>
+                <div class="value">117,329</div>
+            </div>
+            <div class="stat-card">
+                <span class="icon"><i class="fas fa-filter"></i></span>
+                <div class="label">Nulls Filled</div>
+                <div class="value">610</div>
+            </div>
+            <div class="stat-card">
+                <span class="icon"><i class="fas fa-star"></i></span>
+                <div class="label">Avg Review</div>
+                <div class="value">4.03</div>
+            </div>
+        </div>
+
+        <!-- ════════ OVERVIEW ════════ -->
+        <div class="card" style="margin-bottom:24px;">
+            <div class="card-title"><i class="fas fa-info-circle"></i> Project Overview</div>
+            <p>
+                This project processes the <strong>Brazilian E‑Commerce (Olist)</strong> dataset through a complete
+                <strong>ETL pipeline</strong>: loading 9 CSV files, validating primary keys, handling nulls,
+                merging via a star‑schema, and engineering features for a <strong>LightGBM</strong> classifier.
+                The trained model is converted to <strong>ONNX</strong> and deployed in the browser using
+                <strong>ONNX Runtime Web</strong> for real‑time inference.
+            </p>
+            <div class="flow mt-8">
+                <span class="node">customers</span>
+                <span class="arrow"><i class="fas fa-arrow-right"></i></span>
+                <span class="node highlight">orders</span>
+                <span class="arrow"><i class="fas fa-arrow-right"></i></span>
+                <span class="node">order_items</span>
+                <span class="arrow"><i class="fas fa-arrow-right"></i></span>
+                <span class="node">products</span>
+                <span class="arrow"><i class="fas fa-arrow-right"></i></span>
+                <span class="node">product_category</span>
+                <span class="arrow" style="margin-left:12px;"><i class="fas fa-arrow-right"></i></span>
+                <span class="node">order_payments</span>
+                <span class="arrow"><i class="fas fa-arrow-right"></i></span>
+                <span class="node">order_reviews</span>
+                <span class="arrow"><i class="fas fa-arrow-right"></i></span>
+                <span class="node">sellers</span>
+                <span class="arrow"><i class="fas fa-arrow-right"></i></span>
+                <span class="node">geolocation</span>
+            </div>
+            <div class="text-muted mt-8">
+                <i class="fas fa-link"></i> Joins: customers.customer_id = orders.customer_id &nbsp;·&nbsp;
+                orders.order_id = order_items.order_id &nbsp;·&nbsp;
+                orders.order_id = order_payments.order_id &nbsp;·&nbsp;
+                orders.order_id = order_reviews.order_id &nbsp;·&nbsp;
+                order_items.product_id = products.product_id &nbsp;·&nbsp;
+                order_items.seller_id = sellers.seller_id &nbsp;·&nbsp;
+                products.product_category_name = product_category.product_category_name &nbsp;·&nbsp;
+                customers.customer_zip_code_prefix = geolocation.geolocation_zip_code_prefix &nbsp;·&nbsp;
+                sellers.seller_zip_code_prefix = geolocation.geolocation_zip_code_prefix
+            </div>
+            <div class="text-muted mt-8">
+                <i class="fas fa-exclamation-triangle" style="color:#e2635b;"></i>
+                <strong>Note:</strong> The <code>ecommerce_dashboard</code> link is not available (404). The other notebooks and model are hosted on GitHub.
+            </div>
+        </div>
+
+        <!-- ════════ DATA MERGING & CLEANING ════════ -->
+        <div class="section-title"><i class="fas fa-merge"></i> Data Merging &amp; Cleaning</div>
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title"><i class="fas fa-key"></i> Primary Key Validation</div>
+                <div class="table-wrap">
+                    <table class="mini">
+                        <thead><tr><th>Table</th><th>PK</th><th>Unique</th></tr></thead>
+                        <tbody>
+                            <tr><td>customers</td><td>customer_id</td><td><span class="status-badge success">✅</span></td></tr>
+                            <tr><td>orders</td><td>order_id</td><td><span class="status-badge success">✅</span></td></tr>
+                            <tr><td>order_items</td><td>order_id+order_item_id</td><td><span class="status-badge success">✅</span></td></tr>
+                            <tr><td>order_payments</td><td>order_id+payment_sequential</td><td><span class="status-badge success">✅</span></td></tr>
+                            <tr><td>order_reviews</td><td>review_id+order_id</td><td><span class="status-badge success">✅</span></td></tr>
+                            <tr><td>products</td><td>product_id</td><td><span class="status-badge success">✅</span></td></tr>
+                            <tr><td>sellers</td><td>seller_id</td><td><span class="status-badge success">✅</span></td></tr>
+                            <tr><td>product_category</td><td>product_category_name</td><td><span class="status-badge success">✅</span></td></tr>
+                            <tr><td>geolocation</td><td>zip+lat+lng+city+state</td><td><span class="status-badge danger">❌</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-muted mt-8"><i class="fas fa-info-circle"></i> geolocation has duplicate rows – handled during join.</div>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i class="fas fa-ban"></i> Null Check</div>
+                <div class="table-wrap">
+                    <table class="mini">
+                        <thead><tr><th>Column</th><th>Nulls</th><th>Bar</th></tr></thead>
+                        <tbody>
+                            <tr><td>customers.customer_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                            <tr><td>orders.customer_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                            <tr><td>orders.order_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                            <tr><td>order_items.order_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                            <tr><td>order_items.product_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                            <tr><td>order_items.seller_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                            <tr><td>order_payments.order_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                            <tr><td>order_reviews.order_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                            <tr><td>products.product_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                            <tr><td><strong>products.product_category_name</strong></td><td><strong>610</strong></td><td><div class="null-bar"><div class="fill danger" style="width:28%;"></div></div></td></tr>
+                            <tr><td>sellers.seller_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                            <tr><td>product_category.product_category_name</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-muted mt-8"><i class="fas fa-wrench"></i> 610 nulls in product_category_name → filled with <code>'Unknown Category'</code></div>
+            </div>
+        </div>
+
+        <!-- Row counts -->
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title"><i class="fas fa-chart-bar"></i> Join Row Counts</div>
+                <div class="chart-wrapper tall">
+                    <canvas id="joinChart"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title"><i class="fas fa-list-ol"></i> Step‑by‑Step</div>
+                <div class="table-wrap">
+                    <table class="mini">
+                        <thead><tr><th>Step</th><th>Rows</th><th>Change</th></tr></thead>
+                        <tbody>
+                            <tr><td><span class="step-badge"><span class="num">1</span> customers + orders</span></td><td>99,441</td><td><span class="status-badge success">+99,441</span></td></tr>
+                            <tr><td><span class="step-badge"><span class="num">2</span> + order_items</span></td><td>112,650</td><td><span class="status-badge success">+13,209</span></td></tr>
+                            <tr><td><span class="step-badge"><span class="num">3</span> + products</span></td><td>112,650</td><td><span class="status-badge warning">±0</span></td></tr>
+                            <tr><td><span class="step-badge"><span class="num">4</span> + sellers</span></td><td>112,650</td><td><span class="status-badge warning">±0</span></td></tr>
+                            <tr><td><span class="step-badge"><span class="num">5</span> + order_payments</span></td><td>117,601</td><td><span class="status-badge success">+4,951</span></td></tr>
+                            <tr><td><span class="step-badge"><span class="num">6</span> + order_reviews</span></td><td><strong>117,329</strong></td><td><span class="status-badge danger">−272</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-muted mt-8">
+                    <i class="fas fa-info-circle"></i>
+                    Rows increase due to one‑to‑many (items &amp; payments). 272 rows dropped due to missing reviews.
+                </div>
+            </div>
+        </div>
+
+        <!-- ════════ DATA ANALYSIS CHARTS ════════ -->
+        <div class="section-title"><i class="fas fa-chart-pie"></i> Data Analysis</div>
+        <div class="grid-4">
+            <div class="card">
+                <div class="card-title"><i class="fas fa-credit-card"></i> Payment Type</div>
+                <div class="chart-wrapper short"><canvas id="paymentTypeChart"></canvas></div>
+            </div>
+            <div class="card">
+                <div class="card-title"><i class="fas fa-star"></i> Review Score</div>
+                <div class="chart-wrapper short"><canvas id="reviewScoreChart"></canvas></div>
+            </div>
+            <div class="card">
+                <div class="card-title"><i class="fas fa-truck-fast"></i> On‑Time Delivery</div>
+                <div class="chart-wrapper short"><canvas id="ontimeChart"></canvas></div>
+            </div>
+            <div class="card">
+                <div class="card-title"><i class="fas fa-tags"></i> Demand Category</div>
+                <div class="chart-wrapper short"><canvas id="demandChart"></canvas></div>
+            </div>
+        </div>
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title"><i class="fas fa-dollar-sign"></i> Price Distribution</div>
+                <div class="chart-wrapper tall"><canvas id="priceChart"></canvas></div>
+            </div>
+            <div class="card">
+                <div class="card-title"><i class="fas fa-money-bill-wave"></i> Payment Value Distribution</div>
+                <div class="chart-wrapper tall"><canvas id="paymentValueChart"></canvas></div>
+            </div>
+        </div>
+
+        <!-- ════════ MODEL TRAINING ════════ -->
+        <div class="section-title"><i class="fas fa-brain"></i> Model Training &amp; ONNX Export</div>
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title"><i class="fas fa-cogs"></i> LightGBM Classifier</div>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 6px 0; border-bottom: 1px solid #f0f2f7;"><i class="fas fa-check-circle" style="color:#2d9f6e;"></i> <strong>Features:</strong> price, freight_value, payment_installments, payment_value, review_score, on_time_delivery, approval_time, demand_category, review_response_time</li>
+                    <li style="padding: 6px 0; border-bottom: 1px solid #f0f2f7;"><i class="fas fa-check-circle" style="color:#2d9f6e;"></i> <strong>Target:</strong> order_status (binary: delivered vs others)</li>
+                    <li style="padding: 6px 0; border-bottom: 1px solid #f0f2f7;"><i class="fas fa-check-circle" style="color:#2d9f6e;"></i> <strong>Training rows:</strong> 117,314</li>
+                    <li style="padding: 6px 0; border-bottom: 1px solid #f0f2f7;"><i class="fas fa-check-circle" style="color:#2d9f6e;"></i> <strong>Validation:</strong> 80/20 split</li>
+                    <li style="padding: 6px 0;"><i class="fas fa-check-circle" style="color:#2d9f6e;"></i> <strong>Metrics:</strong> Accuracy ~ 0.96, F1 ~ 0.94</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="card-title"><i class="fas fa-exchange-alt"></i> ONNX Conversion</div>
+                <p>Using <code>onnxmltools</code>, the trained LightGBM model was exported to ONNX format:</p>
+                <pre style="background:#f4f6fb; padding:12px; border-radius:10px; font-size:13px; overflow-x:auto;">
+import onnxmltools
+from onnxmltools.convert.common.data_types import FloatTensorType
+
+initial_type = [('float_input', FloatTensorType([None, X_train.shape[1]]))]
+onnx_model = onnxmltools.convert_lightgbm(
+    final_model, initial_types=initial_type
+)
+onnxmltools.utils.save_model(onnx_model, 'lgbm_model.onnx')</pre>
+                <p class="text-muted mt-8"><i class="fas fa-link"></i> Model file: <a href="https://github.com/Mayank170906/mlProjects/blob/master/Supervised/lgbm_model.onnx" target="_blank">lgbm_model.onnx</a></p>
+            </div>
+        </div>
+
+        <!-- ════════ MODEL TESTER ════════ -->
+        <div class="section-title"><i class="fas fa-flask"></i> Live Model Tester (ONNX in Browser)</div>
+        <div class="card">
+            <div class="card-title"><i class="fas fa-rocket"></i> Load &amp; Predict</div>
+            <p class="text-muted mb-8">The ONNX model is loaded from GitHub using <strong>ONNX Runtime Web</strong>. Click <em>Load Model</em> to fetch it, then enter feature values and click <em>Predict</em>.</p>
+
+            <div class="tester-grid">
+                <div>
+                    <div class="form-group">
+                        <label>Price</label>
+                        <input type="number" id="price" value="120.53" step="0.01" />
+                    </div>
+                    <div class="form-group">
+                        <label>Freight Value</label>
+                        <input type="number" id="freight" value="20.03" step="0.01" />
+                    </div>
+                    <div class="form-group">
+                        <label>Payment Installments</label>
+                        <input type="number" id="installments" value="2.94" step="0.1" />
+                    </div>
+                    <div class="form-group">
+                        <label>Payment Value</label>
+                        <input type="number" id="payment_value" value="172.07" step="0.01" />
+                    </div>
+                    <div class="form-group">
+                        <label>Review Score (1-5)</label>
+                        <input type="number" id="review_score" value="4.03" step="0.1" min="1" max="5" />
+                    </div>
+                </div>
+                <div>
+                    <div class="form-group">
+                        <label>On-Time Delivery (0=No, 1=Yes)</label>
+                        <select id="ontime">
+                            <option value="1">1 - Yes</option>
+                            <option value="0">0 - No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Approval Time (hours)</label>
+                        <input type="number" id="approval_time" value="10.50" step="0.1" />
+                    </div>
+                    <div class="form-group">
+                        <label>Demand Category (0=Very Low ... 4=Very High)</label>
+                        <input type="number" id="demand" value="2" step="1" min="0" max="4" />
+                    </div>
+                    <div class="form-group">
+                        <label>Review Response Time (hours)</label>
+                        <input type="number" id="response_time" value="48.0" step="0.1" />
+                    </div>
+                    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:8px;">
+                        <button class="btn" id="loadModelBtn"><i class="fas fa-download"></i> Load Model</button>
+                        <button class="btn btn-outline" id="predictBtn" disabled><i class="fas fa-robot"></i> Predict</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="logContainer" class="log-box">⏳ Model not loaded yet. Click "Load Model".</div>
+
+            <div id="predictionResult" class="prediction-box" style="display:none;">
+                <div class="label">Prediction (0 = not delivered, 1 = delivered)</div>
+                <div class="value" id="predictionValue">—</div>
+                <div class="text-muted" style="margin-top:4px;">Confidence: <span id="confidenceValue">—</span></div>
+            </div>
+        </div>
+
+        <!-- ════════ FOOTER ════════ -->
+        <div style="text-align:center; padding:32px 0 12px; border-top:1px solid #eaedf4; margin-top:32px; color:#8d97af; font-size:14px;">
+            <i class="fas fa-database"></i> Olist ETL · ML Pipeline &bull; Built with <i class="fas fa-heart" style="color:#e2635b;"></i> &bull; 117,329 rows &bull; 39 columns
+        </div>
+
+    </div>
+
+    <!-- ════════════════════════════════════════ -->
+    <!--  CHARTS  (same data as in analysis)    -->
+    <!-- ════════════════════════════════════════ -->
+    <script>
+        // ─── Helpers ────────────────────────────
+        function getCtx(id) {
+            const el = document.getElementById(id);
+            return el ? el.getContext('2d') : null;
+        }
+
+        const COLORS = {
+            blue: '#5b7cfa',
+            blueLight: '#8aa3ff',
+            green: '#2d9f6e',
+            red: '#e2635b',
+            orange: '#f5a623',
+            purple: '#7c5cbf',
+            teal: '#2d9f9f',
+            pink: '#d9578c',
+            gray: '#b0b8cb',
+            dark: '#2d3b66'
+        };
+
+        const CHART_DEFAULTS = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { boxWidth: 12, padding: 8, font: { size: 11, family: 'Inter' } }
+                }
+            }
+        };
+
+        // ─── 1. Join Row Counts ──────────
+        const joinCtx = getCtx('joinChart');
+        if (joinCtx) {
+            new Chart(joinCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['customers+orders', '+order_items', '+products', '+sellers', '+order_payments',
+                        '+order_reviews'
+                    ],
+                    datasets: [{
+                        label: 'Rows',
+                        data: [99441, 112650, 112650, 112650, 117601, 117329],
+                        backgroundColor: ['#5b7cfa', '#7c9aff', '#8aa3ff', '#9aafff', '#b0c4ff', '#2d3b66'],
+                        borderRadius: 6,
+                        barPercentage: 0.6,
+                    }]
+                },
+                options: {
+                    ...CHART_DEFAULTS,
+                    plugins: { ...CHART_DEFAULTS.plugins, legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f0f2f7' }, ticks: { font: { size: 10 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 9 }, maxRotation: 30 } }
+                    }
+                }
+            });
+        }
+
+        // ─── 2. Payment Type ──────────────
+        const ptCtx = getCtx('paymentTypeChart');
+        if (ptCtx) {
+            new Chart(ptCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Credit Card', 'Boleto', 'Voucher', 'Debit Card'],
+                    datasets: [{
+                        data: [86520, 22835, 6282, 1692],
+                        backgroundColor: ['#5b7cfa', '#8aa3ff', '#b0c4ff', '#d0d8ec'],
+                        borderWidth: 0,
+                    }]
+                },
+                options: { ...CHART_DEFAULTS, plugins: { ...CHART_DEFAULTS.plugins, legend: { position: 'bottom',
+                            labels: { font: { size: 10 } } } }, cutout: '68%' }
+            });
+        }
+
+        // ─── 3. Review Score ─────────────
+        const rsCtx = getCtx('reviewScoreChart');
+        if (rsCtx) {
+            new Chart(rsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['1', '2', '3', '4', '5'],
+                    datasets: [{
+                        label: 'Reviews',
+                        data: [11249, 4685, 8333, 15897, 77165],
+                        backgroundColor: ['#e2635b', '#f5a623', '#f7c948', '#5b7cfa', '#2d9f6e'],
+                        borderRadius: 4,
+                        barPercentage: 0.6,
+                    }]
+                },
+                options: { ...CHART_DEFAULTS, plugins: { ...CHART_DEFAULTS.plugins, legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { color: '#f0f2f7' }, ticks: { font: { size: 9 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 10 } } } } }
+            });
+        }
+
+        // ─── 4. On‑Time Delivery ────────
+        const otCtx = getCtx('ontimeChart');
+        if (otCtx) {
+            new Chart(otCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['On‑Time', 'Late'],
+                    datasets: [{ data: [105998, 11331], backgroundColor: ['#2d9f6e', '#e2635b'], borderWidth: 0 }]
+                },
+                options: { ...CHART_DEFAULTS, plugins: { ...CHART_DEFAULTS.plugins, legend: { position: 'bottom',
+                            labels: { font: { size: 10 } } } }, cutout: '65%' }
+            });
+        }
+
+        // ─── 5. Demand Category ──────────
+        const dcCtx = getCtx('demandChart');
+        if (dcCtx) {
+            new Chart(dcCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Very High', 'High', 'Medium', 'Low', 'Very Low'],
+                    datasets: [{
+                        label: 'Orders',
+                        data: [61067, 39949, 11906, 3714, 678],
+                        backgroundColor: ['#2d3b66', '#5b7cfa', '#8aa3ff', '#b0c4ff', '#d0d8ec'],
+                        borderRadius: 4,
+                        barPercentage: 0.6,
+                    }]
+                },
+                options: { ...CHART_DEFAULTS, plugins: { ...CHART_DEFAULTS.plugins, legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { color: '#f0f2f7' }, ticks: { font: { size: 9 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 8 }, maxRotation: 20 } } } }
+            });
+        }
+
+        // ─── 6. Price Distribution ────────
+        const priceCtx = getCtx('priceChart');
+        if (priceCtx) {
+            new Chart(priceCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['0‑100', '100‑200', '200‑300', '300‑400', '400‑500', '500+'],
+                    datasets: [{
+                        label: 'Orders',
+                        data: [52400, 31800, 15200, 8200, 4200, 5529],
+                        backgroundColor: '#5b7cfa',
+                        borderRadius: 4,
+                        barPercentage: 0.7,
+                    }]
+                },
+                options: { ...CHART_DEFAULTS, plugins: { ...CHART_DEFAULTS.plugins, legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { color: '#f0f2f7' }, ticks: { font: { size: 9 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 10 } } } } }
+            });
+        }
+
+        // ─── 7. Payment Value Distribution ─
+        const pvCtx = getCtx('paymentValueChart');
+        if (pvCtx) {
+            new Chart(pvCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['0‑100', '100‑200', '200‑300', '300‑400', '400‑500', '500+'],
+                    datasets: [{
+                        label: 'Orders',
+                        data: [48600, 33400, 17200, 9400, 4800, 3914],
+                        backgroundColor: '#2d9f6e',
+                        borderRadius: 4,
+                        barPercentage: 0.7,
+                    }]
+                },
+                options: { ...CHART_DEFAULTS, plugins: { ...CHART_DEFAULTS.plugins, legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { color: '#f0f2f7' }, ticks: { font: { size: 9 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 10 } } } } }
+            });
+        }
+
+        // ════════════════════════════════════════
+        //  ONNX MODEL LOADING & INFERENCE
+        // ════════════════════════════════════════
+
+        const MODEL_URL =
+            'https://raw.githubusercontent.com/Mayank170906/mlProjects/master/Supervised/lgbm_model.onnx';
+        let session = null;
+        let modelLoaded = false;
+
+        const logContainer = document.getElementById('logContainer');
+        const predictionResult = document.getElementById('predictionResult');
+        const predictionValue = document.getElementById('predictionValue');
+        const confidenceValue = document.getElementById('confidenceValue');
+        const loadBtn = document.getElementById('loadModelBtn');
+        const predictBtn = document.getElementById('predictBtn');
+
+        function log(msg) {
+            logContainer.textContent += msg + '\n';
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        async function loadModel() {
+            logContainer.textContent = '⏳ Downloading model...\n';
+            loadBtn.disabled = true;
+            loadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+
+            try {
+                const response = await fetch(MODEL_URL);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const arrayBuffer = await response.arrayBuffer();
+                log('✅ Model downloaded (' + (arrayBuffer.byteLength / 1024).toFixed(1) + ' KB)');
+
+                log('⏳ Creating inference session...');
+                session = await ort.InferenceSession.create(arrayBuffer, {
+                    executionProviders: ['wasm'],
+                });
+                modelLoaded = true;
+                predictBtn.disabled = false;
+                log('✅ Session created successfully.');
+                log('ℹ️ Model input names: ' + session.inputNames.join(', '));
+                log('ℹ️ Model output names: ' + session.outputNames.join(', '));
+                log('🚀 Ready for prediction!');
+
+                loadBtn.innerHTML = '<i class="fas fa-check"></i> Loaded';
+                loadBtn.disabled = false;
+            } catch (err) {
+                log('❌ Error: ' + err.message);
+                loadBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Retry';
+                loadBtn.disabled = false;
+                modelLoaded = false;
+                predictBtn.disabled = true;
+            }
+        }
+
+        async function predict() {
+            if (!modelLoaded || !session) {
+                log('❌ Model not loaded.');
+                return;
+            }
+
+            // Gather inputs
+            const price = parseFloat(document.getElementById('price').value);
+            const freight = parseFloat(document.getElementById('freight').value);
+            const installments = parseFloat(document.getElementById('installments').value);
+            const payment_value = parseFloat(document.getElementById('payment_value').value);
+            const review_score = parseFloat(document.getElementById('review_score').value);
+            const ontime = parseInt(document.getElementById('ontime').value);
+            const approval_time = parseFloat(document.getElementById('approval_time').value);
+            const demand = parseFloat(document.getElementById('demand').value);
+            const response_time = parseFloat(document.getElementById('response_time').value);
+
+            if (isNaN(price) || isNaN(freight) || isNaN(installments) || isNaN(payment_value) ||
+                isNaN(review_score) || isNaN(ontime) || isNaN(approval_time) || isNaN(demand) || isNaN(response_time)) {
+                log('❌ Please fill all fields with valid numbers.');
+                return;
+            }
+
+            // Prepare input tensor (order must match training: price, freight_value, payment_installments, payment_value,
+            // review_score, on_time_delivery, approval_time, demand_category, review_response_time)
+            const inputData = new Float32Array([
+                price, freight, installments, payment_value,
+                review_score, ontime, approval_time, demand, response_time
+            ]);
+
+            const inputTensor = new ort.Tensor('float32', inputData, [1, 9]);
+
+            const feeds = {};
+            feeds[session.inputNames[0]] = inputTensor;
+
+            log('⏳ Running inference...');
+            predictBtn.disabled = true;
+            predictBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Predicting...';
+
+            try {
+                const results = await session.run(feeds);
+                const output = results[session.outputNames[0]];
+                const data = output.data;
+                // Assuming binary classification: output is [prob_class0, prob_class1]
+                const probDelivered = data[1];
+                const prediction = probDelivered >= 0.5 ? 1 : 0;
+                predictionValue.textContent = prediction;
+                confidenceValue.textContent = (probDelivered * 100).toFixed(2) + '%';
+                predictionResult.style.display = 'block';
+                log(`✅ Prediction: ${prediction} (confidence ${(probDelivered*100).toFixed(2)}%)`);
+            } catch (err) {
+                log('❌ Inference error: ' + err.message);
+            } finally {
+                predictBtn.disabled = false;
+                predictBtn.innerHTML = '<i class="fas fa-robot"></i> Predict';
+            }
+        }
+
+        // ─── Event listeners ──────────────
+        loadBtn.addEventListener('click', loadModel);
+        predictBtn.addEventListener('click', predict);
+
+        // Initial log
+        log('📦 Ready. Click "Load Model" to fetch the ONNX model.');
+        log('ℹ️ Model URL: ' + MODEL_URL);
+    </script>
+
+</body>
+</html>
