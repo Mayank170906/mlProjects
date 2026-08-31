@@ -3,57 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spaceship Titanic ML</title>
+
+    <title>ML Projects</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
+            background: #f5f5f5;
+            color: #171717;
             font-family: Arial, sans-serif;
-            background: #000;
-            color: #fff;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: auto;
-            padding: 60px 20px;
+            padding: 70px 24px;
+        }
+
+        header {
+            margin-bottom: 45px;
+        }
+
+        .eyebrow {
+            color: #737373;
+            font-size: 12px;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
         }
 
         h1 {
-            font-size: 48px;
-            margin-bottom: 8px;
+            margin: 0;
+            font-size: clamp(40px, 7vw, 64px);
+            letter-spacing: -2.5px;
+            line-height: 1;
+            font-weight: 700;
         }
 
-        p {
-            color: #aaa;
+        .intro {
+            max-width: 600px;
+            margin-top: 18px;
+            color: #666;
+            font-size: 15px;
+            line-height: 1.7;
         }
 
-        .links {
+        .projects {
             display: grid;
-            gap: 12px;
-            margin-top: 40px;
+            gap: 14px;
         }
 
-        a {
+        .project {
             display: block;
-            padding: 18px;
-            border: 1px solid #333;
-            border-radius: 8px;
-            color: #fff;
+            padding: 25px;
+            background: #fff;
+            border: 1px solid #dedede;
+            border-radius: 12px;
+            color: inherit;
             text-decoration: none;
+            transition: .2s ease;
         }
 
-        a:hover {
-            border-color: #777;
+        .project:hover {
+            border-color: #b5b5b5;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .06);
+            transform: translateY(-2px);
         }
 
-        .title {
-            font-size: 20px;
+        .number {
+            color: #999;
+            font-size: 11px;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
         }
 
-        .description {
-            margin-top: 5px;
+        .project-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .project h2 {
+            margin: 0;
+            font-size: 21px;
+            font-weight: 600;
+            letter-spacing: -.3px;
+        }
+
+        .arrow {
+            color: #999;
+            font-size: 22px;
+            transition: .2s ease;
+        }
+
+        .project:hover .arrow {
+            color: #171717;
+            transform: translate(3px, -3px);
+        }
+
+        .project p {
+            max-width: 700px;
+            margin: 9px 0 19px;
+            color: #666;
             font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+
+        .tag {
+            padding: 5px 8px;
+            background: #f7f7f7;
+            border: 1px solid #e5e5e5;
+            border-radius: 5px;
+            color: #737373;
+            font-size: 11px;
+        }
+
+        .more {
+            padding: 25px;
+            border: 1px dashed #d2d2d2;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .more p {
+            margin: 0;
+            color: #999;
+            font-size: 13px;
+        }
+
+        footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #999;
+            font-size: 11px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 45px 18px;
+            }
+
+            header {
+                margin-bottom: 35px;
+            }
+
+            .project {
+                padding: 20px;
+            }
+
+            .project h2 {
+                font-size: 19px;
+            }
         }
     </style>
 </head>
@@ -62,40 +174,83 @@
 
 <div class="container">
 
-    <p>Machine Learning Project</p>
+    <header>
+        <div class="eyebrow">Machine Learning</div>
 
-    <h1>Spaceship Titanic</h1>
+        <h1>Projects.</h1>
 
-    <p>
-        Passenger transportation prediction using tree-based
-        machine learning models.
-    </p>
+        <p class="intro">
+            A collection of machine learning projects covering data analysis,
+            model development, experimentation and deployment.
+        </p>
+    </header>
 
-    <div class="links">
 
-        <a href="report.html">
-            <div class="title">Project Report →</div>
-            <div class="description">
-                Dataset analysis, preprocessing, model comparison and tuning.
+    <main class="projects">
+
+        <!-- Project 01 -->
+        <a class="project" href="./Supervised/index.html">
+
+            <div class="number">01</div>
+
+            <div class="project-header">
+                <h2>Data Analysis & ONNX ML</h2>
+                <span class="arrow">↗</span>
             </div>
+
+            <p>
+                Brazilian E-Commerce analysis, interactive dashboard
+                and machine learning model deployment.
+            </p>
+
+            <div class="tags">
+                <span class="tag">EDA</span>
+                <span class="tag">Dashboard</span>
+                <span class="tag">LightGBM</span>
+                <span class="tag">ONNX</span>
+                <span class="tag">ROC-AUC 0.806</span>
+            </div>
+
         </a>
 
-        <a href="onnx_model.html">
-            <div class="title">ONNX Model →</div>
-            <div class="description">
-                Run the trained model directly in the browser.
+
+        <!-- Project 02 -->
+        <a class="project" href="./Tree/index.html">
+
+            <div class="number">02</div>
+
+            <div class="project-header">
+                <h2>Spaceship Titanic</h2>
+                <span class="arrow">↗</span>
             </div>
+
+            <p>
+                Passenger transportation prediction using tree-based
+                classifiers, hyperparameter tuning and threshold optimization.
+            </p>
+
+            <div class="tags">
+                <span class="tag">Classification</span>
+                <span class="tag">LightGBM</span>
+                <span class="tag">XGBoost</span>
+                <span class="tag">ONNX</span>
+                <span class="tag">78.18% Accuracy</span>
+            </div>
+
         </a>
 
-        <a href="https://github.com/Mayank170906/mlProjects/tree/master/Tree"
-           target="_blank">
-            <div class="title">GitHub Repository ↗</div>
-            <div class="description">
-                View the complete source code and project files.
-            </div>
-        </a>
 
-    </div>
+        <!-- More projects -->
+        <div class="more">
+            <p>More machine learning projects coming soon.</p>
+        </div>
+
+    </main>
+
+
+    <footer>
+        ML Portfolio · Mayank · GitHub Pages
+    </footer>
 
 </div>
 
