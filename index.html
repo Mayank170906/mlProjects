@@ -3,61 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>ML Projects</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            padding: 80px 24px;
+        }
+
+        header {
+            margin-bottom: 55px;
+        }
+
+        .eyebrow {
+            color: #777;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(42px, 7vw, 72px);
+            letter-spacing: -3px;
+            line-height: 1;
+        }
+
+        .intro {
+            max-width: 600px;
+            margin-top: 20px;
+            color: #888;
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        .projects {
+            display: grid;
+            gap: 16px;
+        }
+
+        .project {
+            display: block;
+            position: relative;
+            padding: 28px;
+            background: #080808;
+            border: 1px solid #222;
+            border-radius: 14px;
+            color: #fff;
+            text-decoration: none;
+            transition: border-color .2s, transform .2s;
+        }
+
+        .project:hover {
+            border-color: #555;
+            transform: translateY(-2px);
+        }
+
+        .number {
+            color: #555;
+            font-size: 12px;
+            margin-bottom: 24px;
+        }
+
+        .project-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .project h2 {
+            margin: 0;
+            font-size: 23px;
+            font-weight: 600;
+        }
+
+        .arrow {
+            color: #666;
+            font-size: 24px;
+            transition: color .2s, transform .2s;
+        }
+
+        .project:hover .arrow {
+            color: #fff;
+            transform: translate(3px, -3px);
+        }
+
+        .project p {
+            margin: 10px 0 20px;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            padding: 6px 9px;
+            border: 1px solid #252525;
+            border-radius: 6px;
+            color: #777;
+            font-size: 11px;
+        }
+
+        .more {
+            padding: 28px;
+            border: 1px dashed #292929;
+            border-radius: 14px;
+            text-align: center;
+        }
+
+        .more p {
+            margin: 0;
+            color: #666;
+            font-size: 13px;
+        }
+
+        footer {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid #181818;
+            color: #444;
+            font-size: 12px;
+        }
+    </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex items-center justify-center p-6">
 
-    <main class="max-w-4xl w-full bg-white border border-slate-200 rounded-2xl shadow-sm p-8 space-y-6">
-        <!-- Title -->
-        <header class="border-b border-slate-100 pb-4">
-            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Machine Learning Portfolio</h1>
-            <p class="text-sm text-slate-500 mt-1">End-to-end data science projects — from analysis to deployment.</p>
-        </header>
+<body>
 
-        <!-- Project Links -->
-        <section class="space-y-4">
-            
-            <!-- Project 1: Data Analysis & ONNX ML -->
-            <a href="./Supervised/index.html" 
-               class="group flex flex-col md:flex-row md:items-center justify-between p-5 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-xl transition duration-150 gap-3">
-                
-                <div class="flex items-start space-x-4">
-                    <span class="text-3xl">📊</span>
-                    <div>
-                        <h2 class="font-semibold text-slate-900 group-hover:text-blue-600 transition text-lg">
-                            Data Analysis & ONNX ML
-                        </h2>
-                        <p class="text-sm text-slate-600 font-medium">Brazilian E-Commerce: Analysis, Dashboard & ONNX ML</p>
-                        <ul class="text-xs text-slate-500 mt-1.5 space-y-0.5 list-disc list-inside">
-                            <li><span class="font-medium">Data Analysis:</span> 9 tables · 117K orders · delivery patterns · satisfaction drivers</li>
-                            <li><span class="font-medium">Dashboard:</span> Interactive HTML with charts, data quality, and business metrics</li>
-                            <li><span class="font-medium">ML Model:</span> LightGBM + Optuna tuning → 0.806 ROC-AUC</li>
-                            <li><span class="font-medium">ONNX Deployment:</span> Downloadable model for local inference via ONNX Runtime — no gpu needed</li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <div class="flex items-center gap-3 ml-12 md:ml-0">
-                    <span class="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-medium">Live Demo</span>
-                    <span class="text-slate-400 group-hover:text-blue-600 font-bold text-xl transition">→</span>
-                </div>
-            </a>
+<div class="container">
 
-            <!-- Future Projects Placeholder -->
-            <div class="p-4 border-2 border-dashed border-slate-200 rounded-xl text-center text-slate-400 text-sm">
-                <span class="font-medium">🚀 More projects coming soon</span>
-                <p class="text-xs mt-0.5">Supervised · Unsupervised · Deep Learning · NLP</p>
+    <header>
+        <div class="eyebrow">Machine Learning</div>
+
+        <h1>Projects.</h1>
+
+        <p class="intro">
+            A collection of machine learning projects covering data analysis,
+            model development, experimentation and deployment.
+        </p>
+    </header>
+
+
+    <main class="projects">
+
+        <!-- Project 01 -->
+        <a class="project" href="./Supervised/index.html">
+
+            <div class="number">01</div>
+
+            <div class="project-header">
+                <h2>Data Analysis & ONNX ML</h2>
+                <span class="arrow">↗</span>
             </div>
 
-        </section>
+            <p>
+                Brazilian E-Commerce analysis, interactive dashboard
+                and machine learning model deployment.
+            </p>
 
-        <!-- Footer -->
-        <footer class="text-xs text-slate-400 text-center pt-2 border-t border-slate-100 pt-4">
-            Hosted via GitHub Pages · Mayank
-        </footer>
+            <div class="tags">
+                <span class="tag">EDA</span>
+                <span class="tag">Dashboard</span>
+                <span class="tag">LightGBM</span>
+                <span class="tag">ONNX</span>
+                <span class="tag">ROC-AUC 0.806</span>
+            </div>
+
+        </a>
+
+
+        <!-- Project 02 -->
+        <a class="project" href="./Tree/index.html">
+
+            <div class="number">02</div>
+
+            <div class="project-header">
+                <h2>Spaceship Titanic</h2>
+                <span class="arrow">↗</span>
+            </div>
+
+            <p>
+                Passenger transportation prediction using tree-based
+                classifiers, hyperparameter tuning and threshold optimization.
+            </p>
+
+            <div class="tags">
+                <span class="tag">Classification</span>
+                <span class="tag">LightGBM</span>
+                <span class="tag">XGBoost</span>
+                <span class="tag">ONNX</span>
+                <span class="tag">78.18% Accuracy</span>
+            </div>
+
+        </a>
+
+
+        <!-- More -->
+        <div class="more">
+            <p>More machine learning projects coming soon.</p>
+        </div>
+
     </main>
+
+
+    <footer>
+        ML Portfolio · Mayank · GitHub Pages
+    </footer>
+
+</div>
 
 </body>
 </html>

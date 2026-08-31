@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spaceship Titanic — Report</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 50px 20px;
+        }
+
+        a {
+            color: #aaa;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: #fff;
+        }
+
+        h1 {
+            font-size: 42px;
+            margin-bottom: 5px;
+        }
+
+        h2 {
+            margin-top: 45px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 8px;
+        }
+
+        h3 {
+            margin-top: 30px;
+        }
+
+        p, li {
+            color: #bbb;
+        }
+
+        code {
+            background: #111;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        pre {
+            background: #111;
+            border: 1px solid #222;
+            padding: 15px;
+            overflow-x: auto;
+            color: #ccc;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid #222;
+        }
+
+        th {
+            color: #fff;
+        }
+
+        td {
+            color: #aaa;
+        }
+
+        .highlight {
+            border: 1px solid #333;
+            padding: 18px;
+            margin: 20px 0;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 35px;
+        }
+
+        footer {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid #222;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <a class="back" href="index.html">← Back to project</a>
+
+    <h1>Spaceship Titanic</h1>
+    <p>Passenger transportation prediction using tree-based classification models.</p>
+
+    <div class="highlight">
+        <strong>Best result:</strong> 78.18% validation accuracy after
+        LightGBM hyperparameter tuning and probability threshold optimization.
+        <br>
+        <strong>Selected threshold:</strong> 0.42
+    </div>
+
+    <h2>1. Dataset</h2>
+
+    <p>
+        The project uses the Kaggle Spaceship Titanic dataset.
+        The training data contains 8,693 rows and 14 columns, while the
+        test data contains 4,277 rows and 13 columns.
+    </p>
+
+    <p>
+        The target variable is <code>Transported</code>, which represents
+        whether a passenger was transported.
+    </p>
+
+    <h2>2. Data Preprocessing</h2>
+
+    <p>The original dataset contained categorical, numerical and high-cardinality features.</p>
+
+    <h3>Missing Values</h3>
+
+    <ul>
+        <li>Categorical columns were filled with <code>Unknown</code>.</li>
+        <li>Numerical columns were filled using the median.</li>
+        <li>Rows with remaining missing values in the training data were removed.</li>
+    </ul>
+
+    <h3>Removed Features</h3>
+
+    <ul>
+        <li><code>Cabin</code> was removed because cabin information was shared by passengers.</li>
+        <li><code>Name</code> was removed because most names were unique and unlikely to generalize.</li>
+    </ul>
+
+    <p>
+        The categorical features were converted into numerical dummy variables
+        using one-hot encoding.
+    </p>
+
+    <p>
+        Final model features included passenger age, spending in Room Service,
+        Food Court, Shopping Mall, Spa and VR Deck, along with encoded
+        Home Planet, CryoSleep, Destination and VIP information.
+    </p>
+
+    <h2>3. Model Comparison</h2>
+
+    <table>
+        <tr>
+            <th>Model</th>
+            <th>Validation Accuracy</th>
+        </tr>
+
+        <tr>
+            <td>Decision Tree</td>
+            <td>73.37%</td>
+        </tr>
+
+        <tr>
+            <td>Random Forest</td>
+            <td>77.29%</td>
+        </tr>
+
+        <tr>
+            <td>LightGBM</td>
+            <td>77.70%</td>
+        </tr>
+
+        <tr>
+            <td>Gradient Boosting</td>
+            <td>78.05%</td>
+        </tr>
+
+        <tr>
+            <td>XGBoost</td>
+            <td>76.81%</td>
+        </tr>
+
+        <tr>
+            <td>Hard Voting</td>
+            <td>77.29%</td>
+        </tr>
+
+        <tr>
+            <td>Soft Voting</td>
+            <td>77.49%</td>
+        </tr>
+
+        <tr>
+            <td>Weighted Hard Voting</td>
+            <td>77.77%</td>
+        </tr>
+
+        <tr>
+            <td>Weighted Soft Voting</td>
+            <td>77.70%</td>
+        </tr>
+    </table>
+
+    <h2>4. Hyperparameter Tuning</h2>
+
+    <p>
+        Gradient Boosting was first tuned using <code>GridSearchCV</code>.
+        The best cross-validation accuracy was approximately
+        <strong>80.23%</strong>, but its validation accuracy was
+        approximately <strong>77.15%</strong>.
+    </p>
+
+    <p>
+        LightGBM was then tuned using <code>RandomizedSearchCV</code>
+        with 30 parameter combinations and 5-fold cross-validation.
+    </p>
+
+    <p>The best LightGBM parameters were:</p>
+
+    <pre>{
+    "subsample": 1.0,
+    "reg_lambda": 0.1,
+    "reg_alpha": 0.0,
+    "num_leaves": 31,
+    "n_estimators": 100,
+    "min_child_samples": 20,
+    "max_depth": -1,
+    "learning_rate": 0.05,
+    "colsample_bytree": 1.0
+}</pre>
+
+    <p>
+        The best cross-validation score was approximately
+        <strong>80.49%</strong>, with a validation accuracy of
+        <strong>77.84%</strong>.
+    </p>
+
+    <h2>5. Classification Threshold</h2>
+
+    <p>
+        Instead of directly using the default probability threshold of
+        0.50, prediction probabilities were obtained using
+        <code>predict_proba()</code>.
+    </p>
+
+    <pre>probs = model.predict_proba(X_val)[:, 1]</pre>
+
+    <p>
+        Thresholds from 0.01 to 0.99 were tested. The threshold producing
+        the highest validation accuracy was:
+    </p>
+
+    <div class="highlight">
+        <strong>Threshold = 0.42</strong><br>
+        Validation Accuracy = <strong>78.18%</strong>
+    </div>
+
+    <p>
+        The final binary prediction is therefore based on whether the
+        probability of <code>Transported = True</code> is at least 0.42.
+    </p>
+
+    <pre>predictions = test_probs >= 0.42</pre>
+
+    <h2>6. Final Prediction</h2>
+
+    <p>
+        The tuned LightGBM model was used to generate probabilities for
+        the test dataset. The optimized threshold was then applied to
+        convert those probabilities into True/False predictions.
+    </p>
+
+    <p>
+        The resulting predictions were combined with <code>PassengerId</code>
+        and saved as:
+    </p>
+
+    <pre>./cdata/predictions.csv</pre>
+
+    <h2>7. Final Pipeline</h2>
+
+    <p>
+        The overall workflow was:
+    </p>
+
+    <ol>
+        <li>Load the Spaceship Titanic dataset.</li>
+        <li>Analyze missing values and feature types.</li>
+        <li>Handle categorical and numerical missing values.</li>
+        <li>Remove Cabin and Name.</li>
+        <li>One-hot encode categorical features.</li>
+        <li>Compare multiple tree-based classifiers.</li>
+        <li>Tune Gradient Boosting and LightGBM.</li>
+        <li>Select the best LightGBM model.</li>
+        <li>Optimize the classification threshold.</li>
+        <li>Generate test predictions.</li>
+        <li>Save predictions to CSV.</li>
+    </ol>
+
+    <h2>8. Result</h2>
+
+    <div class="highlight">
+        <strong>Model:</strong> Tuned LightGBM<br>
+        <strong>Threshold:</strong> 0.42<br>
+        <strong>Validation Accuracy:</strong> 78.18%
+    </div>
+
+    <footer>
+        Spaceship Titanic ML Project ·
+        <a href="https://github.com/Mayank170906/mlProjects/tree/master/Tree"
+           target="_blank">GitHub Repository ↗</a>
+    </footer>
+
+</div>
+
+</body>
+</html>
