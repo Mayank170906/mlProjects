@@ -423,7 +423,18 @@
 :root { --portfolio-ink:#17221f; --portfolio-muted:#63716c; --portfolio-paper:#f4f2ec; --portfolio-accent:#be5b3e; --portfolio-line:#d9ded7; }
 body { background:radial-gradient(circle at 90% 0%, #eadfd1 0, transparent 30%),var(--portfolio-paper); }
 body::before { content:'Mayank Choudhary  /  Integrated M.Tech, 4th year, VIT  /  Machine Learning Portfolio'; display:block; max-width:1440px; margin:0 auto 18px; padding:10px 18px; border-bottom:1px solid var(--portfolio-line); color:var(--portfolio-muted); font:600 11px/1.4 'Trebuchet MS',Arial,sans-serif; letter-spacing:.08em; text-transform:uppercase; }
-.dashboard { border-color:var(--portfolio-line); box-shadow:0 18px 50px rgba(35,47,41,.08); } button,.btn { background:var(--portfolio-accent); } @media (max-width:600px) { body::before { font-size:9px; } }
+.dashboard { border-color:var(--portfolio-line); box-shadow:0 18px 50px rgba(35,47,41,.08); } button,.btn { background:var(--portfolio-accent); }
+.control-rail { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin:-8px 0 24px; padding:12px 14px; background:rgba(255,253,248,.78); border:1px solid var(--portfolio-line); border-radius:12px; }
+.control-rail label { display:flex; align-items:center; gap:8px; color:var(--portfolio-muted); font-size:12px; font-weight:700; }
+.control-rail input { width:min(300px, 55vw); padding:9px 12px; border:1px solid var(--portfolio-line); border-radius:8px; background:#fff; color:var(--portfolio-ink); outline:none; }
+.control-rail input:focus { border-color:var(--portfolio-accent); box-shadow:0 0 0 3px rgba(190,91,62,.12); }
+.control-actions { display:flex; gap:8px; }
+.control-actions button { border:1px solid var(--portfolio-accent); border-radius:7px; padding:9px 12px; color:#fff; cursor:pointer; font:700 11px 'Trebuchet MS',Arial,sans-serif; }
+.control-actions button.secondary { background:transparent; color:var(--portfolio-accent); }
+.dashboard.compact .card { padding:16px 18px; } .dashboard.compact .chart-wrapper.tall { height:220px; }
+body.night { background:#1d2927; color:#eef2eb; } body.night .control-rail, body.night .card, body.night .stat-card, body.night .header { background:#263633; border-color:#40524d; } body.night .header-left h1, body.night .stat-card .value, body.night .card-title, body.night table.mini td { color:#eef2eb; } body.night .header-left .sub, body.night .text-muted, body.night .stat-card .label { color:#b7c5bd; }
+.dashboard .card.is-hidden, .dashboard .stat-card.is-hidden { display:none; }
+@media (max-width:600px) { body::before { font-size:9px; } .control-rail { align-items:stretch; } .control-rail label { width:100%; } .control-rail input { flex:1; width:auto; } .control-actions { width:100%; } .control-actions button { flex:1; } }
 </style>
 
     <div class="dashboard">
@@ -443,6 +454,17 @@ body::before { content:'Mayank Choudhary  /  Integrated M.Tech, 4th year, VIT  /
                 <span class="badge"><i class="fas fa-rows"></i> 117 k rows</span>
             </div>
         </header>
+
+        <div class="control-rail" role="toolbar" aria-label="Dashboard controls">
+            <label for="dashboardSearch"><i class="fas fa-search"></i> Explore dashboard
+                <input id="dashboardSearch" type="search" placeholder="Filter cards and sections..." autocomplete="off">
+            </label>
+            <div class="control-actions">
+                <button id="compactToggle" class="secondary" type="button"><i class="fas fa-compress"></i> Compact view</button>
+                <button id="themeToggle" class="secondary" type="button"><i class="fas fa-moon"></i> Night mode</button>
+                <button id="exportCharts" type="button"><i class="fas fa-download"></i> Export charts</button>
+            </div>
+        </div>
 
         <!-- ════════ STATS ════════ -->
         <div class="stats-grid">
@@ -894,6 +916,60 @@ body::before { content:'Mayank Choudhary  /  Integrated M.Tech, 4th year, VIT  /
                 }
             });
         }
+
+        // ─── Dashboard interactions ─────────────────────────────
+        const dashboard = document.querySelector('.dashboard');
+        const searchInput = document.getElementById('dashboardSearch');
+        const compactToggle = document.getElementById('compactToggle');
+        const themeToggle = document.getElementById('themeToggle');
+        const exportCharts = document.getElementById('exportCharts');
+
+        document.querySelectorAll('.stat-card .value').forEach((value) => {
+            const raw = value.textContent.replace(/,/g, '').trim();
+            const target = Number.parseFloat(raw);
+            if (!Number.isFinite(target)) return;
+            const suffix = raw.includes('.') ? '' : '';
+            let current = 0;
+            const increment = Math.max(target / 24, 1);
+            const timer = window.setInterval(() => {
+                current = Math.min(current + increment, target);
+                value.textContent = `${Math.round(current).toLocaleString()}${suffix}`;
+                if (current >= target) window.clearInterval(timer);
+            }, 24);
+        });
+
+        searchInput?.addEventListener('input', (event) => {
+            const query = event.target.value.trim().toLowerCase();
+            document.querySelectorAll('.dashboard .card, .dashboard .stat-card').forEach((card) => {
+                card.classList.toggle('is-hidden', query && !card.textContent.toLowerCase().includes(query));
+            });
+        });
+
+        compactToggle?.addEventListener('click', () => {
+            dashboard.classList.toggle('compact');
+            compactToggle.classList.toggle('secondary');
+            compactToggle.innerHTML = dashboard.classList.contains('compact')
+                ? '<i class="fas fa-expand"></i> Spacious view'
+                : '<i class="fas fa-compress"></i> Compact view';
+        });
+
+        themeToggle?.addEventListener('click', () => {
+            document.body.classList.toggle('night');
+            themeToggle.innerHTML = document.body.classList.contains('night')
+                ? '<i class="fas fa-sun"></i> Day mode'
+                : '<i class="fas fa-moon"></i> Night mode';
+        });
+
+        exportCharts?.addEventListener('click', () => {
+            document.querySelectorAll('canvas[id]').forEach((canvas) => {
+                const link = document.createElement('a');
+                link.download = `${canvas.id}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+            exportCharts.innerHTML = '<i class="fas fa-check"></i> Charts exported';
+            window.setTimeout(() => { exportCharts.innerHTML = '<i class="fas fa-download"></i> Export charts'; }, 2200);
+        });
     </script>
 
 </body>

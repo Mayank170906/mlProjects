@@ -213,6 +213,12 @@
 body { background:radial-gradient(circle at 90% 0%, #eadfd1 0, transparent 30%),var(--portfolio-paper); color:var(--portfolio-ink); }
 body::before { content:'Mayank Choudhary  /  Integrated M.Tech, 4th year, VIT  /  Machine Learning Portfolio'; display:block; max-width:900px; margin:0 auto; padding:10px 20px; border-bottom:1px solid var(--portfolio-line); color:var(--portfolio-muted); font:600 11px/1.4 'Trebuchet MS',Arial,sans-serif; letter-spacing:.08em; text-transform:uppercase; }
 .container { width:min(900px,100%); background:#fffdf8; border-color:var(--portfolio-line); box-shadow:0 18px 50px rgba(35,47,41,.08); } h1,h2,h3 { color:var(--portfolio-ink); } p { color:var(--portfolio-muted); } button { background:var(--portfolio-accent); } @media (max-width:600px) { body::before { font-size:9px; } }
+.scenario-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:18px; padding-bottom:16px; border-bottom:1px solid var(--portfolio-line); }
+.scenario-bar span { margin-right:auto; color:var(--portfolio-muted); font:700 11px 'Trebuchet MS',Arial,sans-serif; text-transform:uppercase; letter-spacing:.08em; }
+.scenario-bar button { border:1px solid var(--portfolio-accent); padding:8px 11px; border-radius:7px; font-size:11px; }
+.scenario-bar button.secondary { background:transparent; color:var(--portfolio-accent); }
+.card { transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease; } .card:hover { transform:translateY(-2px); box-shadow:0 12px 28px rgba(35,47,41,.08); border-color:#d9b8aa; }
+#prediction { color:var(--portfolio-accent); } #result { animation:result-in .35s ease both; } @keyframes result-in { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
 </style>
 
   <div class="container">
@@ -247,6 +253,13 @@ body::before { content:'Mayank Choudhary  /  Integrated M.Tech, 4th year, VIT  /
     <!-- Inputs -->
 
     <div class="card">
+
+      <div class="scenario-bar" aria-label="Prediction scenarios">
+        <span>Try a scenario</span>
+        <button type="button" onclick="applyScenario('balanced')">Balanced</button>
+        <button type="button" onclick="applyScenario('premium')">Premium guest</button>
+        <button type="button" class="secondary" onclick="resetScenario()">Reset</button>
+      </div>
 
       <div class="grid">
 
@@ -568,6 +581,47 @@ body::before { content:'Mayank Choudhary  /  Integrated M.Tech, 4th year, VIT  /
       ).textContent =
         threshold.toFixed(2);
 
+    }
+
+
+    function setValue(id, value) {
+      document.getElementById(id).value = value;
+    }
+
+
+    function applyScenario(name) {
+      if (name === "premium") {
+        setValue("age", 34);
+        setValue("room", 1200);
+        setValue("food", 2600);
+        setValue("mall", 900);
+        setValue("spa", 1800);
+        setValue("vr", 2100);
+        setValue("planet", "europa");
+        setValue("cryo", "false");
+        setValue("destination", "trappist");
+        setValue("vip", "true");
+      } else {
+        setValue("age", 26);
+        setValue("room", 0);
+        setValue("food", 500);
+        setValue("mall", 100);
+        setValue("spa", 0);
+        setValue("vr", 50);
+        setValue("planet", "europa");
+        setValue("cryo", "false");
+        setValue("destination", "trappist");
+        setValue("vip", "false");
+      }
+      document.getElementById("result").style.display = "none";
+      log("Scenario loaded: " + name);
+    }
+
+
+    function resetScenario() {
+      applyScenario("balanced");
+      setValue("threshold", 0.42);
+      updateThreshold();
     }
 
 
