@@ -232,6 +232,26 @@
             margin-bottom: 8px;
         }
 
+        .profile-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 14px;
+            margin-top: 16px;
+        }
+
+        .profile-links a {
+            color: var(--accent-dark);
+            font: 700 12px 'Trebuchet MS', Arial, sans-serif;
+            text-decoration: none;
+            border-bottom: 1px solid #d9b8aa;
+            padding-bottom: 3px;
+        }
+
+        .profile-links a:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
         .project {
             padding: 28px 30px;
             background: rgba(255, 253, 248, .9);
@@ -277,6 +297,11 @@
             Integrated M.Tech student, 4th year, VIT. I design structured,
             practical machine learning workflows from raw data to evaluated,
             browser-ready models.
+            <span class="profile-links">
+                <a href="https://github.com/Mayank170906/mlProjects" target="_blank" rel="noopener noreferrer">Complete project repository ↗</a>
+                <a href="https://github.com/Mayank170906" target="_blank" rel="noopener noreferrer">GitHub profile ↗</a>
+                <a href="https://www.credly.com/users/mayank-choudhary.f07b4c1a/badges/credly" target="_blank" rel="noopener noreferrer">Credly badges ↗</a>
+            </span>
         </div>
     </header>
 
@@ -338,7 +363,8 @@
 
 
     <footer>
-        Mayank Choudhary · Integrated M.Tech, VIT · Machine Learning Portfolio
+        Mayank Choudhary · Integrated M.Tech, VIT · Machine Learning Portfolio ·
+        <a href="https://github.com/Mayank170906/mlProjects" target="_blank" rel="noopener noreferrer">Source on GitHub ↗</a>
     </footer>
 
 </div>
