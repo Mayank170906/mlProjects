@@ -167,6 +167,94 @@
                 font-size: 19px;
             }
         }
+
+        :root {
+            --ink: #17221f;
+            --muted: #63716c;
+            --paper: #f4f2ec;
+            --card: #fffdf8;
+            --line: #d9ded7;
+            --accent: #be5b3e;
+            --accent-dark: #843c2c;
+        }
+
+        body {
+            background: radial-gradient(circle at 90% 0%, #eadfd1 0, transparent 30%), var(--paper);
+            color: var(--ink);
+            font-family: Georgia, 'Times New Roman', serif;
+        }
+
+        .container {
+            max-width: 1160px;
+            padding: 56px 28px 32px;
+        }
+
+        header {
+            display: grid;
+            grid-template-columns: minmax(0, 1.35fr) minmax(260px, .65fr);
+            gap: 42px;
+            align-items: end;
+            margin-bottom: 46px;
+        }
+
+        .eyebrow, .number, footer {
+            font-family: 'Trebuchet MS', Arial, sans-serif;
+        }
+
+        .eyebrow {
+            color: var(--accent-dark);
+            font-weight: 700;
+        }
+
+        h1 {
+            color: var(--ink);
+            font-size: clamp(48px, 8vw, 86px);
+            letter-spacing: -4px;
+        }
+
+        .intro {
+            color: var(--muted);
+            font-size: 17px;
+            max-width: 650px;
+        }
+
+        .profile {
+            border-left: 3px solid var(--accent);
+            padding: 4px 0 4px 22px;
+            color: var(--muted);
+            font: 14px/1.65 'Trebuchet MS', Arial, sans-serif;
+        }
+
+        .profile strong {
+            display: block;
+            color: var(--ink);
+            font: 700 20px/1.2 Georgia, 'Times New Roman', serif;
+            margin-bottom: 8px;
+        }
+
+        .project {
+            padding: 28px 30px;
+            background: rgba(255, 253, 248, .9);
+            border: 1px solid var(--line);
+            border-radius: 3px;
+            box-shadow: 0 10px 30px rgba(35, 47, 41, .04);
+        }
+
+        .project:hover {
+            border-color: var(--accent);
+            box-shadow: 0 16px 32px rgba(35, 47, 41, .1);
+        }
+
+        .project h2 { font-size: 24px; color: var(--ink); }
+        .project p { color: var(--muted); }
+        .arrow { color: var(--accent); }
+        .tag { background: #f1eee6; border-color: #e3ddd1; color: var(--accent-dark); }
+        footer { border-color: var(--line); color: var(--muted); }
+
+        @media (max-width: 720px) {
+            header { grid-template-columns: 1fr; gap: 24px; }
+            h1 { letter-spacing: -2.5px; }
+        }
     </style>
 </head>
 
@@ -183,6 +271,13 @@
             A collection of machine learning projects covering data analysis,
             model development, experimentation and deployment.
         </p>
+
+        <div class="profile">
+            <strong>Mayank Choudhary</strong>
+            Integrated M.Tech student, 4th year, VIT. I design structured,
+            practical machine learning workflows from raw data to evaluated,
+            browser-ready models.
+        </div>
     </header>
 
 
@@ -239,17 +334,11 @@
 
         </a>
 
-
-        <!-- More projects -->
-        <div class="more">
-            <p>More machine learning projects coming soon.</p>
-        </div>
-
     </main>
 
 
     <footer>
-        ML Portfolio · Mayank · GitHub Pages
+        Mayank Choudhary · Integrated M.Tech, VIT · Machine Learning Portfolio
     </footer>
 
 </div>
