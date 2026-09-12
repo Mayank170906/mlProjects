@@ -32,8 +32,9 @@
       <span class="brand__sub">· ML Portfolio</span>
     </a>
     <nav class="masthead__nav" aria-label="Primary">
-      <a class="navlink" href="../index.html">Home</a>
+      <a class="navlink navlink--optional" href="../index.html">Home</a>
       <a class="navlink" href="./report.html">Report</a>
+      <a class="navlink" href="#notebooks">Notebooks</a>
       <a class="navlink navlink--optional" href="./onnx_model.html">Live predictor</a>
       <a class="navlink navlink--optional" href="https://github.com/Mayank170906/mlProjects/tree/master/Tree" target="_blank" rel="noopener">Source&#8239;↗</a>
       <button class="theme-toggle" type="button" aria-label="Switch theme"></button>
@@ -116,6 +117,28 @@
         <div>
           <p class="eyebrow">Features</p>
           <p class="small"><span data-fill="split.n_features|int">16</span> after encoding<br><span class="muted">6 numeric, 10 one-hot</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════ NOTEBOOKS ══════════════════════════ -->
+  <section class="section section--tight" id="notebooks">
+    <div class="wrap">
+      <p class="eyebrow">Notebooks</p>
+      <h2 class="h-xl">The notebooks, as I ran them.</h2>
+      <p class="lede mt-3">Exported directly from Jupyter with code and outputs intact.</p>
+
+      <div class="nb mt-5" data-notebooks>
+        <div class="nb__bar">
+          <div class="nb__tabs" role="tablist" aria-label="Notebooks">
+          <button type="button" role="tab" id="nbtab-clean" aria-controls="nbpanel" aria-selected="true" data-src="./data_cleaner.html" data-name="data_cleaner.ipynb">data_cleaner</button>
+          <button type="button" role="tab" id="nbtab-train" aria-controls="nbpanel" aria-selected="false" data-src="./train_ensemble.html" data-name="train_ensemble.ipynb">train_ensemble</button>
+          </div>
+          <a class="btn btn--sm nb__open" href="./data_cleaner.html" target="_blank" rel="noopener">Open full page&#8239;↗</a>
+        </div>
+        <div class="nb__frame" id="nbpanel" role="tabpanel" aria-labelledby="nbtab-clean">
+          <iframe src="./data_cleaner.html" title="data_cleaner.ipynb" loading="lazy"></iframe>
         </div>
       </div>
     </div>
@@ -551,5 +574,6 @@
 </footer>
 
 <script src="./assets/case-study.js" defer></script>
+<script src="../assets/js/notebooks.js" defer></script>
 </body>
 </html>
