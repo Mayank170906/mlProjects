@@ -1,989 +1,298 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>📊 Olist ETL Pipeline Dashboard</title>
-
-    <!-- ===== Fonts & Icons ===== -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-
-    <!-- ===== Chart.js ===== -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
-    </script>
-
-    <style>
-        /* ─────────── RESET & BASE ─────────── */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #f4f6fb;
-            color: #1a1a2e;
-            padding: 24px;
-        }
-        .dashboard {
-            max-width: 1440px;
-            margin: 0 auto;
-        }
-
-        /* ─────────── SCROLLBAR ─────────── */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #e9ecf3;
-            border-radius: 8px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #b0b8cb;
-            border-radius: 8px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #8d97af;
-        }
-
-        /* ─────────── HEADER ─────────── */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-            background: #ffffff;
-            padding: 20px 32px;
-            border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-            margin-bottom: 28px;
-        }
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        .header-left .logo {
-            font-size: 32px;
-            background: #2d3b66;
-            color: #fff;
-            width: 52px;
-            height: 52px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 14px;
-        }
-        .header-left h1 {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: -0.3px;
-        }
-        .header-left h1 span {
-            color: #5b7cfa;
-        }
-        .header-left .sub {
-            font-size: 14px;
-            color: #6b7280;
-            font-weight: 400;
-            margin-top: 2px;
-        }
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .badge {
-            background: #eef2ff;
-            color: #3b4f8a;
-            padding: 6px 16px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .badge i {
-            font-size: 14px;
-        }
-
-        /* ─────────── STAT CARDS ─────────── */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-            margin-bottom: 28px;
-        }
-        .stat-card {
-            background: #ffffff;
-            padding: 18px 22px;
-            border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
-            border: 1px solid #eaedf4;
-            transition: 0.2s;
-        }
-        .stat-card:hover {
-            border-color: #c8d0e6;
-        }
-        .stat-card .label {
-            font-size: 13px;
-            font-weight: 500;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-        .stat-card .value {
-            font-size: 28px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-top: 4px;
-        }
-        .stat-card .icon {
-            float: right;
-            font-size: 28px;
-            color: #bcc3d9;
-        }
-
-        /* ─────────── SECTION TITLE ─────────── */
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin: 32px 0 16px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .section-title i {
-            color: #5b7cfa;
-            font-size: 20px;
-        }
-
-        /* ─────────── CARDS / GRID ─────────── */
-        .card {
-            background: #ffffff;
-            border-radius: 18px;
-            padding: 24px 28px;
-            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
-            border: 1px solid #eaedf4;
-            transition: 0.2s;
-            height: 100%;
-        }
-        .card:hover {
-            border-color: #d0d8ec;
-        }
-        .card-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: #2d3b66;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .card-title i {
-            color: #5b7cfa;
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 22px;
-            margin-bottom: 22px;
-        }
-        .grid-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 22px;
-            margin-bottom: 22px;
-        }
-        .grid-4 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 22px;
-            margin-bottom: 22px;
-        }
-
-        /* ─────────── TABLES ─────────── */
-        .table-wrap {
-            overflow-x: auto;
-        }
-        table.mini {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-        table.mini th {
-            text-align: left;
-            font-weight: 600;
-            color: #4b5a7a;
-            padding: 8px 6px 8px 0;
-            border-bottom: 2px solid #e9ecf3;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-        table.mini td {
-            padding: 8px 6px 8px 0;
-            border-bottom: 1px solid #f0f2f7;
-            color: #1e293b;
-        }
-        table.mini tr:last-child td {
-            border-bottom: none;
-        }
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 2px 12px;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .status-badge.success {
-            background: #e3f7ec;
-            color: #0c6e4f;
-        }
-        .status-badge.danger {
-            background: #fee9e7;
-            color: #b33a34;
-        }
-        .status-badge.warning {
-            background: #fff3d6;
-            color: #a0742c;
-        }
-
-        .null-bar {
-            display: inline-block;
-            height: 6px;
-            border-radius: 4px;
-            background: #dce2ef;
-            min-width: 40px;
-        }
-        .null-bar .fill {
-            height: 100%;
-            border-radius: 4px;
-            background: #5b7cfa;
-            transition: width 0.6s;
-        }
-        .null-bar .fill.danger {
-            background: #e2635b;
-        }
-
-        /* ─────────── RELATIONSHIP FLOW ─────────── */
-        .flow {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 8px 4px;
-            font-size: 13px;
-            font-weight: 500;
-            padding: 8px 0;
-        }
-        .flow .node {
-            background: #eef2ff;
-            padding: 4px 14px;
-            border-radius: 30px;
-            color: #2d3b66;
-            font-weight: 600;
-            font-size: 12px;
-            white-space: nowrap;
-        }
-        .flow .node.highlight {
-            background: #2d3b66;
-            color: #fff;
-        }
-        .flow .arrow {
-            color: #8d97af;
-            font-size: 16px;
-        }
-        .flow .arrow i {
-            font-size: 12px;
-        }
-
-        /* ─────────── CHART WRAPPER ─────────── */
-        .chart-wrapper {
-            position: relative;
-            height: 220px;
-        }
-        .chart-wrapper.tall {
-            height: 280px;
-        }
-        .chart-wrapper.short {
-            height: 170px;
-        }
-
-        /* ─────────── RESPONSIVE ─────────── */
-        @media (max-width: 1024px) {
-            .grid-4 {
-                grid-template-columns: 1fr 1fr;
-            }
-            .grid-3 {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-        @media (max-width: 768px) {
-            body {
-                padding: 12px;
-            }
-            .header {
-                padding: 16px 20px;
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .header-left h1 {
-                font-size: 20px;
-            }
-            .grid-2,
-            .grid-3,
-            .grid-4 {
-                grid-template-columns: 1fr;
-            }
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .card {
-                padding: 18px 16px;
-            }
-            .stat-card .value {
-                font-size: 22px;
-            }
-        }
-        @media (max-width: 480px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            .header-left .logo {
-                width: 40px;
-                height: 40px;
-                font-size: 24px;
-            }
-        }
-
-        /* ─────────── UTILITIES ─────────── */
-        .mt-8 {
-            margin-top: 8px;
-        }
-        .mb-8 {
-            margin-bottom: 8px;
-        }
-        .text-muted {
-            color: #6b7280;
-            font-size: 13px;
-        }
-        .flex {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .gap-4 {
-            gap: 4px;
-        }
-        .fw-600 {
-            font-weight: 600;
-        }
-        .truncate {
-            max-width: 140px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        /* small badge for join steps */
-        .step-badge {
-            display: inline-block;
-            background: #eef2ff;
-            padding: 2px 12px;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #2d3b66;
-        }
-        .step-badge .num {
-            background: #2d3b66;
-            color: #fff;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            margin-right: 6px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Olist Commerce Dashboard — ML Portfolio</title>
+<meta name="description" content="Interactive dashboard over 98k Olist e-commerce orders: revenue, delivery punctuality, satisfaction, categories, states and payment behaviour, cross-filterable in the browser.">
+<meta name="author" content="Mayank Choudhary">
+<link rel="canonical" href="https://mayank170906.github.io/mlProjects/Supervised/ecommerce_dashboard.html">
+<meta name="theme-color" content="#b4512f">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../assets/css/site.css">
+<link rel="stylesheet" href="./assets/dashboard.css">
+<script src="../assets/js/site.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+<script src="../assets/js/charts.js" defer></script>
 </head>
+<body class="dash-body">
 
-<body>
-<!-- portfolio-nav:start -->
-<style>
-.pf-bar{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
- margin:0 0 18px;padding:10px 18px;border:1px solid #e2ded7;border-radius:9px;background:#faf9f7;
- box-shadow:0 1px 3px rgba(22,25,28,.06);
- font:500 13px/1.4 "Inter",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#3d454b}
-.pf-bar a{color:#3d454b;text-decoration:none}
-.pf-bar a:hover{color:#b4512f}
-.pf-bar__brand{display:inline-flex;align-items:center;gap:8px;font-weight:600;color:#16191c}
-.pf-bar__mark{display:grid;place-items:center;width:22px;height:22px;border-radius:5px;
- background:#b4512f;color:#fff;font:700 10px/1 ui-monospace,Consolas,monospace}
-.pf-bar__sep{color:#a9a49b}
-.pf-bar__here{color:#626c74}
-.pf-bar__spacer{margin-left:auto}
-.pf-bar__btn{padding:5px 11px;border:1px solid #cdc7bd;border-radius:6px;background:#fff;
- color:#16191c;font:600 12px "Inter",Arial,sans-serif;text-decoration:none;cursor:pointer}
-.pf-bar__btn:hover{border-color:#b4512f;color:#b4512f}
-@media (max-width:640px){.pf-bar{padding:9px 14px;font-size:12px}.pf-bar__hide{display:none}}
-@media print{.pf-bar{display:none}}
-</style>
-<nav class="pf-bar" aria-label="Portfolio navigation">
- <a class="pf-bar__brand" href="../index.html"><span class="pf-bar__mark" aria-hidden="true">M</span>Mayank Choudhary</a>
- <span class="pf-bar__sep" aria-hidden="true">/</span>
- <a class="pf-bar__hide" href="./index.html">Customer satisfaction</a>
- <span class="pf-bar__sep pf-bar__hide" aria-hidden="true">/</span>
- <span class="pf-bar__here">Analytics dashboard</span>
- <span class="pf-bar__spacer"></span>
- <a class="pf-bar__btn" href="./index.html">Back to project</a>
- <a class="pf-bar__btn pf-bar__hide" href="../index.html">Portfolio</a>
-</nav>
-<!-- portfolio-nav:end -->
-<div class="dashboard">
+<a class="skip-link" href="#main">Skip to content</a>
 
-        <!-- ════════ HEADER ════════ -->
-        <header class="header">
-            <div class="header-left">
-                <div class="logo"><i class="fas fa-database"></i></div>
-                <div>
-                    <h1>Olist <span>ETL</span> Pipeline</h1>
-                    <div class="sub">Brazilian E‑Commerce · Data Cleaning &amp; Join Story</div>
-                </div>
-            </div>
-            <div class="header-right">
-                <span class="badge"><i class="fas fa-check-circle"></i> 9 Tables</span>
-                <span class="badge"><i class="fas fa-link"></i> 8 Joins</span>
-                <span class="badge"><i class="fas fa-rows"></i> 117 k rows</span>
-            </div>
-        </header>
+<header class="masthead">
+  <div class="wrap wrap--dash masthead__inner">
+    <a class="brand" href="../index.html">
+      <span class="brand__mark" aria-hidden="true">M</span>
+      Mayank Choudhary
+      <span class="brand__sub">· ML Portfolio</span>
+    </a>
+    <nav class="masthead__nav" aria-label="Primary">
+      <a class="navlink navlink--optional" href="../index.html">Home</a>
+      <a class="navlink" href="./index.html">Case study</a>
+      <a class="navlink navlink--optional" href="./report.html">Report</a>
+      <button class="theme-toggle" type="button" aria-label="Switch theme"></button>
+    </nav>
+  </div>
+</header>
 
-        <div class="control-rail" role="toolbar" aria-label="Dashboard controls">
-            <label for="dashboardSearch"><i class="fas fa-search"></i> Explore dashboard
-                <input id="dashboardSearch" type="search" placeholder="Filter cards and sections..." autocomplete="off">
-            </label>
-            <div class="control-actions">
-                <button id="compactToggle" class="secondary" type="button"><i class="fas fa-compress"></i> Compact view</button>
-                <button id="themeToggle" class="secondary" type="button"><i class="fas fa-moon"></i> Night mode</button>
-                <button id="exportCharts" type="button"><i class="fas fa-download"></i> Export charts</button>
-            </div>
-        </div>
+<main id="main" class="wrap wrap--dash">
 
-        <!-- ════════ STATS ════════ -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <span class="icon"><i class="fas fa-table"></i></span>
-                <div class="label">Tables Loaded</div>
-                <div class="value">9</div>
-            </div>
-            <div class="stat-card">
-                <span class="icon"><i class="fas fa-link"></i></span>
-                <div class="label">Relationships</div>
-                <div class="value">9</div>
-            </div>
-            <div class="stat-card">
-                <span class="icon"><i class="fas fa-check-double"></i></span>
-                <div class="label">Valid PKs</div>
-                <div class="value">8 / 9</div>
-            </div>
-            <div class="stat-card">
-                <span class="icon"><i class="fas fa-merge"></i></span>
-                <div class="label">Final Rows</div>
-                <div class="value">117,329</div>
-            </div>
-            <div class="stat-card">
-                <span class="icon"><i class="fas fa-filter"></i></span>
-                <div class="label">Nulls Fixed</div>
-                <div class="value">610</div>
-            </div>
-            <div class="stat-card">
-                <span class="icon"><i class="fas fa-star"></i></span>
-                <div class="label">Avg Review</div>
-                <div class="value">4.03</div>
-            </div>
-        </div>
-
-        <!-- ════════ PRIMARY KEY VALIDATION ════════ -->
-        <div class="section-title"><i class="fas fa-key"></i> Primary Key Validation</div>
-        <div class="grid-2">
-            <div class="card">
-                <div class="card-title"><i class="fas fa-check-circle"></i> Tables &amp; PK Uniqueness</div>
-                <div class="table-wrap">
-                    <table class="mini">
-                        <thead>
-                            <tr><th>Table</th><th>PK</th><th>Unique</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>customers</td><td>customer_id</td><td><span class="status-badge success"><i class="fas fa-check"></i> ✅</span></td></tr>
-                            <tr><td>orders</td><td>order_id</td><td><span class="status-badge success"><i class="fas fa-check"></i> ✅</span></td></tr>
-                            <tr><td>order_items</td><td>order_id + order_item_id</td><td><span class="status-badge success"><i class="fas fa-check"></i> ✅</span></td></tr>
-                            <tr><td>order_payments</td><td>order_id + payment_sequential</td><td><span class="status-badge success"><i class="fas fa-check"></i> ✅</span></td></tr>
-                            <tr><td>order_reviews</td><td>review_id + order_id</td><td><span class="status-badge success"><i class="fas fa-check"></i> ✅</span></td></tr>
-                            <tr><td>products</td><td>product_id</td><td><span class="status-badge success"><i class="fas fa-check"></i> ✅</span></td></tr>
-                            <tr><td>sellers</td><td>seller_id</td><td><span class="status-badge success"><i class="fas fa-check"></i> ✅</span></td></tr>
-                            <tr><td>product_category</td><td>product_category_name</td><td><span class="status-badge success"><i class="fas fa-check"></i> ✅</span></td></tr>
-                            <tr><td>geolocation</td><td>zip+lat+lng+city+state</td><td><span class="status-badge danger"><i class="fas fa-times"></i> ❌</span></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="text-muted mt-8"><i class="fas fa-info-circle"></i> geolocation has duplicate rows – handled during join.</div>
-            </div>
-
-            <!-- ── NULL CHECK ── -->
-            <div class="card">
-                <div class="card-title"><i class="fas fa-ban"></i> Null Check</div>
-                <div class="table-wrap">
-                    <table class="mini">
-                        <thead>
-                            <tr><th>Column</th><th>Nulls</th><th style="width:40%;">Bar</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>customers.customer_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
-                            <tr><td>orders.customer_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
-                            <tr><td>orders.order_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
-                            <tr><td>order_items.order_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
-                            <tr><td>order_items.product_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
-                            <tr><td>order_items.seller_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
-                            <tr><td>order_payments.order_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
-                            <tr><td>order_reviews.order_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
-                            <tr><td>products.product_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
-                            <tr><td><strong>products.product_category_name</strong></td><td><strong>610</strong></td><td><div class="null-bar"><div class="fill danger" style="width:28%;"></div></div></td></tr>
-                            <tr><td>sellers.seller_id</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
-                            <tr><td>product_category.product_category_name</td><td>0</td><td><div class="null-bar"><div class="fill" style="width:0%;"></div></div></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="text-muted mt-8"><i class="fas fa-wrench"></i> 610 nulls in product_category_name → filled with <code>'Unknown Category'</code></div>
-            </div>
-        </div>
-
-        <!-- ════════ RELATIONSHIPS ════════ -->
-        <div class="section-title"><i class="fas fa-project-diagram"></i> Relationships</div>
-        <div class="card" style="margin-bottom:22px;">
-            <div class="flow">
-                <span class="node">customers</span>
-                <span class="arrow"><i class="fas fa-arrow-right"></i></span>
-                <span class="node highlight">orders</span>
-                <span class="arrow"><i class="fas fa-arrow-right"></i></span>
-                <span class="node">order_items</span>
-                <span class="arrow"><i class="fas fa-arrow-right"></i></span>
-                <span class="node">products</span>
-                <span class="arrow"><i class="fas fa-arrow-right"></i></span>
-                <span class="node">product_category</span>
-            </div>
-            <div class="flow">
-                <span class="node">orders</span>
-                <span class="arrow"><i class="fas fa-arrow-right"></i></span>
-                <span class="node">order_payments</span>
-                <span class="arrow" style="margin-left:16px;"><i class="fas fa-arrow-right"></i></span>
-                <span class="node">order_reviews</span>
-                <span class="arrow" style="margin-left:16px;"><i class="fas fa-arrow-right"></i></span>
-                <span class="node">sellers</span>
-                <span class="arrow"><i class="fas fa-arrow-right"></i></span>
-                <span class="node">geolocation</span>
-            </div>
-            <div class="text-muted mt-8" style="font-size:13px;">
-                <i class="fas fa-arrows-alt-h"></i> <strong>Joins:</strong>
-                customers.customer_id = orders.customer_id &nbsp;·&nbsp;
-                orders.order_id = order_items.order_id &nbsp;·&nbsp;
-                orders.order_id = order_payments.order_id &nbsp;·&nbsp;
-                orders.order_id = order_reviews.order_id &nbsp;·&nbsp;
-                order_items.product_id = products.product_id &nbsp;·&nbsp;
-                order_items.seller_id = sellers.seller_id &nbsp;·&nbsp;
-                products.product_category_name = product_category.product_category_name &nbsp;·&nbsp;
-                customers.customer_zip_code_prefix = geolocation.geolocation_zip_code_prefix &nbsp;·&nbsp;
-                sellers.seller_zip_code_prefix = geolocation.geolocation_zip_code_prefix
-            </div>
-        </div>
-
-        <!-- ════════ JOIN ROW COUNTS ════════ -->
-        <div class="section-title"><i class="fas fa-layer-group"></i> Join Row Counts</div>
-        <div class="grid-2">
-            <div class="card">
-                <div class="card-title"><i class="fas fa-chart-bar"></i> Rows After Each Join</div>
-                <div class="chart-wrapper tall">
-                    <canvas id="joinChart"></canvas>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-title"><i class="fas fa-list-ol"></i> Step-by-Step</div>
-                <div class="table-wrap">
-                    <table class="mini">
-                        <thead>
-                            <tr><th>Step</th><th>Rows</th><th>Change</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><span class="step-badge"><span class="num">1</span> customers + orders</span></td><td>99,441</td><td><span class="status-badge success">+99,441</span></td></tr>
-                            <tr><td><span class="step-badge"><span class="num">2</span> + order_items</span></td><td>112,650</td><td><span class="status-badge success">+13,209</span></td></tr>
-                            <tr><td><span class="step-badge"><span class="num">3</span> + products</span></td><td>112,650</td><td><span class="status-badge warning">±0</span></td></tr>
-                            <tr><td><span class="step-badge"><span class="num">4</span> + sellers</span></td><td>112,650</td><td><span class="status-badge warning">±0</span></td></tr>
-                            <tr><td><span class="step-badge"><span class="num">5</span> + order_payments</span></td><td>117,601</td><td><span class="status-badge success">+4,951</span></td></tr>
-                            <tr><td><span class="step-badge"><span class="num">6</span> + order_reviews</span></td><td><strong>117,329</strong></td><td><span class="status-badge danger">−272</span></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="text-muted mt-8">
-                    <i class="fas fa-info-circle"></i>
-                    Rows increase due to one-to-many (items &amp; payments). 272 rows dropped due to missing reviews.
-                </div>
-            </div>
-        </div>
-
-        <!-- ════════ CHARTS: 4‑COLUMN GRID ════════ -->
-        <div class="section-title"><i class="fas fa-chart-pie"></i> Distributions</div>
-        <div class="grid-4">
-
-            <!-- 1. Payment Type -->
-            <div class="card">
-                <div class="card-title"><i class="fas fa-credit-card"></i> Payment Type</div>
-                <div class="chart-wrapper short">
-                    <canvas id="paymentTypeChart"></canvas>
-                </div>
-            </div>
-
-            <!-- 2. Review Score -->
-            <div class="card">
-                <div class="card-title"><i class="fas fa-star"></i> Review Score</div>
-                <div class="chart-wrapper short">
-                    <canvas id="reviewScoreChart"></canvas>
-                </div>
-            </div>
-
-            <!-- 3. On‑Time Delivery -->
-            <div class="card">
-                <div class="card-title"><i class="fas fa-truck-fast"></i> On‑Time Delivery</div>
-                <div class="chart-wrapper short">
-                    <canvas id="ontimeChart"></canvas>
-                </div>
-            </div>
-
-            <!-- 4. Demand Category -->
-            <div class="card">
-                <div class="card-title"><i class="fas fa-tags"></i> Demand Category</div>
-                <div class="chart-wrapper short">
-                    <canvas id="demandChart"></canvas>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- ════════ CHARTS: 2‑COLUMN GRID (Price & Payment Value) ════════ -->
-        <div class="grid-2">
-            <div class="card">
-                <div class="card-title"><i class="fas fa-dollar-sign"></i> Price Distribution</div>
-                <div class="chart-wrapper tall">
-                    <canvas id="priceChart"></canvas>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-title"><i class="fas fa-money-bill-wave"></i> Payment Value Distribution</div>
-                <div class="chart-wrapper tall">
-                    <canvas id="paymentValueChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- ════════ FOOTER ════════ -->
-        <div style="text-align:center;padding:28px 0 8px 0;color:#8d97af;font-size:14px;border-top:1px solid #eaedf4;margin-top:12px;">
-            <i class="fas fa-database"></i> Olist ETL Dashboard &bull; Built with <i class="fas fa-heart" style="color:#e2635b;"></i> &bull; 117,329 rows &bull; 39 columns
-        </div>
-
+  <!-- ══════════════ TITLE ══════════════ -->
+  <div class="dash-head">
+    <div>
+      <nav class="crumbs crumbs--flush" aria-label="Breadcrumb">
+        <a href="../index.html">Portfolio</a>
+        <span class="crumbs__sep" aria-hidden="true">/</span>
+        <a href="./index.html">Customer satisfaction</a>
+        <span class="crumbs__sep" aria-hidden="true">/</span>
+        <span aria-current="page">Dashboard</span>
+      </nav>
+      <h1 class="dash-title">Olist commerce dashboard</h1>
+      <p class="dash-sub">
+        <span id="coverage">Loading orders…</span>
+        <span class="dash-sub__sep" aria-hidden="true">·</span>
+        Click any bar, row or segment to filter every view.
+      </p>
     </div>
+    <div class="dash-head__actions">
+      <button class="btn btn--sm" id="copyLink" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>
+        <span>Copy link</span>
+      </button>
+      <button class="btn btn--sm" id="exportCsv" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v3h16v-3"/></svg>
+        <span>Export CSV</span>
+      </button>
+    </div>
+  </div>
 
-    <!-- ════════════════════════════════════════ -->
-    <!--  CHARTS  -->
-    <!-- ════════════════════════════════════════ -->
-    <script>
-        // ─── Helpers ────────────────────────────
-        function getCtx(id) {
-            const el = document.getElementById(id);
-            if (!el) return null;
-            return el.getContext('2d');
-        }
+  <!-- ══════════════ FILTERS ══════════════ -->
+  <section class="filters" aria-label="Filters">
+    <div class="filters__grid">
+      <label class="ctl">
+        <span class="ctl__label">From</span>
+        <select class="ctl__input" id="fFrom"></select>
+      </label>
+      <label class="ctl">
+        <span class="ctl__label">To</span>
+        <select class="ctl__input" id="fTo"></select>
+      </label>
+      <label class="ctl">
+        <span class="ctl__label">Customer state</span>
+        <select class="ctl__input" id="fState"><option value="">All states</option></select>
+      </label>
+      <label class="ctl">
+        <span class="ctl__label">Category</span>
+        <select class="ctl__input" id="fCategory"><option value="">All categories</option></select>
+      </label>
+      <label class="ctl">
+        <span class="ctl__label">Delivery</span>
+        <select class="ctl__input" id="fBucket"><option value="">Any delivery status</option></select>
+      </label>
+      <div class="ctl ctl--presets" role="group" aria-label="Period presets">
+        <span class="ctl__label">Period</span>
+        <div class="seg" id="presets">
+          <button type="button" data-preset="all">All</button>
+          <button type="button" data-preset="2017">2017</button>
+          <button type="button" data-preset="2018">2018</button>
+          <button type="button" data-preset="last6">Last 6m</button>
+        </div>
+      </div>
+    </div>
+    <div class="chips" id="chips" aria-live="polite"></div>
+  </section>
 
-        const COLORS = {
-            blue: '#5b7cfa',
-            blueLight: '#8aa3ff',
-            green: '#2d9f6e',
-            red: '#e2635b',
-            orange: '#f5a623',
-            purple: '#7c5cbf',
-            teal: '#2d9f9f',
-            pink: '#d9578c',
-            gray: '#b0b8cb',
-            dark: '#2d3b66'
-        };
+  <!-- ══════════════ KPIs ══════════════ -->
+  <section class="kpis" id="kpis" aria-label="Key metrics"></section>
 
-        const CHART_DEFAULTS = {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    labels: { boxWidth: 12, padding: 8, font: { size: 11, family: 'Inter' } }
-                }
-            }
-        };
+  <!-- ══════════════ INSIGHTS ══════════════ -->
+  <section class="insights" id="insights" aria-label="Insights for the current selection" aria-live="polite"></section>
 
-        // ─── 1. Join Row Counts (Bar) ──────────
-        const joinCtx = getCtx('joinChart');
-        if (joinCtx) {
-            new Chart(joinCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['customers+orders', '+order_items', '+products', '+sellers', '+order_payments',
-                        '+order_reviews'
-                    ],
-                    datasets: [{
-                        label: 'Rows',
-                        data: [99441, 112650, 112650, 112650, 117601, 117329],
-                        backgroundColor: ['#5b7cfa', '#7c9aff', '#8aa3ff', '#9aafff', '#b0c4ff', '#2d3b66'],
-                        borderRadius: 6,
-                        barPercentage: 0.6,
-                    }]
-                },
-                options: {
-                    ...CHART_DEFAULTS,
-                    plugins: {
-                        ...CHART_DEFAULTS.plugins,
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: '#f0f2f7' }, ticks: { font: { size: 10 } } },
-                        x: { grid: { display: false }, ticks: { font: { size: 9 }, maxRotation: 30 } }
-                    }
-                }
-            });
-        }
+  <!-- ══════════════ GRID ══════════════ -->
+  <div class="dash-grid">
 
-        // ─── 2. Payment Type (Doughnut) ────────
-        const ptCtx = getCtx('paymentTypeChart');
-        if (ptCtx) {
-            new Chart(ptCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Credit Card', 'Boleto', 'Voucher', 'Debit Card'],
-                    datasets: [{
-                        data: [86520, 22835, 6282, 1692],
-                        backgroundColor: ['#5b7cfa', '#8aa3ff', '#b0c4ff', '#d0d8ec'],
-                        borderWidth: 0,
-                    }]
-                },
-                options: {
-                    ...CHART_DEFAULTS,
-                    plugins: {
-                        ...CHART_DEFAULTS.plugins,
-                        legend: { position: 'bottom', labels: { font: { size: 10 } } }
-                    },
-                    cutout: '68%',
-                }
-            });
-        }
+    <!-- Trend -->
+    <article class="panel span-8">
+      <header class="panel__head">
+        <div>
+          <h2 class="panel__title" id="trendTitle">Revenue by month</h2>
+          <p class="panel__sub" id="trendSub">Gross merchandise value, items plus freight</p>
+        </div>
+        <div class="seg" id="trendMetric" role="tablist" aria-label="Trend metric">
+          <button type="button" role="tab" data-metric="gmv" aria-selected="true">Revenue</button>
+          <button type="button" role="tab" data-metric="orders">Orders</button>
+          <button type="button" role="tab" data-metric="sat">Satisfaction</button>
+          <button type="button" role="tab" data-metric="late">Late rate</button>
+        </div>
+      </header>
+      <div class="panel__plot panel__plot--tall">
+        <canvas id="trendChart" aria-label="Monthly trend for the selected metric"></canvas>
+      </div>
+      <details class="figure__table" id="trendTable"><summary>Table view</summary></details>
+    </article>
 
-        // ─── 3. Review Score (Bar) ─────────────
-        const rsCtx = getCtx('reviewScoreChart');
-        if (rsCtx) {
-            new Chart(rsCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['1', '2', '3', '4', '5'],
-                    datasets: [{
-                        label: 'Reviews',
-                        data: [11249, 4685, 8333, 15897, 77165],
-                        backgroundColor: ['#e2635b', '#f5a623', '#f7c948', '#5b7cfa', '#2d9f6e'],
-                        borderRadius: 4,
-                        barPercentage: 0.6,
-                    }]
-                },
-                options: {
-                    ...CHART_DEFAULTS,
-                    plugins: {
-                        ...CHART_DEFAULTS.plugins,
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: '#f0f2f7' }, ticks: { font: { size: 9 } } },
-                        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
-                    }
-                }
-            });
-        }
+    <!-- Punctuality -->
+    <article class="panel span-4">
+      <header class="panel__head">
+        <div>
+          <h2 class="panel__title">Punctuality drives ratings</h2>
+          <p class="panel__sub">Share rated 4–5★ by delivery vs promised date</p>
+        </div>
+      </header>
+      <div class="panel__plot panel__plot--tall">
+        <canvas id="bucketChart" aria-label="Satisfaction rate by delivery status; click a bar to filter"></canvas>
+      </div>
+      <div class="figure__legend">
+        <span class="legend-key"><span class="legend-key__mark legend-key__mark--early" aria-hidden="true"></span> Early</span>
+        <span class="legend-key"><span class="legend-key__mark legend-key__mark--late" aria-hidden="true"></span> Late</span>
+        <span class="legend-key"><span class="legend-key__mark legend-key__mark--ref" aria-hidden="true"></span> Not delivered</span>
+      </div>
+      <details class="figure__table" id="bucketTable"><summary>Table view</summary></details>
+    </article>
 
-        // ─── 4. On‑Time Delivery (Doughnut) ────
-        const otCtx = getCtx('ontimeChart');
-        if (otCtx) {
-            new Chart(otCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['On‑Time', 'Late'],
-                    datasets: [{
-                        data: [105998, 11331],
-                        backgroundColor: ['#2d9f6e', '#e2635b'],
-                        borderWidth: 0,
-                    }]
-                },
-                options: {
-                    ...CHART_DEFAULTS,
-                    plugins: {
-                        ...CHART_DEFAULTS.plugins,
-                        legend: { position: 'bottom', labels: { font: { size: 10 } } }
-                    },
-                    cutout: '65%',
-                }
-            });
-        }
+    <!-- Categories -->
+    <article class="panel span-6">
+      <header class="panel__head">
+        <div>
+          <h2 class="panel__title">Categories</h2>
+          <p class="panel__sub" id="catSub">Top 11 by revenue · click to filter</p>
+        </div>
+        <div class="seg" id="catMetric" role="tablist" aria-label="Category metric">
+          <button type="button" role="tab" data-metric="gmv" aria-selected="true">Revenue</button>
+          <button type="button" role="tab" data-metric="orders">Orders</button>
+          <button type="button" role="tab" data-metric="sat">Satisfaction</button>
+        </div>
+      </header>
+      <div class="rank" id="catList"></div>
+    </article>
 
-        // ─── 5. Demand Category (Bar) ──────────
-        const dcCtx = getCtx('demandChart');
-        if (dcCtx) {
-            new Chart(dcCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Very High', 'High', 'Medium', 'Low', 'Very Low'],
-                    datasets: [{
-                        label: 'Orders',
-                        data: [61067, 39949, 11906, 3714, 678],
-                        backgroundColor: ['#2d3b66', '#5b7cfa', '#8aa3ff', '#b0c4ff', '#d0d8ec'],
-                        borderRadius: 4,
-                        barPercentage: 0.6,
-                    }]
-                },
-                options: {
-                    ...CHART_DEFAULTS,
-                    plugins: {
-                        ...CHART_DEFAULTS.plugins,
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: '#f0f2f7' }, ticks: { font: { size: 9 } } },
-                        x: { grid: { display: false }, ticks: { font: { size: 8 }, maxRotation: 20 } }
-                    }
-                }
-            });
-        }
+    <!-- States -->
+    <article class="panel span-6">
+      <header class="panel__head">
+        <div>
+          <h2 class="panel__title">Customer states</h2>
+          <p class="panel__sub">Sortable · click a row to filter</p>
+        </div>
+      </header>
+      <div class="table-scroll table-scroll--panel">
+        <table class="data data--dense" id="stateTable">
+          <thead>
+            <tr>
+              <th scope="col"><button type="button" data-sort="name">State</button></th>
+              <th scope="col" class="num"><button type="button" data-sort="orders">Orders</button></th>
+              <th scope="col" class="num"><button type="button" data-sort="gmv">Revenue</button></th>
+              <th scope="col" class="num"><button type="button" data-sort="sat">Satisfied</button></th>
+              <th scope="col" class="num"><button type="button" data-sort="days" title="Average days from purchase to delivery">Days</button></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </article>
 
-        // ─── 6. Price Distribution (Histogram) ──
-        const priceCtx = getCtx('priceChart');
-        if (priceCtx) {
-            // simulate bins from the data description
-            new Chart(priceCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['0‑100', '100‑200', '200‑300', '300‑400', '400‑500', '500+'],
-                    datasets: [{
-                        label: 'Orders',
-                        data: [52400, 31800, 15200, 8200, 4200, 5529],
-                        backgroundColor: '#5b7cfa',
-                        borderRadius: 4,
-                        barPercentage: 0.7,
-                    }]
-                },
-                options: {
-                    ...CHART_DEFAULTS,
-                    plugins: {
-                        ...CHART_DEFAULTS.plugins,
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: '#f0f2f7' }, ticks: { font: { size: 9 } } },
-                        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
-                    }
-                }
-            });
-        }
+    <!-- Reviews -->
+    <article class="panel span-4">
+      <header class="panel__head">
+        <div>
+          <h2 class="panel__title">Review scores</h2>
+          <p class="panel__sub" id="reviewSub">Distribution of 1–5★ ratings</p>
+        </div>
+      </header>
+      <div class="panel__plot">
+        <canvas id="reviewChart" aria-label="Column chart of review score counts"></canvas>
+      </div>
+      <details class="figure__table" id="reviewTable"><summary>Table view</summary></details>
+    </article>
 
-        // ─── 7. Payment Value Distribution ──────
-        const pvCtx = getCtx('paymentValueChart');
-        if (pvCtx) {
-            new Chart(pvCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['0‑100', '100‑200', '200‑300', '300‑400', '400‑500', '500+'],
-                    datasets: [{
-                        label: 'Orders',
-                        data: [48600, 33400, 17200, 9400, 4800, 3914],
-                        backgroundColor: '#2d9f6e',
-                        borderRadius: 4,
-                        barPercentage: 0.7,
-                    }]
-                },
-                options: {
-                    ...CHART_DEFAULTS,
-                    plugins: {
-                        ...CHART_DEFAULTS.plugins,
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: '#f0f2f7' }, ticks: { font: { size: 9 } } },
-                        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
-                    }
-                }
-            });
-        }
+    <!-- Payments -->
+    <article class="panel span-4">
+      <header class="panel__head">
+        <div>
+          <h2 class="panel__title">Payment mix</h2>
+          <p class="panel__sub">Dominant method per order</p>
+        </div>
+      </header>
+      <div class="mix" id="payMix"></div>
+    </article>
 
-        // ─── Dashboard interactions ─────────────────────────────
-        const dashboard = document.querySelector('.dashboard');
-        const searchInput = document.getElementById('dashboardSearch');
-        const compactToggle = document.getElementById('compactToggle');
-        const themeToggle = document.getElementById('themeToggle');
-        const exportCharts = document.getElementById('exportCharts');
+    <!-- Timing -->
+    <article class="panel span-4">
+      <header class="panel__head">
+        <div>
+          <h2 class="panel__title">When people buy</h2>
+          <p class="panel__sub" id="timingSub">Orders by weekday</p>
+        </div>
+        <div class="seg" id="timingMetric" role="tablist" aria-label="Timing view">
+          <button type="button" role="tab" data-metric="day" aria-selected="true">Day</button>
+          <button type="button" role="tab" data-metric="hour">Hour</button>
+        </div>
+      </header>
+      <div class="panel__plot">
+        <canvas id="timingChart" aria-label="Column chart of orders by purchase time"></canvas>
+      </div>
+      <details class="figure__table" id="timingTable"><summary>Table view</summary></details>
+    </article>
 
-        document.querySelectorAll('.stat-card .value').forEach((value) => {
-            const raw = value.textContent.replace(/,/g, '').trim();
-            const target = Number.parseFloat(raw);
-            if (!Number.isFinite(target)) return;
-            const suffix = raw.includes('.') ? '' : '';
-            let current = 0;
-            const increment = Math.max(target / 24, 1);
-            const timer = window.setInterval(() => {
-                current = Math.min(current + increment, target);
-                value.textContent = `${Math.round(current).toLocaleString()}${suffix}`;
-                if (current >= target) window.clearInterval(timer);
-            }, 24);
-        });
+    <!-- Pipeline -->
+    <article class="panel span-12">
+      <header class="panel__head">
+        <div>
+          <h2 class="panel__title">Where these numbers come from</h2>
+          <p class="panel__sub">Source tables, the modelling join, and how this dashboard differs from it</p>
+        </div>
+      </header>
+      <div class="pipe">
+        <div>
+          <h3 class="pipe__h">Source tables</h3>
+          <div class="pipe__tables" id="sourceTables"></div>
+        </div>
+        <div>
+          <h3 class="pipe__h">Modelling join · 7 of 9 tables</h3>
+          <ol class="funnel" id="joinFunnel"></ol>
+        </div>
+        <div class="pipe__note">
+          <h3 class="pipe__h">Unit of analysis</h3>
+          <p class="small muted">
+            The modelling frame has one row per <em>order-item-payment</em> (117,329 rows), which
+            inflates multi-item orders. This dashboard aggregates to <strong>one row per
+            order</strong> — <span id="orderCount">—</span> orders — so revenue and counts are not
+            double-counted. Category is the order's highest-priced item; payment method is the
+            largest payment by value.
+          </p>
+          <p class="small muted mt-2">
+            <span id="excluded">—</span>
+          </p>
+          <p class="xsmall muted mt-2">Generated by <code>tools/gen_dashboard_data.py</code>.</p>
+        </div>
+      </div>
+    </article>
 
-        searchInput?.addEventListener('input', (event) => {
-            const query = event.target.value.trim().toLowerCase();
-            document.querySelectorAll('.dashboard .card, .dashboard .stat-card').forEach((card) => {
-                card.classList.toggle('is-hidden', query && !card.textContent.toLowerCase().includes(query));
-            });
-        });
+  </div>
+</main>
 
-        compactToggle?.addEventListener('click', () => {
-            dashboard.classList.toggle('compact');
-            compactToggle.classList.toggle('secondary');
-            compactToggle.innerHTML = dashboard.classList.contains('compact')
-                ? '<i class="fas fa-expand"></i> Spacious view'
-                : '<i class="fas fa-compress"></i> Compact view';
-        });
+<footer class="site-footer">
+  <div class="wrap wrap--dash site-footer__grid">
+    <div>
+      <strong class="footer-name">Mayank Choudhary</strong><br>
+      Machine Learning Portfolio · Integrated M.Tech, VIT
+    </div>
+    <nav class="footer-links" aria-label="Footer">
+      <a href="../index.html">Portfolio home</a>
+      <a href="./index.html">Case study</a>
+      <a href="./report.html">Technical report</a>
+      <a href="https://github.com/Mayank170906/mlProjects" target="_blank" rel="noopener">Repository&#8239;↗</a>
+    </nav>
+    <div class="xsmall footer-legal">
+      Olist Brazilian E-Commerce Public Dataset, CC BY-NC-SA 4.0.
+    </div>
+  </div>
+</footer>
 
-        themeToggle?.addEventListener('click', () => {
-            document.body.classList.toggle('night');
-            themeToggle.innerHTML = document.body.classList.contains('night')
-                ? '<i class="fas fa-sun"></i> Day mode'
-                : '<i class="fas fa-moon"></i> Night mode';
-        });
+<div class="toast" id="toast" role="status" hidden></div>
 
-        exportCharts?.addEventListener('click', () => {
-            document.querySelectorAll('canvas[id]').forEach((canvas) => {
-                const link = document.createElement('a');
-                link.download = `${canvas.id}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            });
-            exportCharts.innerHTML = '<i class="fas fa-check"></i> Charts exported';
-            window.setTimeout(() => { exportCharts.innerHTML = '<i class="fas fa-download"></i> Export charts'; }, 2200);
-        });
-    </script>
-
+<script src="./assets/dashboard.js" defer></script>
 </body>
 </html>

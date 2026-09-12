@@ -36,6 +36,7 @@ where Optuna's best trial reported 0.8057 and an honest refit gives 0.7936.
 Supporting tooling:
 
 ```bash
+uv run python tools/gen_dashboard_data.py  # → Supervised/assets/dashboard.json (dashboard cube)
 uv run python tools/check_site.py    # verify links, anchors, data bindings and charts
 uv run python tools/inject_nav.py    # re-apply the shared nav to generated notebook exports
 ```

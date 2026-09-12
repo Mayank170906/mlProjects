@@ -1749,3 +1749,19 @@ table.data tr.is-total td {
 .kv dt {
   overflow-wrap: anywhere;
 }
+
+/* Very small phones: keep the masthead on one line inside 320px. */
+@media (max-width: 360px) {
+  .masthead__inner {
+    gap: 8px;
+  }
+  .brand {
+    font-size: 13px;
+  }
+  .navlink {
+    padding: 6px 7px;
+  }
+  .theme-toggle {
+    margin-left: 2px;
+  }
+}

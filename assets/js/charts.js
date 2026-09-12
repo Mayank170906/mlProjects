@@ -164,9 +164,23 @@
 
     render();
     registry.push(render);
-    return function () {
+
+    var getter = function () {
       return instance;
     };
+
+    /* Rebuild data and options from `build` without destroying the chart, so
+       filter-driven updates animate between states instead of redrawing from zero. */
+    getter.refresh = function () {
+      if (!instance) return;
+      var p = palette();
+      var cfg = build(p);
+      instance.data = cfg.data;
+      instance.options = merge(baseOptions(p), cfg.options || {});
+      instance.update();
+    };
+
+    return getter;
   }
 
   /* ---- mark presets ------------------------------------------------------ */

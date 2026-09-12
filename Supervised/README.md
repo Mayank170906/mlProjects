@@ -51,7 +51,7 @@ of total model gain.
 | 1 | [`merge_data.ipynb`](./merge_data.html) | Primary-key validation, null audit, and the seven-table star-schema join |
 | 2 | [`data-analysys.ipynb`](./data-analysys.html) | Distributions, delivery behaviour, category patterns |
 | 3 | [`nl.ipynb`](./nl.html) | Feature engineering, four model iterations, Optuna search, ONNX export |
-| 4 | `ecommerce_dashboard.py` | Generates [the Plotly dashboard](./ecommerce_dashboard.html) |
+| 4 | `tools/gen_dashboard_data.py` | Builds the order-level data cube behind [the interactive dashboard](./ecommerce_dashboard.html) |
 
 ### Leakage control
 

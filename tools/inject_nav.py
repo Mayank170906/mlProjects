@@ -19,7 +19,6 @@ TARGETS = {
     "Supervised/merge_data.html": ("Relational ETL notebook", "Customer satisfaction"),
     "Supervised/data-analysys.html": ("Exploratory analysis notebook", "Customer satisfaction"),
     "Supervised/nl.html": ("Modelling &amp; tuning notebook", "Customer satisfaction"),
-    "Supervised/ecommerce_dashboard.html": ("Analytics dashboard", "Customer satisfaction"),
     "Tree/data_cleaner.html": ("Data cleaning notebook", "Spaceship Titanic"),
     "Tree/train_ensemble.html": ("Benchmark &amp; tuning notebook", "Spaceship Titanic"),
 }

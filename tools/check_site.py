@@ -29,6 +29,7 @@ PAGES = [
     "Tree/index.html",
     "Tree/report.html",
     "Tree/onnx_model.html",
+    "Supervised/ecommerce_dashboard.html",
 ]
 
 # data-fill paths on these pages are checked against this metrics file
@@ -45,6 +46,7 @@ SCRIPTS_FOR = {
     "Supervised/report.html": ["Supervised/assets/report.js"],
     "Tree/index.html": ["Tree/assets/case-study.js"],
     "Tree/report.html": ["Tree/assets/report.js"],
+    "Supervised/ecommerce_dashboard.html": ["Supervised/assets/dashboard.js"],
 }
 
 # GitHub Pages serves the repo at /mlProjects/; 404.html must use absolute paths
