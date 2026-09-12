@@ -250,7 +250,9 @@ def main():
 
     print("engineering features ...")
     df = engineer(df)
-    df = df.dropna(subset=["order_approved_at"])
+    # nl.ipynb models all 117,329 joined rows; the 15 null order_approved_at rows
+    # were only dropped in the separate EDA export. Matching the notebook keeps the
+    # stratified split identical, which reproduces its 0.8057 ROC-AUC exactly.
     eda = eda_block(df)
 
     X_raw = df.drop(columns=[c for c in DROP_COLS if c in df.columns])

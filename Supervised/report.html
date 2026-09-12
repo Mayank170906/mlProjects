@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Customer Satisfaction Prediction — Technical Report</title>
-<meta name="description" content="Technical report: seven-table relational ETL over 117,314 Olist orders, 34 leakage-controlled features, Optuna-tuned LightGBM, threshold calibration, ONNX export, and a documented account of tuning-set selection bias.">
+<meta name="description" content="Technical report: seven-table relational ETL over 117,329 Olist order rows, 34 leakage-controlled features, Optuna-tuned LightGBM, threshold calibration, ONNX export, and a documented account of tuning-set selection bias.">
 <meta name="author" content="Mayank Choudhary">
 <link rel="canonical" href="https://mayank170906.github.io/mlProjects/Supervised/report.html">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Customer Satisfaction Prediction — Technical Report">
-<meta property="og:description" content="Seven-table ETL, 34 leakage-controlled features, Optuna-tuned LightGBM and ONNX export, measured on a 23,463-row holdout.">
+<meta property="og:description" content="Seven-table ETL, 34 leakage-controlled features, Optuna-tuned LightGBM and ONNX export, measured on a 23,466-row holdout.">
 <meta name="theme-color" content="#b4512f">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -87,7 +87,7 @@
       <h1 class="h-xl">Customer satisfaction prediction on Brazilian e-commerce orders</h1>
       <p class="lede mt-3">
         A supervised classifier that flags orders likely to receive a poor review, trained on
-        117,314 rows assembled from seven joined relational tables and evaluated once on a held-out
+        117,329 rows assembled from seven joined relational tables and evaluated on a held-out
         fifth of the data.
       </p>
       <div class="pill-row mt-4">
@@ -152,11 +152,11 @@
       <div class="callout callout--key">
         <span class="callout__icon" aria-hidden="true">◆</span>
         <span>
-          <strong>Reported numbers are the refit, not the search.</strong> Optuna's best trial
-          scored 0.8057, but that was a maximum over 30 trials evaluated on the same holdout used
-          to select them. Refitting the winning configuration and measuring once yields
-          <strong data-fill="headline.roc_auc|dec4">—</strong>. <a href="#tuning">Section 7</a>
-          works through the gap.
+          <strong>Read the headline with one caveat.</strong> Optuna chose the hyperparameters
+          by scoring on the same holdout that reports
+          <strong data-fill="headline.roc_auc|dec4">—</strong>, so that figure is somewhat
+          optimistic. <a href="#tuning">Section 7</a> explains why, and how sensitive the number
+          is to the split itself.
         </span>
       </div>
     </section>
@@ -264,10 +264,11 @@
         <div class="callout callout--warn">
           <span class="callout__icon" aria-hidden="true">▲</span>
           <span>
-            <strong>Two defects handled explicitly.</strong> 610 products carry a null
+            <strong>Two defects found.</strong> 610 products carry a null
             <code>product_category_name</code> (filled with <code>Unknown Category</code>), and
-            15 orders have a null <code>order_approved_at</code> (dropped, leaving
-            <span data-fill="dataset.model_rows|int">—</span> modelling rows).
+            15 rows have a null <code>order_approved_at</code>. The EDA export dropped those 15;
+            the final model keeps all <span data-fill="dataset.model_rows|int">—</span> rows and
+            never uses the timestamp directly.
           </span>
         </div>
       </div>
@@ -307,7 +308,6 @@
             <tr><td>4</td><td>⋈ sellers</td><td class="num">112,650</td><td class="num">±0</td><td>Every item resolves to a seller</td></tr>
             <tr><td>5</td><td>⋈ order_payments</td><td class="num">117,601</td><td class="num">+4,951</td><td>Fan-out: split payments per order</td></tr>
             <tr><td>6</td><td>⋈ order_reviews</td><td class="num">117,329</td><td class="num">−272</td><td>Inner join drops orders never reviewed</td></tr>
-            <tr class="is-total"><td>7</td><td>drop null <code>order_approved_at</code></td><td class="num" data-fill="dataset.model_rows|int">—</td><td class="num">−15</td><td>Unapprovable orders cannot be scored</td></tr>
           </tbody>
         </table>
       </div>
@@ -533,7 +533,7 @@ X_te = (X_te.merge(seller_stats, how="left")
 
       <div class="table-scroll mb-4">
         <table class="data">
-          <caption>Iteration history. All measured on the same stratified 20% holdout.</caption>
+          <caption>Iteration history from nl.ipynb. All LightGBM runs use the same stratified 20% holdout.</caption>
           <thead>
             <tr>
               <th scope="col">#</th>
@@ -557,15 +557,27 @@ X_te = (X_te.merge(seller_stats, how="left")
             </tr>
             <tr>
               <td>3</td>
-              <td>Seller/category aggregates computed <em>before</em> the split</td>
-              <td class="num"><span class="figure-bad">0.8523</span></td>
-              <td><strong>Leaking.</strong> The jump was the tell — aggregates had absorbed validation outcomes</td>
+              <td>Unweighted, plus delay / freight interaction features and threshold tuning</td>
+              <td class="num">0.7655</td>
+              <td>Kept the features — minority F1 rose from 0.55 to 0.56 at threshold 0.711</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Seller and category track records computed on the <em>full</em> dataset</td>
+              <td class="num">0.7712</td>
+              <td><strong>Leaky.</strong> Aggregates had seen test-set rows — rejected on principle</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Same aggregates fitted on training rows only</td>
+              <td class="num">0.7698</td>
+              <td>Accepted a slightly lower score in exchange for an honest one</td>
             </tr>
             <tr class="is-highlight">
-              <td>4</td>
-              <td>Aggregates recomputed after the split, then Optuna-tuned</td>
+              <td>6</td>
+              <td>Leakage-free features, Optuna-tuned (30 trials)</td>
               <td class="num" data-fill="headline.roc_auc|dec4">—</td>
-              <td>Adopted — the honest number, and the one deployed</td>
+              <td>Adopted and exported to ONNX</td>
             </tr>
           </tbody>
         </table>
@@ -574,12 +586,31 @@ X_te = (X_te.merge(seller_stats, how="left")
       <div class="callout callout--caveat">
         <span class="callout__icon" aria-hidden="true">▲</span>
         <span>
-          <strong>Iteration 3 is the useful failure.</strong> An unexplained six-point jump from
-          a feature-engineering change that "should" have helped a little is the standard
-          signature of leakage. Chasing it down rather than banking it is the difference between
-          a model that holds up and one that collapses on first contact with production.
+          <strong>Iterations 4 and 5 are the ones worth discussing.</strong> Computing seller
+          averages on the whole dataset lets each test row's own outcome leak into its
+          features. Here the leak was small — 0.7712 against 0.7698 — but the point is that it
+          was removed <em>even though the score went down</em>. On other data the same mistake
+          can inflate results dramatically and fail silently in production.
         </span>
       </div>
+
+      <h3>Approaches tried before LightGBM</h3>
+      <p class="prose">
+        <a href="https://github.com/Mayank170906/mlProjects/blob/master/Supervised/model.ipynb" target="_blank" rel="noopener">model.ipynb</a>
+        records earlier experiments on a narrower 11-column dataset, with a 70/30 split:
+      </p>
+      <ul class="prose">
+        <li><strong>Keras neural network, binary.</strong> At threshold 0.7 it predicted every
+          order as "bad" (16% accuracy). Retuned to 0.39 it reached 79.7% accuracy but only 0.41
+          precision on bad reviews.</li>
+        <li><strong>LightGBM, three classes</strong> (bad / undecided / good). 79.7% accuracy,
+          but recall on "undecided" was 0.02 — the 3-star class was effectively never predicted.
+          Class weights raised it to 0.15 at the cost of overall accuracy (72.8%).</li>
+      </ul>
+      <p class="prose">
+        Both results pushed the project toward a binary target and a tree model working on a
+        richer, engineered feature set.
+      </p>
 
       <h3>Why LightGBM</h3>
       <ul class="prose">
@@ -631,30 +662,27 @@ X_te = (X_te.merge(seller_stats, how="left")
         </div>
       </div>
 
-      <h3>The gap between 0.8057 and the published figure</h3>
+      <h3>How much to trust 0.8057</h3>
       <p class="prose">
-        The notebook reports <code>Best Trial ROC-AUC: 0.8057</code>. That value is the
-        <em>maximum of 30 draws</em> from a noisy evaluation, each scored on the very split used
-        to rank them. Taking a maximum over repeated evaluations of the same holdout is a
-        selection procedure, and its output is biased upward by construction: some of those
-        30 trials are better than average partly because they happened to suit this particular
-        23,463-row sample.
+        The notebook reports <code>Best Trial ROC-AUC: 0.8057</code>, and refitting the chosen
+        parameters reproduces it exactly. The caveat is structural: each of the 30 trials was
+        scored on the same holdout used to pick the winner, so the winning score is partly a
+        property of that particular 23,466-row sample. A best-of-30 on the evaluation set is
+        optimistic by construction, even though the size of the optimism is not measured here.
       </p>
       <p class="prose">
-        Refitting the selected configuration and measuring it once — which is what
-        <code>tools/gen_supervised_metrics.py</code> does — gives
-        <strong data-fill="headline.roc_auc|dec4">—</strong>. The roughly 0.012 difference is the
-        optimism, and it is the kind of gap that quietly turns a "0.81 model" into a
-        disappointing production deployment.
+        A direct illustration of how sensitive a single split is: removing just 15 of the
+        117,329 rows before splitting (the null-approval rows) reshuffles the stratified
+        partition and moves the same model's ROC-AUC from 0.8057 to 0.7936. A 0.012 swing from
+        15 rows is a reminder that a single holdout number carries real variance.
       </p>
 
       <div class="grid grid-2">
         <div class="callout callout--warn">
           <span class="callout__icon" aria-hidden="true">▲</span>
           <span>
-            <strong>What was done.</strong> The lower, unbiased-at-the-configuration-level number
-            is published everywhere on this site, and the search value is reported only here,
-            labelled as a selection statistic.
+            <strong>What that means.</strong> Treat 0.8057 as an upper-leaning estimate. Something
+            around 0.79–0.81 is the honest range from what has been measured so far.
           </span>
         </div>
         <div class="callout callout--good">
@@ -773,7 +801,7 @@ X_te = (X_te.merge(seller_stats, how="left")
             <div class="confusion__cell confusion__cell--hit"><strong data-fill="confusion_matrix.tp|int">—</strong><span>true positive</span></div>
           </div>
           <p class="figure__note">
-            2,550 satisfied customers are flagged as at-risk for every 3,205 genuinely
+            2,569 satisfied customers are flagged as at-risk alongside the 3,187 genuinely
             dissatisfied ones caught. Whether that ratio is acceptable is a business decision,
             not a modelling one — <a href="#threshold">§9</a> shows the full trade-off.
           </p>
@@ -996,7 +1024,8 @@ uv run python tools/gen_supervised_metrics.py</code></pre>
 
       <p class="prose">
         The script joins the seven tables, rebuilds the 34 features, re-splits with
-        <code>random_state=42</code>, refits the tuned model and writes
+        <code>random_state=42</code> on the same 117,329 rows as the notebook, refits the tuned
+        model and writes
         <a href="./assets/metrics.json"><code>Supervised/assets/metrics.json</code></a> — the
         single source every number and chart on this page reads at load time. No value in this
         report is typed by hand, so it cannot drift out of sync with the model.

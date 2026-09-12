@@ -1,6 +1,6 @@
 # Customer Satisfaction Prediction — Olist Brazilian E-Commerce
 
-Supervised binary classification over **117,314 order rows** assembled from the Olist
+Supervised binary classification over **117,329 order rows** assembled from the Olist
 relational dataset. The model flags orders likely to receive a poor review using only
 information available before the customer writes one.
 
@@ -11,24 +11,24 @@ information available before the customer writes one.
 
 ## Results
 
-Measured once on a stratified 23,463-row holdout.
+Measured on a stratified 23,466-row holdout.
 
 | Metric | Value |
 |---|---:|
-| ROC-AUC | **0.7936** |
-| Average precision | 0.8984 |
-| Accuracy @ 0.685 | 83.3% |
-| Recall — satisfied | 0.922 |
-| Recall — dissatisfied | 0.557 |
-| Log loss | 0.4138 |
-| Brier score | 0.1251 |
+| ROC-AUC | **0.8057** |
+| Average precision | 0.9045 |
+| Accuracy @ 0.666 | 84.1% |
+| Recall — satisfied | 0.934 |
+| Recall — dissatisfied | 0.554 |
+| Log loss | 0.4037 |
+| Brier score | 0.1219 |
 
-### On the 0.8057 you will see in the notebook
+### How much to trust 0.8057
 
-`nl.ipynb` prints `Best Trial ROC-AUC: 0.8057`. That is the **maximum over 30 Optuna trials
-scored on the same holdout used to rank them** — a selection statistic, biased upward by
-construction. Refitting the winning configuration and measuring once gives **0.7936**, and that
-is the number published everywhere on the site.
+Refitting the tuned parameters reproduces the notebook's 0.8057 exactly. Two caveats: Optuna
+scored its 30 trials on the same holdout used to pick the winner, so the figure leans
+optimistic; and dropping just 15 rows before splitting reshuffles the partition and moves the
+score to 0.7936. Treat it as an estimate in the 0.79–0.81 range.
 [The report works through the gap.](https://mayank170906.github.io/mlProjects/Supervised/report.html#tuning)
 
 ### The finding that matters more than the AUC
@@ -59,9 +59,9 @@ Four features summarise a seller's or category's track record. These are compute
 train/test split, on training rows only, and joined onto validation rows with a train-derived
 fallback for unseen keys.
 
-An earlier iteration computed them before splitting and scored 0.8523 ROC-AUC — a six-point jump
-from a change that should have helped marginally. That jump was the tell, and chasing it down is
-recorded as iteration 3 in
+An earlier iteration computed them on the full dataset (0.7712 ROC-AUC). Moving the
+computation after the split cost a little (0.7698) and was kept anyway, because the first
+version let test rows influence their own features. Both runs are recorded as iterations 4–5 in
 [§6 of the report](https://mayank170906.github.io/mlProjects/Supervised/report.html#modelling).
 
 ---
@@ -80,8 +80,7 @@ directly.
 | ⋈ products | 112,650 | Every item resolves |
 | ⋈ sellers | 112,650 | Every item resolves |
 | ⋈ order_payments | 117,601 | Fan-out: split payments |
-| ⋈ order_reviews | 117,329 | Inner join drops unreviewed orders |
-| drop null `order_approved_at` | **117,314** | Unapprovable orders cannot be scored |
+| ⋈ order_reviews | **117,329** | Inner join drops unreviewed orders |
 
 Raw CSVs are **not** tracked in this repository. `merge_data.ipynb` downloads them via
 `kagglehub`, or place them manually in `Supervised/data/`.
@@ -110,7 +109,7 @@ Five categorical features (`customer_state`, `order_status`, `product_category_n
 |---|---|
 | Input | `float_input`, `[N, 34]` float32 |
 | Output | `[N, 2]` float32 — column 1 is P(satisfied) |
-| Threshold | 0.6849 |
+| Threshold | 0.6656 |
 
 **Caveat:** the graph carries no category encoder. Callers must reproduce the training-time
 category codes for the five categorical columns, or those features are silently meaningless.

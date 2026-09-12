@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Briefings — Mayank Choudhary</title>
+<meta name="description" content="Condensed briefings on two machine learning projects, with a plain-English guide to the concepts behind them — ROC-AUC, precision, recall, thresholds, leakage, calibration and more — illustrated with real project numbers.">
+<meta name="author" content="Mayank Choudhary">
+<link rel="canonical" href="https://mayank170906.github.io/mlProjects/briefings.html">
+<meta name="theme-color" content="#b4512f">
+<link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="./assets/css/site.css">
+<link rel="stylesheet" href="./assets/css/briefing.css">
+<script src="./assets/js/site.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+<script src="./assets/js/charts.js" defer></script>
+<script src="./assets/js/briefing.js" defer></script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="masthead">
+  <div class="wrap masthead__inner">
+    <a class="brand" href="./index.html">
+      <span class="brand__mark" aria-hidden="true">M</span>
+      Mayank Choudhary
+      <span class="brand__sub">· ML Portfolio</span>
+    </a>
+    <nav class="masthead__nav" aria-label="Primary">
+      <a class="navlink navlink--optional" href="./index.html">Home</a>
+      <a class="navlink" href="./Supervised/briefing.html">E-commerce</a>
+      <a class="navlink" href="./Tree/briefing.html">Titanic</a>
+      <button class="theme-toggle" type="button" aria-label="Switch theme"></button>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="./index.html">Portfolio</a>
+    <span class="crumbs__sep" aria-hidden="true">/</span>
+    <span aria-current="page">Project briefings</span>
+  </nav>
+</div>
+
+<main id="main" class="wrap report">
+
+  <nav class="toc" aria-label="On this page">
+    <p class="toc__title">On this page</p>
+    <ol class="toc__list">
+      <li><a href="#briefings">Briefings</a></li>
+      <li><a href="#compare">Side by side</a></li>
+      <li><a href="#concepts">Concepts explained</a></li>
+      <li><a href="#lab">Threshold lab</a></li>
+      <li><a href="#questions">Portfolio questions</a></li>
+    </ol>
+    <p class="toc__title mt-4">Project briefings</p>
+    <ol class="toc__list">
+      <li><a href="./Supervised/briefing.html">Customer satisfaction</a></li>
+      <li><a href="./Tree/briefing.html">Spaceship Titanic</a></li>
+    </ol>
+  </nav>
+
+  <div class="report__body">
+
+    <!-- ══════════ HERO ══════════ -->
+    <header class="brief-hero">
+      <p class="eyebrow eyebrow--accent">Project briefings</p>
+      <h1 class="brief-hero__title">What was built, what it showed, and why.</h1>
+      <p class="lede mt-4">
+        Each briefing condenses one project into the essentials: the data, the steps taken, the
+        results, how every conclusion was reached, and answers to the questions a reviewer is
+        most likely to ask. This page also explains the terms those briefings rely on, using
+        numbers from the projects themselves.
+      </p>
+      <div class="brief-hero__meta">
+        <span class="pill pill--accent">2 projects</span>
+        <span class="pill">25 concepts explained</span>
+        <span class="pill">Interactive threshold lab</span>
+        <span class="pill">Every number from the notebooks</span>
+      </div>
+    </header>
+
+    <!-- ══════════ BRIEFINGS ══════════ -->
+    <section id="briefings">
+      <div class="sec-head">
+        <span class="sec-head__num">01</span>
+        <h2>The briefings</h2>
+        <p>Start with either. Each one links to the full report and notebooks for more depth.</p>
+      </div>
+
+      <div class="grid grid-2">
+        <a class="brief-card" href="./Supervised/briefing.html">
+          <div class="pill-row">
+            <span class="pill pill--accent">Project 01</span>
+            <span class="pill">Binary classification</span>
+          </div>
+          <h3 class="brief-card__title">Customer satisfaction prediction</h3>
+          <p class="small muted m-0">
+            117,329 rows from seven joined Olist tables. A LightGBM model predicts whether a
+            customer will leave a 4–5★ review, using only information known before the review.
+          </p>
+          <ul class="points">
+            <li><span><strong>0.8057 ROC-AUC</strong>, 84.1% accuracy at threshold 0.666</span></li>
+            <li><span>Late orders: <strong>26.4%</strong> satisfied vs <strong>80.2%</strong> on time</span></li>
+            <li><span>6 LightGBM iterations, a leakage fix, 30 Optuna trials, ONNX export</span></li>
+          </ul>
+          <span class="brief-card__go">Read the briefing →</span>
+        </a>
+
+        <a class="brief-card" href="./Tree/briefing.html">
+          <div class="pill-row">
+            <span class="pill pill--accent">Project 02</span>
+            <span class="pill">Model comparison</span>
+          </div>
+          <h3 class="brief-card__title">Spaceship Titanic</h3>
+          <p class="small muted m-0">
+            8,693 passengers. Five tree models and four voting ensembles compared on one split,
+            then the best candidate tuned, thresholded and deployed as a browser predictor.
+          </p>
+          <ul class="points">
+            <li><span><strong>0.8687 ROC-AUC</strong>, 78.18% accuracy at threshold 0.42</span></li>
+            <li><span>No voting ensemble beat its best single member</span></li>
+            <li><span><code>CryoSleep</code> carries a third of the model's signal</span></li>
+          </ul>
+          <span class="brief-card__go">Read the briefing →</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ══════════ COMPARE ══════════ -->
+    <section id="compare">
+      <div class="sec-head">
+        <span class="sec-head__num">02</span>
+        <h2>Side by side</h2>
+        <p>The two projects exercise different skills, which is the point of pairing them.</p>
+      </div>
+
+      <div class="table-scroll">
+        <table class="data">
+          <thead>
+            <tr>
+              <th scope="col"></th>
+              <th scope="col">Customer satisfaction</th>
+              <th scope="col">Spaceship Titanic</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Question</th><td>Will this customer leave a good review?</td><td>Was this passenger transported?</td></tr>
+            <tr><th scope="row">Data</th><td>9 relational CSVs, 7 joined → 117,329 rows</td><td>One flat CSV → 8,693 rows (7,265 after cleaning)</td></tr>
+            <tr><th scope="row">Target balance</th><td>Imbalanced — 75.5% satisfied</td><td>Balanced — 50.3% transported</td></tr>
+            <tr><th scope="row">Main challenge</th><td>Joining tables correctly and avoiding leakage</td><td>Choosing fairly between many similar models</td></tr>
+            <tr><th scope="row">Model</th><td>LightGBM, tuned with Optuna (30 trials)</td><td>LightGBM, tuned with RandomizedSearchCV (30 draws)</td></tr>
+            <tr><th scope="row">Threshold chosen by</th><td>Best F1 on the <em>dissatisfied</em> class → 0.666</td><td>Best accuracy → 0.42</td></tr>
+            <tr><th scope="row">ROC-AUC</th><td class="num">0.8057</td><td class="num">0.8687</td></tr>
+            <tr><th scope="row">Key insight</th><td>Lateness, not price, drives bad reviews</td><td>Cryosleep status dominates; ensembles added nothing</td></tr>
+            <tr><th scope="row">Deployed as</th><td>ONNX file + interactive dashboard</td><td>ONNX file + in-browser predictor</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════════ CONCEPTS ══════════ -->
+    <section id="concepts">
+      <div class="sec-head">
+        <span class="sec-head__num">03</span>
+        <h2>Concepts explained</h2>
+        <p>Plain definitions, the formula where there is one, and a worked example from the projects.</p>
+      </div>
+
+      <div class="qa-tools">
+        <input class="qa-search" id="conceptSearch" type="search" placeholder="Search concepts…" aria-label="Search concepts">
+        <div class="chipset" id="conceptChips" role="group" aria-label="Filter concepts">
+          <button type="button" data-cat="all" aria-pressed="true">All</button>
+          <button type="button" data-cat="metric" aria-pressed="false">Metrics</button>
+          <button type="button" data-cat="validation" aria-pressed="false">Validation</button>
+          <button type="button" data-cat="model" aria-pressed="false">Models</button>
+          <button type="button" data-cat="data" aria-pressed="false">Data</button>
+          <button type="button" data-cat="deploy" aria-pressed="false">Deployment</button>
+        </div>
+        <span class="qa-count" id="conceptCount"></span>
+      </div>
+
+      <div class="concepts">
+
+        <article class="concept" data-cat="metric" id="c-confusion">
+          <div class="concept__head"><h3 class="concept__name">Confusion matrix</h3><span class="qa__tag">Metric</span></div>
+          <p class="concept__def">A 2×2 table counting every prediction by what the model said and what was true: true positives (TP), false positives (FP), false negatives (FN) and true negatives (TN). Almost every classification metric is built from these four numbers.</p>
+          <div class="concept__example"><b>From the e-commerce model</b>Of 23,466 held-out rows: TP 16,545 · FP 2,569 · FN 1,165 · TN 3,187. The model wrongly called 2,569 unhappy customers "satisfied".</div>
+          <p class="concept__pitfall">Always check which class is "positive". Swapping it changes precision and recall completely.</p>
+        </article>
+
+        <article class="concept" data-cat="metric" id="c-accuracy">
+          <div class="concept__head"><h3 class="concept__name">Accuracy</h3><span class="qa__tag">Metric</span></div>
+          <p class="concept__def">The share of all predictions that were correct.</p>
+          <p class="concept__formula">accuracy = (TP + TN) / (TP + FP + FN + TN)</p>
+          <div class="concept__example"><b>Worked example</b>E-commerce: (16,545 + 3,187) / 23,466 = <strong>84.1%</strong>. But predicting "satisfied" for everyone already scores 75.5%, so the real gain is about 9 points.</div>
+          <p class="concept__pitfall">On imbalanced data a useless model can look accurate. Always compare against the majority-class baseline.</p>
+        </article>
+
+        <article class="concept" data-cat="metric" id="c-precision">
+          <div class="concept__head"><h3 class="concept__name">Precision</h3><span class="qa__tag">Metric</span></div>
+          <p class="concept__def">Of everything the model flagged as positive, how much really was. It answers: "When the model says yes, can I trust it?"</p>
+          <p class="concept__formula">precision = TP / (TP + FP)</p>
+          <div class="concept__example"><b>Worked example</b>Titanic: 625 / (625 + 211) = <strong>0.748</strong>. About 3 in 4 passengers predicted "transported" actually were.</div>
+          <p class="concept__pitfall">Precision can be pushed high simply by predicting "yes" rarely — check recall alongside it.</p>
+        </article>
+
+        <article class="concept" data-cat="metric" id="c-recall">
+          <div class="concept__head"><h3 class="concept__name">Recall (sensitivity)</h3><span class="qa__tag">Metric</span></div>
+          <p class="concept__def">Of all the real positives, how many the model found. It answers: "How much do I miss?"</p>
+          <p class="concept__formula">recall = TP / (TP + FN)</p>
+          <div class="concept__example"><b>Worked example</b>E-commerce, dissatisfied class: 3,187 / (3,187 + 2,569) = <strong>0.554</strong>. The model catches just over half of unhappy customers.</div>
+          <p class="concept__pitfall">Recall of 1.0 is trivial — predict positive for everyone. It only means something next to precision.</p>
+        </article>
+
+        <article class="concept" data-cat="metric" id="c-f1">
+          <div class="concept__head"><h3 class="concept__name">F1 score</h3><span class="qa__tag">Metric</span></div>
+          <p class="concept__def">The harmonic mean of precision and recall — a single number that is only high when both are high.</p>
+          <p class="concept__formula">F1 = 2 · precision · recall / (precision + recall)</p>
+          <div class="concept__example"><b>Worked example</b>E-commerce, dissatisfied class: 2 · 0.732 · 0.554 / (0.732 + 0.554) = <strong>0.631</strong>. The threshold 0.666 was picked because it maximised exactly this number.</div>
+          <p class="concept__pitfall">F1 ignores true negatives, so it suits "find the rare class" problems better than balanced ones.</p>
+        </article>
+
+        <article class="concept" data-cat="metric" id="c-threshold">
+          <div class="concept__head"><h3 class="concept__name">Decision threshold</h3><span class="qa__tag">Metric</span></div>
+          <p class="concept__def">Models output a probability; the threshold is the cut-off that turns it into yes/no. 0.5 is only a default — lowering it catches more positives, raising it makes each "yes" more reliable.</p>
+          <div class="concept__example"><b>From both projects</b>Titanic: moving from 0.50 to <strong>0.42</strong> raised accuracy from 77.84% to 78.18%. E-commerce: <strong>0.666</strong> balances catching unhappy customers against false alarms. Try it in the <a href="#lab">threshold lab</a>.</div>
+          <p class="concept__pitfall">Choosing the threshold on the test set makes the reported score slightly optimistic.</p>
+        </article>
+
+        <article class="concept" data-cat="metric" id="c-roc">
+          <div class="concept__head"><h3 class="concept__name">ROC curve</h3><span class="qa__tag">Metric</span></div>
+          <p class="concept__def">Plots the true positive rate (recall) against the false positive rate for every possible threshold. A perfect model hugs the top-left corner; random guessing follows the diagonal.</p>
+          <p class="concept__formula">TPR = TP / (TP + FN) &nbsp;·&nbsp; FPR = FP / (FP + TN)</p>
+          <div class="concept__example"><b>Reading it</b>Each point is one threshold. The curve shows every trade-off available; choosing a threshold just picks one point on it.</div>
+          <p class="concept__pitfall">With very imbalanced data the ROC curve can look good while precision is poor — also check the precision–recall curve.</p>
+        </article>
+
+        <article class="concept" data-cat="metric" id="c-auc">
+          <div class="concept__head"><h3 class="concept__name">ROC-AUC</h3><span class="qa__tag">Metric</span></div>
+          <p class="concept__def">The area under the ROC curve, from 0.5 (random) to 1.0 (perfect). Intuitively: pick one random positive and one random negative — AUC is the probability the model gives the positive a higher score.</p>
+          <div class="concept__example"><b>Worked example</b>Titanic AUC <strong>0.8687</strong>: take a transported and a non-transported passenger at random, and the model ranks the transported one higher about 87 times in 100. It does not depend on any threshold.</div>
+          <p class="concept__pitfall">AUC measures ranking, not calibrated probabilities — a model can rank well and still be overconfident.</p>
+        </article>
+
+        <article class="concept" data-cat="metric" id="c-pr">
+          <div class="concept__head"><h3 class="concept__name">Precision–recall curve &amp; average precision</h3><span class="qa__tag">Metric</span></div>
+          <p class="concept__def">Plots precision against recall across thresholds. Average precision (AP) summarises the curve in one number. A random model's precision equals the positive rate, so that is the baseline.</p>
+          <div class="concept__example"><b>Worked example</b>E-commerce AP is <strong>0.904</strong>, but the baseline is already 0.755 (share of satisfied rows). The honest improvement is the gap between the two.</div>
+          <p class="concept__pitfall">Unlike ROC-AUC, AP's baseline changes with class balance, so AP values are not comparable across datasets.</p>
+        </article>
+
+        <article class="concept" data-cat="metric" id="c-logloss">
+          <div class="concept__head"><h3 class="concept__name">Log loss</h3><span class="qa__tag">Metric</span></div>
+          <p class="concept__def">Measures how good the predicted <em>probabilities</em> are, heavily punishing confident mistakes. Lower is better; 0 is perfect.</p>
+          <p class="concept__formula">log loss = −mean( y·ln p + (1−y)·ln(1−p) )</p>
+          <div class="concept__example"><b>Worked example</b>E-commerce model: <strong>0.404</strong>. Always predicting the base rate (0.755) would score about 0.557, so the model's probabilities carry real information.</div>
+          <p class="concept__pitfall">A single wildly confident wrong prediction can dominate the average.</p>
+        </article>
+
+        <article class="concept" data-cat="metric" id="c-brier">
+          <div class="concept__head"><h3 class="concept__name">Brier score</h3><span class="qa__tag">Metric</span></div>
+          <p class="concept__def">The mean squared difference between predicted probability and the actual 0/1 outcome. Lower is better; gentler on confident mistakes than log loss.</p>
+          <p class="concept__formula">Brier = mean( (p − y)² )</p>
+          <div class="concept__example"><b>Worked example</b>E-commerce: <strong>0.122</strong>, against 0.185 for a constant 0.755 guess.</div>
+          <p class="concept__pitfall">Also depends on class balance — compare to the constant-prediction baseline, not to zero.</p>
+        </article>
+
+        <article class="concept" data-cat="metric" id="c-calibration">
+          <div class="concept__head"><h3 class="concept__name">Calibration</h3><span class="qa__tag">Metric</span></div>
+          <p class="concept__def">Whether predicted probabilities match reality: of all orders scored 0.8, about 80% should truly be satisfied. A reliability diagram plots predicted against observed frequency.</p>
+          <div class="concept__example"><b>Why it matters here</b>A threshold like 0.666 only means something if 0.666 behaves like a probability. Both reports include reliability diagrams to check this.</div>
+          <p class="concept__pitfall">Class weighting and heavy resampling often break calibration even when AUC holds.</p>
+        </article>
+
+        <article class="concept" data-cat="validation" id="c-split">
+          <div class="concept__head"><h3 class="concept__name">Train / test split &amp; stratification</h3><span class="qa__tag">Validation</span></div>
+          <p class="concept__def">The model learns on one part of the data and is scored on another it never saw. Stratifying keeps the class ratio the same in both parts.</p>
+          <div class="concept__example"><b>From both projects</b>Both use an 80/20 split with <code>stratify=y</code> and <code>random_state=42</code>. E-commerce: 93,863 train / 23,466 test. Titanic: 5,812 / 1,453.</div>
+          <p class="concept__pitfall">A single split has variance: dropping just 15 rows before splitting moved the e-commerce AUC from 0.8057 to 0.7936.</p>
+        </article>
+
+        <article class="concept" data-cat="validation" id="c-leakage">
+          <div class="concept__head"><h3 class="concept__name">Data leakage</h3><span class="qa__tag">Validation</span></div>
+          <p class="concept__def">When information unavailable at prediction time — or from the test set — slips into training. Scores look better than the model will really perform.</p>
+          <div class="concept__example"><b>From the e-commerce project</b>Seller average delay was first computed on all rows, so test orders influenced their own features (AUC 0.7712). Computing it on training rows only gave 0.7698 — lower, but honest. Review text was also excluded, since it is written after the outcome.</div>
+          <p class="concept__pitfall">Leakage rarely causes an error — it silently inflates results.</p>
+        </article>
+
+        <article class="concept" data-cat="validation" id="c-cv">
+          <div class="concept__head"><h3 class="concept__name">Cross-validation (k-fold)</h3><span class="qa__tag">Validation</span></div>
+          <p class="concept__def">Split training data into k parts; train on k−1 and score on the remaining one, rotating k times. The average gives a steadier estimate than one split.</p>
+          <div class="concept__example"><b>From the Titanic project</b>RandomizedSearchCV used 5-fold CV: 30 candidates × 5 folds = 150 fits. The best CV accuracy was 80.49%, but on the untouched validation split it was 77.84%.</div>
+          <p class="concept__pitfall">The CV score of the <em>chosen</em> configuration is optimistic, because it was chosen for being highest.</p>
+        </article>
+
+        <article class="concept" data-cat="validation" id="c-selection">
+          <div class="concept__head"><h3 class="concept__name">Selection bias (optimism)</h3><span class="qa__tag">Validation</span></div>
+          <p class="concept__def">Try many options and keep the best score, and part of that score is luck. The more options compared on the same data, the more optimistic the winner's number.</p>
+          <div class="concept__example"><b>From both projects</b>Titanic: best CV 80.49% vs 77.84% on holdout. E-commerce: Optuna scored 30 trials on the same test set it reports 0.8057 on.</div>
+          <p class="concept__pitfall">The fix is a separate tuning set or nested cross-validation, keeping the final test set untouched.</p>
+        </article>
+
+        <article class="concept" data-cat="validation" id="c-imbalance">
+          <div class="concept__head"><h3 class="concept__name">Class imbalance</h3><span class="qa__tag">Validation</span></div>
+          <p class="concept__def">When one class is far more common than the other. Models drift toward predicting the majority class, and accuracy becomes misleading.</p>
+          <div class="concept__example"><b>From the e-commerce project</b>75.5% of rows are satisfied. Class weighting (<code>scale_pos_weight</code>) raised dissatisfied recall from 0.38 to 0.59 but lowered AUC, so the final model instead tunes the threshold.</div>
+          <p class="concept__pitfall">Resampling or reweighting changes probabilities — recheck calibration afterwards.</p>
+        </article>
+
+        <article class="concept" data-cat="validation" id="c-tuning">
+          <div class="concept__head"><h3 class="concept__name">Hyperparameter search</h3><span class="qa__tag">Validation</span></div>
+          <p class="concept__def">Hyperparameters are settings chosen before training (tree depth, learning rate…). <strong>Grid search</strong> tries every combination; <strong>random search</strong> samples some; <strong>Bayesian search</strong> (Optuna) uses past trials to pick promising next ones.</p>
+          <div class="concept__example"><b>From both projects</b>Titanic: grid of 162 combos for gradient boosting; random 30 of 26,244 for LightGBM. E-commerce: Optuna, 30 trials over 9 parameters.</div>
+          <p class="concept__pitfall">More search means more optimism in the best score (see selection bias).</p>
+        </article>
+
+        <article class="concept" data-cat="model" id="c-tree">
+          <div class="concept__head"><h3 class="concept__name">Decision tree &amp; random forest</h3><span class="qa__tag">Model</span></div>
+          <p class="concept__def">A decision tree asks a sequence of yes/no questions about features. A random forest trains many trees on random samples of rows and features and averages them, which reduces overfitting.</p>
+          <div class="concept__example"><b>From the Titanic project</b>Single tree 73.37% accuracy; random forest 77.29%. Averaging many noisy trees gained about 4 points.</div>
+          <p class="concept__pitfall">A single deep tree memorises training data — its test score is usually the weakest.</p>
+        </article>
+
+        <article class="concept" data-cat="model" id="c-boosting">
+          <div class="concept__head"><h3 class="concept__name">Gradient boosting &amp; LightGBM</h3><span class="qa__tag">Model</span></div>
+          <p class="concept__def">Boosting builds trees one after another, each correcting the errors of the ones before. LightGBM is a fast implementation that grows trees leaf-wise and handles categorical features and missing values natively.</p>
+          <div class="concept__example"><b>From both projects</b>Both final models are LightGBM. The e-commerce model uses 694 trees with up to 127 leaves; the Titanic model settled on just 100 trees with 31 leaves.</div>
+          <p class="concept__pitfall">Boosting overfits if trees are too deep or too many — tune with validation, not training scores.</p>
+        </article>
+
+        <article class="concept" data-cat="model" id="c-voting">
+          <div class="concept__head"><h3 class="concept__name">Voting ensemble</h3><span class="qa__tag">Model</span></div>
+          <p class="concept__def">Combine several models: <strong>hard voting</strong> takes the majority label, <strong>soft voting</strong> averages probabilities, and weights let stronger models count more.</p>
+          <div class="concept__example"><b>From the Titanic project</b>Four voting schemes over tree, forest, boosting and XGBoost scored 77.29–77.77% — none beat gradient boosting alone (78.05%), because the members made the same mistakes.</div>
+          <p class="concept__pitfall">Ensembles help only when members disagree on <em>different</em> rows.</p>
+        </article>
+
+        <article class="concept" data-cat="model" id="c-importance">
+          <div class="concept__head"><h3 class="concept__name">Feature importance (gain)</h3><span class="qa__tag">Model</span></div>
+          <p class="concept__def">How much each feature improved the model's splits, summed across all trees. "Gain" weights by improvement; "split" just counts uses.</p>
+          <div class="concept__example"><b>From both projects</b>E-commerce: <code>delivery_delay_days</code> 15.9% of gain, <code>delay_severity</code> 8.3%. Titanic: <code>CryoSleep_True</code> 33.8%.</div>
+          <p class="concept__pitfall">Importance shows what the model uses, not what causes the outcome. Correlated features also share credit unpredictably.</p>
+        </article>
+
+        <article class="concept" data-cat="data" id="c-encoding">
+          <div class="concept__head"><h3 class="concept__name">One-hot vs native categoricals</h3><span class="qa__tag">Data</span></div>
+          <p class="concept__def">One-hot encoding turns a category into 0/1 columns, one per value. LightGBM can instead split on categories directly without expanding them.</p>
+          <div class="concept__example"><b>From both projects</b>Titanic one-hot encoded 4 columns (dropping the first level) to reach 16 features. E-commerce kept 5 categoricals native — <code>product_category_name</code> alone has 70+ values.</div>
+          <p class="concept__pitfall">Categories in the test set that were never seen in training need a plan.</p>
+        </article>
+
+        <article class="concept" data-cat="data" id="c-missing">
+          <div class="concept__head"><h3 class="concept__name">Missing values</h3><span class="qa__tag">Data</span></div>
+          <p class="concept__def">Options: drop the rows, fill with a statistic (median), add an explicit "Unknown" category, or predict the value with a model.</p>
+          <div class="concept__example"><b>From the Titanic project</b>Predicting missing categoricals was only 72.3% accurate, so "Unknown" was used instead. Dropping remaining gaps cost 1,428 training rows (16.4%).</div>
+          <p class="concept__pitfall">Dropping rows quietly shrinks and can bias the data — count what you lose.</p>
+        </article>
+
+        <article class="concept" data-cat="deploy" id="c-onnx">
+          <div class="concept__head"><h3 class="concept__name">ONNX</h3><span class="qa__tag">Deployment</span></div>
+          <p class="concept__def">Open Neural Network Exchange — a portable model format. A model trained in Python can run in C++, Java, or a web browser through ONNX Runtime, with no Python needed.</p>
+          <div class="concept__example"><b>From both projects</b>Both models are exported with <code>onnxmltools</code>. The Titanic model runs live in the browser via ONNX Runtime Web; the e-commerce export removes the <code>ZipMap</code> node so outputs are a plain probability array.</div>
+          <p class="concept__pitfall">ONNX takes raw numbers in a fixed order — preprocessing and column order must match training exactly.</p>
+        </article>
+
+      </div>
+      <p class="qa-empty mt-3" id="conceptEmpty" hidden>No concepts match that search.</p>
+    </section>
+
+    <!-- ══════════ LAB ══════════ -->
+    <section id="lab">
+      <div class="sec-head">
+        <span class="sec-head__num">04</span>
+        <h2>Threshold lab</h2>
+        <p>
+          The real Spaceship Titanic model on its 1,453 validation passengers. Drag the threshold
+          and watch the confusion matrix, the metrics, and the position on the ROC curve change.
+        </p>
+      </div>
+
+      <div class="lab is-loading" id="thresholdLab" data-src="./Tree/assets/metrics.json">
+        <div>
+          <label class="field__label" for="labSlider">Decision threshold</label>
+          <div class="row row--between">
+            <span class="lab__t" id="labT">0.42</span>
+            <span class="xsmall muted">predict "transported" when P ≥ threshold</span>
+          </div>
+          <div class="lab__slider">
+            <input id="labSlider" type="range" min="0.05" max="0.95" step="0.01" value="0.42">
+          </div>
+
+          <div class="lab__matrix" role="table" aria-label="Confusion matrix">
+            <div></div>
+            <div class="lab__axis">Predicted no</div>
+            <div class="lab__axis">Predicted yes</div>
+            <div class="lab__axis">Actually no</div>
+            <div class="lab__cell lab__cell--hit"><strong id="labTN">—</strong><span>true negative</span></div>
+            <div class="lab__cell lab__cell--miss"><strong id="labFP">—</strong><span>false positive</span></div>
+            <div class="lab__axis">Actually yes</div>
+            <div class="lab__cell lab__cell--miss"><strong id="labFN">—</strong><span>false negative</span></div>
+            <div class="lab__cell lab__cell--hit"><strong id="labTP">—</strong><span>true positive</span></div>
+          </div>
+
+          <div class="lab__metrics">
+            <div class="lab__metric"><span>Accuracy</span><strong id="labAcc">—</strong></div>
+            <div class="lab__metric"><span>Precision</span><strong id="labPrec">—</strong></div>
+            <div class="lab__metric"><span>Recall</span><strong id="labRec">—</strong></div>
+            <div class="lab__metric"><span>F1</span><strong id="labF1">—</strong></div>
+          </div>
+          <p class="lab__note" id="labNote" aria-live="polite"></p>
+        </div>
+
+        <figure class="m-0">
+          <figcaption class="figure__head">
+            <div class="figure__title">Where the threshold sits on the ROC curve</div>
+            <p class="figure__sub">AUC 0.8687 — the area under this curve — does not move with the threshold.</p>
+          </figcaption>
+          <div class="figure__plot">
+            <canvas id="labRoc" aria-label="ROC curve with the current threshold marked"></canvas>
+          </div>
+          <div class="figure__legend">
+            <span class="legend-key"><span class="legend-key__mark legend-key__mark--line legend-key__mark--s1" aria-hidden="true"></span> ROC curve</span>
+            <span class="legend-key"><span class="legend-key__mark legend-key__mark--s2" aria-hidden="true"></span> Current threshold</span>
+            <span class="legend-key"><span class="legend-key__mark legend-key__mark--line legend-key__mark--ref" aria-hidden="true"></span> Random guessing</span>
+          </div>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ══════════ PORTFOLIO QUESTIONS ══════════ -->
+    <section id="questions">
+      <div class="sec-head">
+        <span class="sec-head__num">05</span>
+        <h2>Questions about the portfolio as a whole</h2>
+        <p>Project-specific questions live in each briefing.</p>
+      </div>
+
+      <div class="qa-tools">
+        <input class="qa-search" id="qaSearch" type="search" placeholder="Search questions…" aria-label="Search questions">
+        <div class="chipset" id="qaChips" role="group" aria-label="Filter questions">
+          <button type="button" data-cat="all" aria-pressed="true">All</button>
+          <button type="button" data-cat="approach" aria-pressed="false">Approach</button>
+          <button type="button" data-cat="tools" aria-pressed="false">Tools</button>
+          <button type="button" data-cat="growth" aria-pressed="false">Growth</button>
+        </div>
+        <button class="btn btn--sm" id="qaToggle" type="button">Expand all</button>
+        <span class="qa-count" id="qaCount"></span>
+      </div>
+
+      <div class="qa-list">
+        <details class="qa" data-cat="approach" id="q-why-trees">
+          <summary><span class="qa__q">Why are both final models gradient-boosted trees?</span><span class="qa__tag">Approach</span></summary>
+          <div class="qa__a">
+            <span class="qa__short">Both datasets are tabular with mixed numeric and categorical columns — the setting where boosted trees are consistently strong.</span>
+            <p>Trees need no feature scaling, handle non-linear effects and interactions automatically, and tolerate missing values. In the e-commerce project a Keras neural network was tried first and was harder to get right: at a 0.7 threshold it predicted every order as "bad". LightGBM reached a higher ROC-AUC with far less tuning, and both models export cleanly to ONNX.</p>
+          </div>
+        </details>
+
+        <details class="qa" data-cat="approach" id="q-trust">
+          <summary><span class="qa__q">How do you know the reported numbers are real?</span><span class="qa__tag">Approach</span></summary>
+          <div class="qa__a">
+            <span class="qa__short">Two scripts reload the saved models, reproduce the notebooks' exact splits, and regenerate every figure on the site.</span>
+            <p>The Titanic script reproduces the notebook's 78.18% accuracy to the digit; the e-commerce script reproduces its 0.8057 ROC-AUC exactly. The site reads these numbers from JSON at load time, so nothing is typed by hand. The reports also state where numbers are optimistic — for example, where tuning and testing shared the same data.</p>
+          </div>
+        </details>
+
+        <details class="qa" data-cat="approach" id="q-metric-choice">
+          <summary><span class="qa__q">Why do the two projects use different metrics?</span><span class="qa__tag">Approach</span></summary>
+          <div class="qa__a">
+            <span class="qa__short">Because the class balance and the goal differ.</span>
+            <p>Titanic is roughly 50/50 and Kaggle scores it on accuracy, so accuracy is a fair target and the threshold maximises it. The e-commerce data is 75/25, where accuracy is misleading and the business goal is to <em>find unhappy customers</em>, so the threshold maximises F1 on the dissatisfied class and ROC-AUC is the headline.</p>
+          </div>
+        </details>
+
+        <details class="qa" data-cat="tools" id="q-stack">
+          <summary><span class="qa__q">What tools and libraries were used overall?</span><span class="qa__tag">Tools</span></summary>
+          <div class="qa__a">
+            <ul>
+              <li><strong>Data:</strong> pandas, NumPy, kagglehub (download)</li>
+              <li><strong>Modelling:</strong> scikit-learn, LightGBM, XGBoost, Optuna; TensorFlow/Keras in early experiments</li>
+              <li><strong>Deployment:</strong> onnxmltools, ONNX Runtime (Python), ONNX Runtime Web (browser)</li>
+              <li><strong>Reporting &amp; site:</strong> Jupyter, matplotlib, Chart.js, plain HTML/CSS/JS on GitHub Pages</li>
+              <li><strong>Environment:</strong> uv for dependency management</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="qa" data-cat="tools" id="q-site">
+          <summary><span class="qa__q">How is the website built and deployed?</span><span class="qa__tag">Tools</span></summary>
+          <div class="qa__a">
+            <span class="qa__short">Static HTML, CSS and JavaScript with no framework or build step, published by a GitHub Actions workflow on every push.</span>
+            <p>Charts use Chart.js; the Titanic predictor runs the real ONNX model in the browser with WebAssembly, so no server is involved. The e-commerce dashboard filters a pre-aggregated data cube entirely client-side.</p>
+          </div>
+        </details>
+
+        <details class="qa" data-cat="growth" id="q-differently">
+          <summary><span class="qa__q">What would you do differently next time?</span><span class="qa__tag">Growth</span></summary>
+          <div class="qa__a">
+            <ul>
+              <li>Keep a truly untouched test set and tune on a separate validation set (or nested CV), so the headline number carries no selection optimism.</li>
+              <li>Use time-based splits for the e-commerce data, since real predictions are always about future orders.</li>
+              <li>In Titanic, reorder the cleaning steps so rows are not dropped for gaps in columns that are deleted anyway, and engineer cabin and group features.</li>
+              <li>Report results as a range across several splits rather than a single number.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="qa" data-cat="growth" id="q-hardest">
+          <summary><span class="qa__q">What was the hardest part?</span><span class="qa__tag">Growth</span></summary>
+          <div class="qa__a">
+            <span class="qa__short">Not the modelling — the data plumbing and being honest about the numbers.</span>
+            <p>Joining seven tables without silently duplicating or losing rows took careful row-count checks at every merge. Spotting that seller averages computed on all data leak test information, and accepting the lower score after fixing it, was the most important decision in the e-commerce project.</p>
+          </div>
+        </details>
+      </div>
+      <p class="qa-empty mt-3" id="qaEmpty" hidden>No questions match that search.</p>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap site-footer__grid">
+    <div>
+      <strong class="footer-name">Mayank Choudhary</strong><br>
+      Machine Learning Portfolio · Integrated M.Tech, VIT
+    </div>
+    <nav class="footer-links" aria-label="Footer">
+      <a href="./index.html">Portfolio home</a>
+      <a href="./Supervised/briefing.html">E-commerce briefing</a>
+      <a href="./Tree/briefing.html">Titanic briefing</a>
+      <a href="https://github.com/Mayank170906/mlProjects" target="_blank" rel="noopener">Repository&#8239;↗</a>
+    </nav>
+    <div class="xsmall footer-legal">
+      Figures come from the project notebooks and the scripts in <code>tools/</code>.
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

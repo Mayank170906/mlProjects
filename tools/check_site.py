@@ -24,8 +24,11 @@ ROOT = Path(__file__).resolve().parents[1]
 PAGES = [
     "index.html",
     "404.html",
+    "briefings.html",
+    "Supervised/briefing.html",
     "Supervised/index.html",
     "Supervised/report.html",
+    "Tree/briefing.html",
     "Tree/index.html",
     "Tree/report.html",
     "Tree/onnx_model.html",

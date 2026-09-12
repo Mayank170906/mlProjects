@@ -150,7 +150,7 @@
       <p class="eyebrow">The benchmark</p>
       <h2 class="h-xl">Every model on the same split, then the ensembles that didn't help.</h2>
       <p class="lede mt-3">
-        Five base learners and four voting schemes, all evaluated on one stratified 20% validation
+        Five base learners and four voting schemes over four of them, all evaluated on one stratified 20% validation
         split so the comparison is apples to apples.
       </p>
 
@@ -178,7 +178,7 @@
             <span class="callout__icon" aria-hidden="true">◆</span>
             <span>
               <strong>The ensembles never won.</strong> Weighted hard voting reached 77.77%, just
-              under gradient boosting's 78.05% on its own. Averaging five learners that all make
+              under gradient boosting's 78.05% on its own. Averaging four tree learners that make
               the same mistakes on the same rows adds computation, not accuracy — the errors are
               correlated, so there is nothing to cancel.
             </span>
@@ -239,10 +239,12 @@
               <p class="step__body">
                 Roughly 2% of each column is missing, spread thin. Model-based imputation was
                 tested and reached only ~72% accuracy at predicting the missing categoricals, so
-                it was rejected in favour of <code>Unknown</code> for categoricals and the median
-                for numerics — an explicit <code>Unknown</code> level lets the tree decide
-                whether missingness itself is informative. Rows still carrying a gap after filling
-                were then dropped, which cost <strong>1,428 of 8,693</strong> labelled passengers.
+                it was rejected in favour of an explicit <code>Unknown</code> level for
+                categoricals. In training, rows still missing any value were then dropped —
+                before <code>Cabin</code> and <code>Name</code> were removed, so some rows were
+                lost for gaps in columns deleted a step later. That cost <strong>1,428 of
+                8,693</strong> passengers. The test set was median-filled instead, so every
+                competition row gets a prediction.
               </p>
               <div class="step__meta">
                 <span class="pill pill--warn">Imputation tried and rejected</span>
@@ -270,7 +272,7 @@
               <p class="step__body">
                 A single stratified 80/20 split, <code>random_state=42</code>, reused for every
                 candidate. Decision tree, random forest, gradient boosting, XGBoost and LightGBM,
-                then hard, soft, weighted-hard and weighted-soft voting over them.
+                then hard, soft and weighted (1:2:3:4) voting over the first four.
               </p>
               <div class="step__meta">
                 <span class="pill"><span data-fill="split.train_rows|int">—</span> train</span>

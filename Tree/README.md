@@ -49,7 +49,7 @@ Nine models, one stratified split, library defaults.
 
 Two conclusions:
 
-1. **No ensemble beat its best member.** Five tree models on identical features make correlated
+1. **No ensemble beat its best member.** The four voted tree models (DT, RF, GB, XGBoost) on identical features make correlated
    mistakes on the same rows, so voting preserves the errors instead of cancelling them.
 2. **The top six sit within 0.8 points** — narrower than the ~1.1-point standard error of a
    1,453-row split. Which of them is "best" is not a question this split can answer. LightGBM
@@ -73,11 +73,11 @@ selection, so it is the one quoted throughout.
 | Decision | Choice | Why |
 |---|---|---|
 | Missing categoricals | Fill with `"Unknown"` | Model-based imputation was tried and reached only **72.3%** accuracy — filling 2% of cells at 28% error injects noise. An explicit `Unknown` level lets the tree use missingness itself. |
-| Missing numerics | Median | Same reasoning; no invented structure. |
+| Missing numerics | Test: median · Train: rows dropped | Every test row needs a prediction, so the test set is median-filled; training rows with gaps were dropped instead. |
 | `Cabin` | Dropped | Shared between passengers, so it leaks group membership across a random split. Safe, but see limitations. |
 | `Name` | Dropped | Near-unique; any split on it memorises individuals. |
 | Categoricals | One-hot, first level dropped | Yields the 16-column matrix the model consumes. |
-| Residual missing rows | **Dropped** | The questionable one: this cost **1,428 of 8,693** labelled passengers (16.4%). Extending the `Unknown` sentinel would have kept them. |
+| Residual missing rows | **Dropped** | The questionable one: `dropna()` ran before `Cabin`/`Name` were removed, costing **1,428 of 8,693** passengers (16.4%), some for gaps in columns never used. |
 
 ---
 

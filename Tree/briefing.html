@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spaceship Titanic — Project Briefing</title>
+<meta name="description" content="Briefing on the Spaceship Titanic tree-model benchmark: the data, preprocessing, model comparison, threshold selection, results, limitations and browser deployment.">
+<meta name="author" content="Mayank Choudhary">
+<link rel="canonical" href="https://mayank170906.github.io/mlProjects/Tree/briefing.html">
+<meta name="theme-color" content="#b4512f">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../assets/css/site.css">
+<link rel="stylesheet" href="../assets/css/briefing.css">
+<script src="../assets/js/site.js" defer></script>
+<script src="../assets/js/briefing.js" defer></script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="masthead">
+  <div class="wrap masthead__inner">
+    <a class="brand" href="../index.html">
+      <span class="brand__mark" aria-hidden="true">M</span>
+      Mayank Choudhary
+      <span class="brand__sub">· ML Portfolio</span>
+    </a>
+    <nav class="masthead__nav" aria-label="Primary">
+      <a class="navlink navlink--optional" href="../briefings.html">All briefings</a>
+      <a class="navlink" href="./index.html">Case study</a>
+      <a class="navlink" href="./report.html">Report</a>
+      <a class="navlink navlink--optional" href="./onnx_model.html">Live predictor</a>
+      <button class="theme-toggle" type="button" aria-label="Switch theme"></button>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="../index.html">Portfolio</a>
+    <span class="crumbs__sep" aria-hidden="true">/</span>
+    <a href="../briefings.html">Briefings</a>
+    <span class="crumbs__sep" aria-hidden="true">/</span>
+    <span aria-current="page">Spaceship Titanic</span>
+  </nav>
+</div>
+
+<main id="main" class="wrap report">
+
+  <nav class="toc" aria-label="On this page">
+    <p class="toc__title">On this page</p>
+    <ol class="toc__list">
+      <li><a href="#glance">At a glance</a></li>
+      <li><a href="#data">The data</a></li>
+      <li><a href="#steps">What was done</a></li>
+      <li><a href="#results">Results</a></li>
+      <li><a href="#conclusions">How conclusions were reached</a></li>
+      <li><a href="#tools">Libraries &amp; tools</a></li>
+      <li><a href="#qa">Questions &amp; answers</a></li>
+      <li><a href="#deeper">Go deeper</a></li>
+    </ol>
+    <p class="toc__title mt-4">Related</p>
+    <ol class="toc__list">
+      <li><a href="../briefings.html#concepts">Concepts explained</a></li>
+      <li><a href="../Supervised/briefing.html">Customer satisfaction briefing</a></li>
+    </ol>
+  </nav>
+
+  <div class="report__body">
+
+    <header class="brief-hero">
+      <p class="eyebrow eyebrow--accent">Project briefing · 02</p>
+      <h1 class="brief-hero__title">Spaceship Titanic</h1>
+      <p class="lede mt-4">
+        A controlled comparison of tree-based classifiers predicting whether a passenger was
+        transported to another dimension, followed by tuning, threshold selection and a browser
+        deployment of the winning model.
+      </p>
+      <div class="brief-hero__meta">
+        <span class="pill pill--accent">ROC-AUC 0.8687</span>
+        <span class="pill">Accuracy 78.18%</span>
+        <span class="pill">8,693 labelled rows</span>
+        <span class="pill">LightGBM · ONNX</span>
+      </div>
+    </header>
+
+    <section id="glance">
+      <div class="sec-head">
+        <span class="sec-head__num">01</span>
+        <h2>At a glance</h2>
+      </div>
+      <div class="facts mb-4">
+        <div class="fact"><span class="fact__k">Question</span><span class="fact__v">Was this passenger transported?</span></div>
+        <div class="fact"><span class="fact__k">Dataset</span><span class="fact__v">Kaggle Spaceship Titanic, 2022</span></div>
+        <div class="fact"><span class="fact__k">Rows modelled</span><span class="fact__v"><strong>7,265</strong> after cleaning</span></div>
+        <div class="fact"><span class="fact__k">Target</span><span class="fact__v"><code>Transported</code> · roughly 50/50</span></div>
+        <div class="fact"><span class="fact__k">Features</span><span class="fact__v"><strong>16</strong> after one-hot encoding</span></div>
+        <div class="fact"><span class="fact__k">Model</span><span class="fact__v">LightGBM, selected with 30 random search draws</span></div>
+        <div class="fact"><span class="fact__k">Headline</span><span class="fact__v"><strong>0.8687</strong> ROC-AUC · <strong>78.18%</strong> accuracy</span></div>
+        <div class="fact"><span class="fact__k">Output</span><span class="fact__v">ONNX model, report, browser predictor</span></div>
+      </div>
+      <div class="callout callout--key">
+        <span class="callout__icon" aria-hidden="true">◆</span>
+        <span><strong>The one-sentence takeaway.</strong> LightGBM ranks transported passengers well, but no voting ensemble beat its best single member; the final threshold of <strong>0.42</strong> lifts validation accuracy from 77.84% to 78.18%.</span>
+      </div>
+    </section>
+
+    <section id="data">
+      <div class="sec-head">
+        <span class="sec-head__num">02</span>
+        <h2>The data</h2>
+        <p>One flat competition dataset with mixed categorical, numeric and composite fields.</p>
+      </div>
+      <div class="table-scroll mb-4">
+        <table class="data">
+          <thead><tr><th scope="col">Split</th><th scope="col" class="num">Rows</th><th scope="col">Role</th><th scope="col">Target</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">train.csv</th><td class="num">8,693</td><td>Labelled competition data</td><td><code>Transported</code></td></tr>
+            <tr><th scope="row">test.csv</th><td class="num">4,277</td><td>Competition prediction set</td><td>Not provided</td></tr>
+            <tr><th scope="row">after cleaning</th><td class="num">7,265</td><td>Rows passed to modelling</td><td>1,428 rows dropped</td></tr>
+            <tr class="is-total"><th scope="row">Validation split</th><td class="num">1,453</td><td>Stratified 20% holdout</td><td>50.31% positive</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3 class="h-sm mb-3">What was used</h3>
+          <ul class="points">
+            <li><span><strong>Numeric:</strong> age and five onboard spending columns.</span></li>
+            <li><span><strong>Categorical:</strong> home planet, cryosleep, destination and VIP.</span></li>
+            <li><span><strong>Encoding:</strong> one-hot encoding produced the 16-column model matrix.</span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="h-sm mb-3">What was excluded</h3>
+          <ul class="points">
+            <li><span><strong><code>Cabin</code>:</strong> shared group information could leak across a random split.</span></li>
+            <li><span><strong><code>Name</code>:</strong> nearly unique, so it would encourage memorisation.</span></li>
+            <li><span><strong><code>PassengerId</code>:</strong> retained only for labelling submissions.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="steps">
+      <div class="sec-head">
+        <span class="sec-head__num">03</span>
+        <h2>What was done, step by step</h2>
+        <p>From cleaning and benchmarking to a reproducible browser model.</p>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="step__num" aria-hidden="true"></div><div><h3 class="step__title">Clean and inspect</h3><p class="step__body">Loaded the train and test files, filled missing categoricals with an explicit <code>Unknown</code> level, median-filled test numerics, and removed remaining incomplete training rows. This left 7,265 labelled rows.</p><div class="step__meta"><span class="pill">data_cleaner.ipynb</span><span class="pill">pandas</span></div></div></div>
+        <div class="step"><div class="step__num" aria-hidden="true"></div><div><h3 class="step__title">Encode the features</h3><p class="step__body">Dropped <code>Cabin</code> and <code>Name</code> for leakage and memorisation reasons, then one-hot encoded the remaining categoricals. The model receives 16 numeric columns in a fixed order.</p><div class="step__meta"><span class="pill">pandas</span><span class="pill">scikit-learn</span></div></div></div>
+        <div class="step"><div class="step__num" aria-hidden="true"></div><div><h3 class="step__title">Benchmark nine models</h3><p class="step__body">Compared five tree learners and four voting ensembles on the same stratified 80/20 split. Gradient boosting led the untuned field at 78.05%; the ensembles did not beat it.</p><div class="step__meta"><span class="pill">train_ensemble.ipynb</span><span class="pill">scikit-learn</span><span class="pill">LightGBM</span></div></div></div>
+        <div class="step"><div class="step__num" aria-hidden="true"></div><div><h3 class="step__title">Tune LightGBM</h3><p class="step__body">RandomizedSearchCV tested 30 candidates from a nine-parameter space with five-fold cross-validation. The selected model uses 100 trees, 31 leaves, a 0.05 learning rate and L2 regularisation.</p><div class="step__meta"><span class="pill">RandomizedSearchCV</span><span class="pill">30 draws</span></div></div></div>
+        <div class="step"><div class="step__num" aria-hidden="true"></div><div><h3 class="step__title">Choose a threshold</h3><p class="step__body">Swept the validation probabilities instead of assuming 0.5. Because the target is balanced, accuracy is a reasonable objective; the best cut-off was <strong>0.42</strong>.</p><div class="step__meta"><span class="pill">threshold sweep</span><span class="pill">ROC-AUC</span></div></div></div>
+        <div class="step"><div class="step__num" aria-hidden="true"></div><div><h3 class="step__title">Export and deploy</h3><p class="step__body">Exported the final model to ONNX with a fixed float32 input contract, then connected it to an ONNX Runtime Web predictor so a passenger can be scored in the browser without Python.</p><div class="step__meta"><span class="pill">onnxmltools</span><span class="pill">ONNX Runtime Web</span></div></div></div>
+      </div>
+    </section>
+
+    <section id="results">
+      <div class="sec-head">
+        <span class="sec-head__num">04</span>
+        <h2>Results</h2>
+        <p>Measured on the untouched 1,453-row validation split.</p>
+      </div>
+      <div class="stats mb-4">
+        <div class="stat stat--accent"><span class="stat__label">ROC-AUC</span><span class="stat__value">0.8687</span><span class="stat__note">ranking quality</span></div>
+        <div class="stat"><span class="stat__label">Accuracy</span><span class="stat__value">78.18%</span><span class="stat__note">threshold 0.42</span></div>
+        <div class="stat"><span class="stat__label">F1</span><span class="stat__value">0.798</span><span class="stat__note">positive class</span></div>
+        <div class="stat"><span class="stat__label">Log loss</span><span class="stat__value">0.448</span><span class="stat__note">lower is better</span></div>
+      </div>
+      <div class="grid grid-2 mb-4">
+        <div class="table-scroll"><table class="data"><caption>Confusion matrix at threshold 0.42</caption><thead><tr><th scope="col">Actual / predicted</th><th scope="col" class="num">No</th><th scope="col" class="num">Yes</th></tr></thead><tbody><tr><th scope="row">No</th><td class="num">511</td><td class="num">211</td></tr><tr><th scope="row">Yes</th><td class="num">106</td><td class="num">625</td></tr></tbody></table></div>
+        <div class="table-scroll"><table class="data"><caption>Positive-class results</caption><thead><tr><th scope="col">Metric</th><th scope="col" class="num">Value</th></tr></thead><tbody><tr><th scope="row">Precision</th><td class="num">0.748</td></tr><tr><th scope="row">Recall</th><td class="num">0.855</td></tr><tr><th scope="row">F1</th><td class="num">0.798</td></tr><tr><th scope="row">Accuracy at 0.50</th><td class="num">77.84%</td></tr></tbody></table></div>
+      </div>
+      <div class="callout callout--caveat"><span class="callout__icon" aria-hidden="true">▲</span><span><strong>Read the score with its limits.</strong> The 80.49% cross-validation score is a selection statistic, and the threshold was chosen on the same validation split used for the headline accuracy. Repeated or nested validation would give a more conservative estimate.</span></div>
+    </section>
+
+    <section id="conclusions">
+      <div class="sec-head"><span class="sec-head__num">05</span><h2>How each conclusion was reached</h2><p>Evidence, interpretation and the decision that followed.</p></div>
+      <article class="claim"><header class="claim__head"><span class="claim__n">C1</span><h3 class="claim__title">No voting ensemble beat its best member</h3></header><div class="claim__body"><div class="claim__col"><span class="claim__label">Evidence</span>Four voting schemes scored 77.29%–77.77%, while gradient boosting alone reached 78.05%.</div><div class="claim__col"><span class="claim__label">How it was checked</span>Every model saw the same features and the same stratified validation rows.</div><div class="claim__col claim__col--decision"><span class="claim__label">Decision</span>Carry LightGBM forward for tuning and deployment; do not claim ensembles helped.</div></div></article>
+      <article class="claim"><header class="claim__head"><span class="claim__n">C2</span><h3 class="claim__title">LightGBM was chosen for tuning headroom, not a benchmark win</h3></header><div class="claim__body"><div class="claim__col"><span class="claim__label">Evidence</span>The top six untuned models sit within 0.8 percentage points, inside the noise of one split.</div><div class="claim__col"><span class="claim__label">How it was checked</span>RandomizedSearchCV gave LightGBM a reproducible search path and a model that exports cleanly.</div><div class="claim__col claim__col--decision"><span class="claim__label">Decision</span>Use the tuned model while treating small benchmark differences cautiously.</div></div></article>
+      <article class="claim"><header class="claim__head"><span class="claim__n">C3</span><h3 class="claim__title">Explicit missingness was preferable to inaccurate imputation</h3></header><div class="claim__body"><div class="claim__col"><span class="claim__label">Evidence</span>A model-based imputer reached only 72.3% accuracy for missing categoricals.</div><div class="claim__col"><span class="claim__label">How it was checked</span>Unknown indicators let the classifier use missingness directly; the training and test handling was documented separately.</div><div class="claim__col claim__col--decision"><span class="claim__label">Decision</span>Keep an explicit <code>Unknown</code> category, while fixing the later row-drop issue in the next iteration.</div></div></article>
+      <article class="claim"><header class="claim__head"><span class="claim__n">C4</span><h3 class="claim__title">The threshold should be 0.42, not 0.5</h3></header><div class="claim__body"><div class="claim__col"><span class="claim__label">Evidence</span>Accuracy rises from 77.84% at the default threshold to 78.18% at 0.42.</div><div class="claim__col"><span class="claim__label">How it was checked</span>A sweep evaluated the validation probabilities across possible cut-offs.</div><div class="claim__col claim__col--decision"><span class="claim__label">Decision</span>Use 0.42 in the report and the browser predictor, while recording that selection and evaluation share data.</div></div></article>
+      <article class="claim"><header class="claim__head"><span class="claim__n">C5</span><h3 class="claim__title">The model ranks better than its labels suggest</h3></header><div class="claim__body"><div class="claim__col"><span class="claim__label">Evidence</span>ROC-AUC is 0.8687 while thresholded accuracy is 78.18%.</div><div class="claim__col"><span class="claim__label">How it was checked</span>AUC evaluates ranking across all thresholds; accuracy evaluates one operating point.</div><div class="claim__col claim__col--decision"><span class="claim__label">Decision</span>Report both: AUC describes ranking quality, and accuracy describes the chosen action rule.</div></div></article>
+    </section>
+
+    <section id="tools">
+      <div class="sec-head"><span class="sec-head__num">06</span><h2>Libraries &amp; tools</h2><p>What supported each stage of the project.</p></div>
+      <div class="table-scroll"><table class="data"><thead><tr><th scope="col">Tool</th><th scope="col">Used for</th><th scope="col">Where</th></tr></thead><tbody><tr><th scope="row">pandas · NumPy</th><td>Loading, cleaning, encoding and numeric operations</td><td>All notebooks</td></tr><tr><th scope="row">scikit-learn</th><td>Splitting, preprocessing, benchmarks, search and metrics</td><td>Training pipeline</td></tr><tr><th scope="row">LightGBM</th><td>Final gradient-boosted classifier</td><td>train_ensemble, model export</td></tr><tr><th scope="row">XGBoost</th><td>One of the benchmark learners</td><td>train_ensemble</td></tr><tr><th scope="row">onnxmltools · ONNX</th><td>Portable model conversion and graph contract</td><td>final_model.onnx</td></tr><tr><th scope="row">ONNX Runtime Web</th><td>Client-side inference through WebAssembly</td><td>Live predictor</td></tr><tr><th scope="row">Chart.js</th><td>Interactive report visualisations</td><td>Case study and report</td></tr></tbody></table></div>
+    </section>
+
+    <section id="qa">
+      <div class="sec-head"><span class="sec-head__num">07</span><h2>Questions &amp; answers</h2><p>The questions a reviewer is most likely to ask.</p></div>
+      <div class="qa-tools"><input class="qa-search" id="qaSearch" type="search" placeholder="Search questions…" aria-label="Search questions"><div class="chipset" id="qaChips" role="group" aria-label="Filter questions"><button type="button" data-cat="all" aria-pressed="true">All</button><button type="button" data-cat="data" aria-pressed="false">Data</button><button type="button" data-cat="model" aria-pressed="false">Model</button><button type="button" data-cat="evaluation" aria-pressed="false">Evaluation</button><button type="button" data-cat="limits" aria-pressed="false">Limits</button></div><button class="btn btn--sm" id="qaToggle" type="button">Expand all</button><span class="qa-count" id="qaCount"></span></div>
+      <div class="qa-list">
+        <details class="qa" data-cat="data" id="q-missing"><summary><span class="qa__q">Why were 1,428 training rows dropped?</span><span class="qa__tag">Data</span></summary><div class="qa__a"><span class="qa__short">The original cleaning sequence ran <code>dropna()</code> before unused columns were removed.</span><p>That means some rows were discarded for gaps in <code>Cabin</code> or <code>Name</code>, even though those fields were never model features. The next version should drop those columns first and median-fill numeric gaps consistently.</p></div></details>
+        <details class="qa" data-cat="data" id="q-cabin"><summary><span class="qa__q">Why not use the Cabin column?</span><span class="qa__tag">Data</span></summary><div class="qa__a"><span class="qa__short">Raw cabin values are high-cardinality and shared across passengers.</span><p>A random split could place passengers from the same cabin on both sides, allowing the model to learn group identity rather than general patterns. Splitting Cabin into deck, number and side is a strong next experiment, but it needs group-aware validation.</p></div></details>
+        <details class="qa" data-cat="model" id="q-ensemble"><summary><span class="qa__q">Why did the ensembles not help?</span><span class="qa__tag">Model</span></summary><div class="qa__a"><span class="qa__short">The component models made correlated errors on the same passengers.</span><p>Hard and soft voting landed between 77.29% and 77.77%, below gradient boosting's 78.05%. Voting helps when members fail on different rows; these models did not provide enough independent signal.</p></div></details>
+        <details class="qa" data-cat="model" id="q-lightgbm"><summary><span class="qa__q">Why choose LightGBM?</span><span class="qa__tag">Model</span></summary><div class="qa__a"><span class="qa__short">It was competitive in the benchmark, improved under search and has a practical export path.</span><p>It handles tabular interactions well, needs no scaling, and the final model is small enough to run client-side through ONNX Runtime Web.</p></div></details>
+        <details class="qa" data-cat="evaluation" id="q-metric"><summary><span class="qa__q">Why report ROC-AUC as well as accuracy?</span><span class="qa__tag">Evaluation</span></summary><div class="qa__a"><span class="qa__short">They answer different questions.</span><p>Accuracy describes one threshold. ROC-AUC describes how consistently the model ranks transported passengers above non-transported passengers across all thresholds. The balanced target makes accuracy useful here, but it does not replace ranking quality.</p></div></details>
+        <details class="qa" data-cat="evaluation" id="q-threshold"><summary><span class="qa__q">How was 0.42 selected?</span><span class="qa__tag">Evaluation</span></summary><div class="qa__a"><span class="qa__short">A validation sweep found the accuracy-maximising cut-off.</span><p>At 0.42 the model reaches 78.18%, compared with 77.84% at 0.50. The same split is used for selection and reporting, so this improvement should be treated as slightly optimistic.</p></div></details>
+        <details class="qa" data-cat="limits" id="q-limits"><summary><span class="qa__q">What would you improve next?</span><span class="qa__tag">Limits</span></summary><div class="qa__a"><ul><li>Drop unused columns before removing incomplete rows.</li><li>Engineer Cabin, group-size and companion features.</li><li>Compare models across repeated or nested stratified splits.</li><li>Keep a separate validation set for threshold selection.</li></ul></div></details>
+      </div>
+      <p class="qa-empty mt-3" id="qaEmpty" hidden>No questions match that search.</p>
+    </section>
+
+    <section id="deeper">
+      <div class="sec-head"><span class="sec-head__num">08</span><h2>Go deeper</h2><p>The briefing is the summary; the full artifacts retain the implementation detail.</p></div>
+      <div class="deeper">
+        <a href="./index.html"><span>Overview and benchmark</span><strong>Case study</strong></a>
+        <a href="./report.html"><span>Every decision, chart and table</span><strong>Technical report</strong></a>
+        <a href="./onnx_model.html"><span>Score a passenger in the browser</span><strong>Live predictor</strong></a>
+        <a href="./data_cleaner.html"><span>Cleaning code and outputs</span><strong>data_cleaner notebook</strong></a>
+        <a href="./train_ensemble.html"><span>Benchmarking and search</span><strong>train_ensemble notebook</strong></a>
+        <a href="../briefings.html#concepts"><span>ROC, threshold, leakage…</span><strong>Concepts explained</strong></a>
+        <a href="../Supervised/briefing.html"><span>The other project</span><strong>Customer satisfaction briefing</strong></a>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap site-footer__grid">
+    <div><strong class="footer-name">Mayank Choudhary</strong><br>Machine Learning Portfolio · Integrated M.Tech, VIT</div>
+    <nav class="footer-links" aria-label="Footer">
+      <a href="../index.html">Portfolio home</a>
+      <a href="../briefings.html">All briefings</a>
+      <a href="./report.html">Technical report</a>
+      <a href="./onnx_model.html">Live predictor</a>
+      <a href="https://github.com/Mayank170906/mlProjects" target="_blank" rel="noopener">Repository&#8239;↗</a>
+    </nav>
+    <div class="xsmall footer-legal">Kaggle Spaceship Titanic dataset, CC BY 4.0.</div>
+  </div>
+</footer>
+
+</body>
+</html>

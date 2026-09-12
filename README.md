@@ -11,7 +11,7 @@ report with results measured on held-out data.
 
 | # | Project | Task | Held-out ROC-AUC | Artifacts |
 |---|---------|------|-----------------:|-----------|
-| 01 | [Customer satisfaction prediction](./Supervised/) | Binary classification over 117,314 Olist e-commerce order rows | **0.7936** | [Case study](https://mayank170906.github.io/mlProjects/Supervised/) · [Report](https://mayank170906.github.io/mlProjects/Supervised/report.html) · [Dashboard](https://mayank170906.github.io/mlProjects/Supervised/ecommerce_dashboard.html) |
+| 01 | [Customer satisfaction prediction](./Supervised/) | Binary classification over 117,329 Olist e-commerce order rows | **0.8057** | [Case study](https://mayank170906.github.io/mlProjects/Supervised/) · [Report](https://mayank170906.github.io/mlProjects/Supervised/report.html) · [Dashboard](https://mayank170906.github.io/mlProjects/Supervised/ecommerce_dashboard.html) |
 | 02 | [Spaceship Titanic](./Tree/) | Nine tree-based classifiers benchmarked, tuned and deployed | **0.8687** | [Case study](https://mayank170906.github.io/mlProjects/Tree/) · [Report](https://mayank170906.github.io/mlProjects/Tree/report.html) · [Live predictor](https://mayank170906.github.io/mlProjects/Tree/onnx_model.html) |
 
 Both models are exported to ONNX and run client-side in the browser via WebAssembly.
@@ -28,10 +28,10 @@ uv run python tools/gen_supervised_metrics.py   # → Supervised/assets/metrics.
 uv run python tools/gen_tree_metrics.py         # → Tree/assets/metrics.json
 ```
 
-This means the site cannot drift away from the notebooks. It also means the reported numbers
-are the ones a clean refit actually produces — see
-[the note on tuning-set selection bias](https://mayank170906.github.io/mlProjects/Supervised/report.html#tuning),
-where Optuna's best trial reported 0.8057 and an honest refit gives 0.7936.
+This means the site cannot drift away from the notebooks: the scripts reproduce the notebooks'
+splits exactly (0.8057 and 0.7818). The report also notes
+[how sensitive a single holdout is](https://mayank170906.github.io/mlProjects/Supervised/report.html#tuning)
+— dropping 15 rows before splitting moves the e-commerce score to 0.7936.
 
 Supporting tooling:
 

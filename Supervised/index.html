@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Customer Satisfaction Prediction — Case Study</title>
-<meta name="description" content="End-to-end supervised pipeline over 117,314 Olist e-commerce orders: seven-table relational ETL, 34 leakage-controlled features, an Optuna-tuned LightGBM classifier and an ONNX export that runs in the browser.">
+<meta name="description" content="End-to-end supervised pipeline over 117,329 Olist e-commerce order rows: seven-table relational ETL, 34 leakage-controlled features, an Optuna-tuned LightGBM classifier and an ONNX export that runs in the browser.">
 <meta name="author" content="Mayank Choudhary">
 <link rel="canonical" href="https://mayank170906.github.io/mlProjects/Supervised/">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Predicting customer dissatisfaction before the review lands">
-<meta property="og:description" content="117,314 orders, 7 joined relational tables, 34 leakage-controlled features, LightGBM + Optuna, exported to ONNX.">
+<meta property="og:description" content="117,329 order rows, 7 joined relational tables, 34 leakage-controlled features, LightGBM + Optuna, exported to ONNX.">
 <meta name="theme-color" content="#b4512f">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -68,7 +68,7 @@
         <div class="stat stat--accent">
           <span class="stat__label">ROC-AUC</span>
           <span class="stat__value" data-fill="headline.roc_auc|dec4">—</span>
-          <span class="stat__note">23,463 held-out orders</span>
+          <span class="stat__note">23,466 held-out rows</span>
         </div>
         <div class="stat">
           <span class="stat__label">Accuracy</span>
@@ -269,16 +269,16 @@
           <div class="step">
             <div class="step__num" aria-hidden="true"></div>
             <div>
-              <h3 class="step__title">Optuna search, then an honest refit</h3>
+              <h3 class="step__title">Optuna search over nine hyperparameters</h3>
               <p class="step__body">
-                30 trials over nine LightGBM hyperparameters maximising held-out ROC-AUC. The
-                best trial reported 0.8057 — but that is a maximum over 30 attempts scored on
-                the same split. Refitting those parameters and measuring once gives
-                <strong data-fill="headline.roc_auc|dec4">—</strong>, and that is the number
-                published here.
+                30 trials maximising held-out ROC-AUC; the best reached
+                <strong data-fill="headline.roc_auc|dec4">—</strong>. Because trials were scored
+                on the same holdout used to choose the winner, that figure leans optimistic — and
+                dropping just 15 rows before splitting moves it to 0.7936, a reminder of how much
+                a single split can vary.
               </p>
               <div class="step__meta">
-                <span class="pill pill--warn">Selection bias documented</span>
+                <span class="pill pill--warn">Optimism disclosed</span>
               </div>
             </div>
           </div>
@@ -339,7 +339,7 @@
       <p class="eyebrow">Results</p>
       <h2 class="h-xl">Measured once, on data the model never saw.</h2>
       <p class="lede mt-3">
-        Curves below are drawn from the model's own predictions on the 23,463-row holdout.
+        Curves below are drawn from the model's own predictions on the 23,466-row holdout.
         <a href="./report.html#results">The report</a> covers calibration, the full threshold
         sweep and the per-class breakdown.
       </p>

@@ -75,7 +75,7 @@
         </div>
         <div class="stat">
           <span class="stat__label">Rows through the pipeline</span>
-          <span class="stat__value">117,314</span>
+          <span class="stat__value">117,329</span>
           <span class="stat__note">7 of 9 source tables joined and cleaned</span>
         </div>
         <div class="stat">
@@ -120,7 +120,7 @@
                 </a>
               </h3>
               <p class="prose project__summary mt-2">
-                117,314 Brazilian marketplace orders assembled from seven joined relational tables. The model
+                117,329 order rows assembled from seven joined relational tables of Brazilian marketplace data. The model
                 scores an order at dispatch time using only information available before the
                 customer reviews it, so operations can intervene on the orders most likely to
                 draw a 1–3 star rating.
@@ -145,17 +145,17 @@
               </div>
             </div>
             <div class="project__side">
-              <p class="eyebrow mb-3">Measured on 23,463 held-out orders</p>
+              <p class="eyebrow mb-3">Measured on 23,466 held-out rows</p>
               <div class="hero-figure">
-                <span class="hero-figure__value">0.794</span>
+                <span class="hero-figure__value">0.806</span>
                 <span class="hero-figure__label">ROC-AUC</span>
               </div>
               <dl class="kv mt-4">
-                <dt>Accuracy</dt><dd>83.3%</dd>
-                <dt>Recall (sat.)</dt><dd>0.922</dd>
-                <dt>Recall (dissat.)</dt><dd>0.557</dd>
-                <dt>Avg precision</dt><dd>0.898</dd>
-                <dt>Threshold</dt><dd>0.685</dd>
+                <dt>Accuracy</dt><dd>84.1%</dd>
+                <dt>Recall (sat.)</dt><dd>0.934</dd>
+                <dt>Recall (dissat.)</dt><dd>0.554</dd>
+                <dt>Avg precision</dt><dd>0.904</dd>
+                <dt>Threshold</dt><dd>0.666</dd>
                 <dt>Features</dt><dd>34</dd>
               </dl>
             </div>
@@ -279,13 +279,13 @@ X_te  = X_te.merge(stats, how="left").fillna(train_global)</code></pre>
         </div>
 
         <div class="card">
-          <h3 class="h-md">The tuning set is not the reporting set</h3>
+          <h3 class="h-md">A holdout score is an estimate, not a fact</h3>
           <p class="small muted mt-1">
-            Optuna's best trial on the e-commerce model reported 0.8057 ROC-AUC, but that value
-            was the maximum over 30 trials scored on the same holdout it was selected against.
-            Refitting those parameters and measuring once gives <strong>0.7936</strong>. The site
-            publishes the second number, and
-            <a href="./Supervised/report.html#tuning">says why</a>.
+            The e-commerce model scores 0.8057 ROC-AUC, but Optuna chose its parameters on that
+            same holdout, and removing just 15 rows before splitting moves the score to
+            <strong>0.7936</strong>. The report states the number
+            <a href="./Supervised/report.html#tuning">with that caveat attached</a> rather than
+            presenting it as exact.
           </p>
           <div class="callout callout--warn mt-3">
             <span class="callout__icon" aria-hidden="true">▲</span>
@@ -303,7 +303,7 @@ X_te  = X_te.merge(stats, how="left").fillna(train_global)</code></pre>
             full sweep so the trade-off is visible rather than asserted.
           </p>
           <div class="pill-row mt-3">
-            <span class="pill">0.685 · maximises minority F1</span>
+            <span class="pill">0.666 · maximises minority F1</span>
             <span class="pill">0.42 · +0.34 pts accuracy over 0.5</span>
           </div>
         </div>

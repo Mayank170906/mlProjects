@@ -205,13 +205,13 @@
             <tr><th scope="row"><code>CryoSleep</code></th><td>Boolean</td><td>One-hot encoded with an <code>Unknown</code> level</td></tr>
             <tr><th scope="row"><code>Cabin</code></th><td>Composite string</td><td><span class="figure-bad">Dropped</span> — shared across passengers, see §3</td></tr>
             <tr><th scope="row"><code>Destination</code></th><td>Categorical</td><td>One-hot encoded</td></tr>
-            <tr><th scope="row"><code>Age</code></th><td>Numeric</td><td>Median-imputed</td></tr>
+            <tr><th scope="row"><code>Age</code></th><td>Numeric</td><td>Train: rows with gaps dropped · Test: median</td></tr>
             <tr><th scope="row"><code>VIP</code></th><td>Boolean</td><td>One-hot encoded</td></tr>
-            <tr><th scope="row"><code>RoomService</code></th><td>Numeric</td><td>Median-imputed</td></tr>
-            <tr><th scope="row"><code>FoodCourt</code></th><td>Numeric</td><td>Median-imputed</td></tr>
-            <tr><th scope="row"><code>ShoppingMall</code></th><td>Numeric</td><td>Median-imputed</td></tr>
-            <tr><th scope="row"><code>Spa</code></th><td>Numeric</td><td>Median-imputed</td></tr>
-            <tr><th scope="row"><code>VRDeck</code></th><td>Numeric</td><td>Median-imputed</td></tr>
+            <tr><th scope="row"><code>RoomService</code></th><td>Numeric</td><td>As <code>Age</code></td></tr>
+            <tr><th scope="row"><code>FoodCourt</code></th><td>Numeric</td><td>As <code>Age</code></td></tr>
+            <tr><th scope="row"><code>ShoppingMall</code></th><td>Numeric</td><td>As <code>Age</code></td></tr>
+            <tr><th scope="row"><code>Spa</code></th><td>Numeric</td><td>As <code>Age</code></td></tr>
+            <tr><th scope="row"><code>VRDeck</code></th><td>Numeric</td><td>As <code>Age</code></td></tr>
             <tr><th scope="row"><code>Name</code></th><td>Free text</td><td><span class="figure-bad">Dropped</span> — near-unique</td></tr>
             <tr><th scope="row"><code>Transported</code></th><td>Boolean</td><td><strong>Target</strong></td></tr>
           </tbody>
@@ -250,7 +250,8 @@
           <h4 class="m-0">Adopted: explicit sentinels</h4>
           <p class="small muted mt-1">
             Categoricals are filled with the literal value <code>Unknown</code>, which survives
-            one-hot encoding as its own indicator column. Numerics take the median.
+            one-hot encoding as its own indicator column. Numeric gaps were median-filled in the
+            test set; in training, those rows were dropped (below).
           </p>
           <p class="small muted mt-2">
             <strong>Why it is better.</strong> The tree can split on <code>Unknown</code>
@@ -263,13 +264,14 @@
       <div class="callout callout--caveat mb-4">
         <span class="callout__icon" aria-hidden="true">▲</span>
         <span>
-          <strong>The bigger cost was row removal, not imputation.</strong> After filling, rows
-          that still carried a missing value were dropped, taking training from 8,693 to
-          <strong>7,265</strong> — <strong>1,428 rows, 16.4% of the labelled data</strong>. On a
-          dataset this small that is the most questionable decision in the pipeline: the same
-          <code>Unknown</code>-sentinel logic that justified keeping partially-missing rows
-          should have been extended to cover them. The test set was not filtered this way, so
-          training and inference also see slightly different distributions.
+          <strong>The bigger cost was row removal, not imputation.</strong> After filling the
+          categoricals, <code>c_train.dropna()</code> removed every row still missing anything,
+          taking training from 8,693 to <strong>7,265</strong> — <strong>1,428 rows, 16.4% of
+          the labelled data</strong>. Because it ran <em>before</em> <code>Cabin</code> and
+          <code>Name</code> were dropped, some passengers were discarded for gaps in columns the
+          model never used. Reordering those two steps and median-filling the numerics (as the
+          test set already was) would recover most of them, and would also make training and
+          inference preprocessing identical.
         </span>
       </div>
 
@@ -316,7 +318,8 @@ VIP_True  VIP_Unknown</code></pre>
       <p class="prose">
         All nine models were fit on the same stratified 80/20 split with library defaults, so the
         comparison isolates the learner rather than the tuning effort. The four ensembles vote
-        over the five base learners.
+        over decision tree, random forest, gradient boosting and XGBoost — hard and soft, each
+        unweighted and weighted 1:2:3:4.
       </p>
 
       <figure class="figure mb-4">
@@ -352,7 +355,7 @@ VIP_True  VIP_Unknown</code></pre>
         <li>
           <strong>No ensemble beat its best member.</strong> The best, weighted hard voting at
           77.77%, is 0.28 points <em>below</em> gradient boosting alone. Voting helps when
-          members err on different rows; here five tree models trained on identical features
+          members err on different rows; here four tree models trained on identical features
           make correlated mistakes, so averaging preserves them.
         </li>
         <li>
@@ -619,7 +622,7 @@ best = max(((t / 100, accuracy_score(y_val, probs &gt;= t / 100))
       <p class="prose">
         Everything else is minor. <code>HomePlanet_Europa</code> at 6.4% is the only remaining
         feature above 5%, and <code>Age</code>, <code>VIP</code> and destination contribute
-        little — consistent with the benchmark finding that all five learners converge to
+        little — consistent with the benchmark finding that the boosted and bagged learners converge to
         within a point of each other.
       </p>
 
