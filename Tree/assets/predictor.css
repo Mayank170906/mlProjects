@@ -1,0 +1,201 @@
+/* =============================================================================
+   Live predictor — the only page-specific stylesheet in the site.
+   Everything else comes from ../../assets/css/site.css.
+   ============================================================================= */
+
+.predictor {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .predictor {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* --- form ----------------------------------------------------------------- */
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.field {
+  display: grid;
+  gap: 5px;
+}
+
+.field__label {
+  color: var(--ink-3);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.field__input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-1);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.field__input:hover {
+  border-color: var(--line-strong);
+}
+
+.field__input:focus-visible {
+  border-color: var(--accent);
+  outline: 2px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  outline-offset: 0;
+}
+
+select.field__input {
+  cursor: pointer;
+  font-family: var(--sans);
+}
+
+.btn--sm {
+  padding: 5px 11px;
+  font-size: 12px;
+}
+
+/* --- threshold slider ------------------------------------------------------ */
+
+.threshold {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+
+.threshold__value {
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.threshold input[type="range"] {
+  width: 100%;
+  margin: 10px 0 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* --- probability bar -------------------------------------------------------- */
+
+.prob__track {
+  position: relative;
+  height: 10px;
+  margin-top: 6px;
+  overflow: hidden;
+  border-radius: 5px;
+  background: var(--surface-3);
+}
+
+.prob__fill {
+  height: 100%;
+  width: 0;
+  border-radius: 5px 0 0 5px;
+  background: var(--series-1);
+  transition: width 0.25s ease, background 0.25s ease;
+}
+
+.prob__fill.is-positive {
+  background: var(--good);
+}
+
+/* The threshold marker is a 2px surface-coloured rule, so it separates without
+   drawing a border around the fill. */
+.prob__marker {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  left: 42%;
+  background: var(--ink);
+  transition: left 0.15s ease;
+}
+
+/* --- result ------------------------------------------------------------------ */
+
+#resultCard.is-positive {
+  border-color: color-mix(in srgb, var(--good) 40%, var(--line));
+}
+
+#resultCard.is-negative {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+}
+
+#prediction.is-positive {
+  color: var(--good);
+}
+
+#prediction.is-negative {
+  color: var(--accent);
+}
+
+#result {
+  animation: result-in 0.28s ease both;
+}
+
+@keyframes result-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #result {
+    animation: none;
+  }
+  .prob__fill,
+  .prob__marker {
+    transition: none;
+  }
+}
+
+/* --- status & log -------------------------------------------------------------- */
+
+.pill.is-ready {
+  border-color: color-mix(in srgb, var(--good) 30%, transparent);
+  background: var(--good-wash);
+  color: var(--good);
+}
+
+.pill.is-error {
+  border-color: color-mix(in srgb, var(--bad) 30%, transparent);
+  background: var(--bad-wash);
+  color: var(--bad);
+}
+
+.log {
+  max-height: 220px;
+  margin: 0;
+  overflow-y: auto;
+  font-size: 11.5px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+details > summary {
+  cursor: pointer;
+  color: var(--ink-3);
+}
+
+details > summary:hover {
+  color: var(--accent);
+}

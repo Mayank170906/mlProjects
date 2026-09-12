@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mayank170906.github.io/mlProjects/sitemap.xml

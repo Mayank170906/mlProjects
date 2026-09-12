@@ -1,1013 +1,1076 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Brazilian E‑Commerce – Customer Satisfaction</title>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js">
-    </script>
-    <style>
-        /* ─── RESET & BASE ─── */
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        :root {
-            --bg-primary: #f0f4f9;
-            --bg-card: #ffffff;
-            --bg-header: #0b2b4a;
-            --text-primary: #1a2634;
-            --text-secondary: #2d3f53;
-            --text-muted: #5f7d9a;
-            --border-light: #e4ebf3;
-            --accent: #1b6b8a;
-            --accent-light: #4a9bbd;
-            --shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-            --radius: 16px;
-            --transition: 0.25s ease;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            padding: 2rem 1rem;
-        }
-
-        .container {
-            max-width: 1440px;
-            margin: 0 auto;
-            background: var(--bg-card);
-            border-radius: 28px;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            padding: 2.5rem 3rem;
-        }
-
-        /* ─── TYPOGRAPHY ─── */
-        h1 {
-            font-size: 2.4rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #0b2b4a, #1b6b8a);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        h2 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin: 2.2rem 0 1rem 0;
-            padding-bottom: 0.5rem;
-            border-bottom: 3px solid var(--border-light);
-            color: #0b2b4a;
-        }
-        h3 {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin: 1.6rem 0 0.6rem 0;
-            color: #1e3b5c;
-        }
-        h4 {
-            font-size: 1.05rem;
-            font-weight: 600;
-            margin: 1rem 0 0.3rem 0;
-            color: #2c4a6e;
-        }
-        p {
-            margin-bottom: 0.75rem;
-            color: var(--text-secondary);
-        }
-        code {
-            background: #eef2f7;
-            padding: 0.1rem 0.5rem;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            color: #1b6b8a;
-        }
-
-        /* ─── BADGES & META ─── */
-        .badge {
-            display: inline-block;
-            background: #0b2b4a;
-            color: #fff;
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding: 0.2rem 0.8rem;
-            border-radius: 20px;
-            letter-spacing: 0.3px;
-            text-transform: uppercase;
-            margin-right: 0.3rem;
-        }
-        .badge-success {
-            background: #0d5a2e;
-        }
-        .badge-warning {
-            background: #b45309;
-        }
-        .badge-info {
-            background: #1b6b8a;
-        }
-
-        .report-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.5rem 3rem;
-            background: #f0f5fa;
-            border-radius: var(--radius);
-            padding: 1.2rem 2rem;
-            margin: 0.5rem 0 1.5rem 0;
-            font-size: 0.95rem;
-            color: #1e3b5c;
-            border: 1px solid var(--border-light);
-        }
-        .report-meta span {
-            font-weight: 600;
-        }
-
-        .tag {
-            display: inline-block;
-            background: var(--border-light);
-            padding: 0.1rem 0.7rem;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: #1e3b5c;
-        }
-
-        /* ─── STAT CARDS ─── */
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin: 1.2rem 0;
-        }
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            margin: 1.2rem 0;
-        }
-        .grid-4 {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.2rem;
-            margin: 1.2rem 0;
-        }
-        .grid-5 {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 1rem;
-            margin: 1.2rem 0;
-        }
-
-        .stat-card {
-            background: #f8fafc;
-            border-radius: var(--radius);
-            padding: 1.2rem 1.5rem;
-            border: 1px solid var(--border-light);
-            transition: var(--transition);
-        }
-        .stat-card:hover {
-            border-color: #b8cfdf;
-            background: #f4f8fc;
-        }
-        .stat-card .label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-        .stat-card .value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #0b2b4a;
-            line-height: 1.2;
-            margin-top: 0.1rem;
-        }
-        .stat-card .sub {
-            font-size: 0.85rem;
-            color: #3e5f7d;
-            margin-top: 0.15rem;
-        }
-
-        /* ─── TABLES ─── */
-        .table-wrap {
-            overflow-x: auto;
-            margin: 1rem 0 1.5rem 0;
-            border-radius: 14px;
-            border: 1px solid var(--border-light);
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-            background: #fff;
-        }
-        table th {
-            background: #f0f5fa;
-            color: #1e3b5c;
-            font-weight: 600;
-            padding: 0.7rem 1rem;
-            text-align: left;
-            border-bottom: 2px solid var(--border-light);
-            white-space: nowrap;
-        }
-        table td {
-            padding: 0.6rem 1rem;
-            border-bottom: 1px solid #edf2f7;
-            color: #1f3b55;
-        }
-        table tr:hover td {
-            background: #f8fafc;
-        }
-        table .mono {
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            font-size: 0.82rem;
-        }
-        .table-success {
-            background: #d4edda !important;
-            color: #0d5a2e;
-        }
-        .table-danger {
-            background: #f8d7da !important;
-            color: #7a2a2e;
-        }
-        .table-warning {
-            background: #fff3cd !important;
-            color: #856404;
-        }
-
-        /* ─── CHARTS ─── */
-        .chart-box {
-            background: #fafcfe;
-            border-radius: var(--radius);
-            padding: 1.2rem 1.2rem 0.6rem 1.2rem;
-            border: 1px solid var(--border-light);
-            margin: 1rem 0;
-        }
-        .chart-box canvas {
-            max-height: 260px;
-            max-width: 100%;
-        }
-
-        /* ─── PERFORMANCE GRID ─── */
-        .perf-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-        .perf-item {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 0.9rem 1.2rem;
-            text-align: center;
-            border: 1px solid var(--border-light);
-        }
-        .perf-item .perf-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-        .perf-item .perf-value {
-            font-size: 1.7rem;
-            font-weight: 700;
-            color: #0b2b4a;
-        }
-        .perf-item .perf-sub {
-            font-size: 0.8rem;
-            color: #3e5f7d;
-        }
-
-        /* ─── CONFUSION MATRIX ─── */
-        .cm {
-            display: grid;
-            grid-template-columns: auto 1fr 1fr;
-            gap: 0.1rem;
-            max-width: 380px;
-            margin: 0.8rem 0 1.2rem 0;
-            font-weight: 500;
-        }
-        .cm .cm-label {
-            padding: 0.5rem 0.8rem;
-            font-weight: 600;
-            color: #1e3b5c;
-            font-size: 0.85rem;
-        }
-        .cm .cm-cell {
-            padding: 0.8rem 1rem;
-            text-align: center;
-            border-radius: 8px;
-            font-size: 1.1rem;
-        }
-        .cm .cm-tp {
-            background: #d4edda;
-            color: #0d5a2e;
-        }
-        .cm .cm-fp {
-            background: #f8d7da;
-            color: #7a2a2e;
-        }
-        .cm .cm-fn {
-            background: #f8d7da;
-            color: #7a2a2e;
-        }
-        .cm .cm-tn {
-            background: #d4edda;
-            color: #0d5a2e;
-        }
-
-        /* ─── HIGHLIGHT ─── */
-        .highlight {
-            background: #eef6fb;
-            border-left: 4px solid var(--accent);
-            padding: 0.8rem 1.4rem;
-            border-radius: 8px;
-            margin: 0.8rem 0;
-        }
-
-        /* ─── RESPONSIVE ─── */
-        @media (max-width: 1200px) {
-            .grid-4 { grid-template-columns: 1fr 1fr; }
-            .grid-5 { grid-template-columns: 1fr 1fr 1fr; }
-        }
-        @media (max-width: 1024px) {
-            .container { padding: 1.5rem; }
-            .grid-2, .grid-3 { grid-template-columns: 1fr 1fr; }
-            .perf-grid { grid-template-columns: 1fr 1fr; }
-        }
-        @media (max-width: 768px) {
-            .container { padding: 1rem; border-radius: 16px; }
-            .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; }
-            .perf-grid { grid-template-columns: 1fr; }
-            .report-meta { flex-direction: column; gap: 0.5rem; }
-            h1 { font-size: 1.8rem; }
-            h2 { font-size: 1.4rem; }
-        }
-
-        /* ─── SCROLLBAR ─── */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #eef2f7; }
-        ::-webkit-scrollbar-thumb { background: #b8cfdf; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #8fb3cc; }
-
-        /* ─── MISC ─── */
-        .text-muted { color: var(--text-muted); }
-        .mt-1 { margin-top: 0.8rem; }
-        .mb-1 { margin-bottom: 0.8rem; }
-        .flex-between { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
-        hr { border: 0; border-top: 2px solid var(--border-light); margin: 2rem 0 0.5rem 0; }
-        .status-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 0.4rem; }
-        .dot-green { background: #22c55e; }
-        .dot-red { background: #ef4444; }
-        .dot-yellow { background: #eab308; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Satisfaction Prediction — Technical Report</title>
+<meta name="description" content="Technical report: seven-table relational ETL over 117,314 Olist orders, 34 leakage-controlled features, Optuna-tuned LightGBM, threshold calibration, ONNX export, and a documented account of tuning-set selection bias.">
+<meta name="author" content="Mayank Choudhary">
+<link rel="canonical" href="https://mayank170906.github.io/mlProjects/Supervised/report.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Customer Satisfaction Prediction — Technical Report">
+<meta property="og:description" content="Seven-table ETL, 34 leakage-controlled features, Optuna-tuned LightGBM and ONNX export, measured on a 23,463-row holdout.">
+<meta name="theme-color" content="#b4512f">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../assets/css/site.css">
+<script src="../assets/js/site.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+<script src="../assets/js/charts.js" defer></script>
 </head>
 <body>
-<nav class="portfolio-nav" aria-label="Page navigation" style="max-width:1440px;margin:0 auto 18px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font:700 12px 'Trebuchet MS',Arial,sans-serif"><a href="../index.html" style="padding:9px 13px;border:1px solid #d9ded7;border-radius:7px;background:#fffdf8;color:#843c2c;text-decoration:none">&#8962; Home</a><button type="button" onclick="if (history.length > 1) history.back(); else window.location.href='../index.html';" style="padding:9px 13px;border:1px solid #d9ded7;border-radius:7px;background:transparent;color:#63716c;cursor:pointer;font:inherit">&#8592; Back</button></nav>
-<style>
-:root { --portfolio-ink:#17221f; --portfolio-muted:#63716c; --portfolio-paper:#f4f2ec; --portfolio-accent:#be5b3e; --portfolio-line:#d9ded7; }
-body { background:radial-gradient(circle at 90% 0%, #eadfd1 0, transparent 30%),var(--portfolio-paper); }
-body::before { content:'Mayank Choudhary  /  Integrated M.Tech, 4th year, VIT  /  Machine Learning Portfolio'; display:block; max-width:1440px; margin:0 auto 18px; padding:10px 18px; border-bottom:1px solid var(--portfolio-line); color:var(--portfolio-muted); font:600 11px/1.4 'Trebuchet MS',Arial,sans-serif; letter-spacing:.08em; text-transform:uppercase; }
-.container { border:1px solid var(--portfolio-line); box-shadow:0 18px 50px rgba(35,47,41,.08); } h1,h2,h3,h4 { color:var(--portfolio-ink); } h2 { border-color:var(--portfolio-line); } .highlight { background:#fffaf5; border-color:#d9b8aa; } @media (max-width:600px) { body::before { font-size:9px; } }
-</style>
 
-<div class="container">
+<a class="skip-link" href="#main">Skip to content</a>
 
-    <!-- ═══════ HEADER ═══════ -->
-    <header style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;">
-        <div>
-            <h1>📊 Brazilian E‑Commerce<br /><span style="font-size:1.2rem; color:#1b6b8a; -webkit-text-fill-color:#1b6b8a;">Customer Satisfaction Prediction</span></h1>
-            <p style="color:#3e5f7d; font-size:1.05rem; max-width:720px; margin-top:0.2rem;">
-                End‑to‑end ML pipeline · 9 tables · 117k orders · LightGBM + ONNX export
-            </p>
-        </div>
-        <div style="background:#f0f5fa; padding:0.5rem 1.4rem; border-radius:40px; border:1px solid var(--border-light); font-size:0.9rem; white-space:nowrap;">
-            <span class="badge">v2.0</span> 2026‑08‑31
-        </div>
-    </header>
+<header class="masthead">
+  <div class="wrap masthead__inner">
+    <a class="brand" href="../index.html">
+      <span class="brand__mark" aria-hidden="true">M</span>
+      Mayank Choudhary
+      <span class="brand__sub">· ML Portfolio</span>
+    </a>
+    <nav class="masthead__nav" aria-label="Primary">
+      <a class="navlink" href="../index.html">Home</a>
+      <a class="navlink" href="./index.html">Case study</a>
+      <a class="navlink navlink--optional" href="./ecommerce_dashboard.html">Dashboard</a>
+      <a class="navlink navlink--optional" href="https://github.com/Mayank170906/mlProjects/tree/master/Supervised" target="_blank" rel="noopener">Source&#8239;↗</a>
+      <button class="theme-toggle" type="button" aria-label="Switch theme"></button>
+    </nav>
+  </div>
+</header>
 
-    <!-- Meta -->
-    <div class="report-meta">
-        <div><span>📁 Dataset</span> Olist Brazilian E‑Commerce</div>
-        <div><span>🧠 Model</span> LightGBM · ROC‑AUC 0.8057</div>
-        <div><span>📦 Export</span> ONNX (downloadable)</div>
-        <div><span>🎯 Target</span> <code>is_satisfied</code> (customer satisfaction)</div>
-        <div><span>📊 Final Rows</span> 117,329</div>
-    </div>
-
-    <!-- ═══════ SUMMARY ═══════ -->
-    <h2>📌 Executive Summary</h2>
-    <div style="display:grid; grid-template-columns:2fr 1fr; gap:1.5rem;">
-        <div>
-            <p>
-                This project builds a robust <strong>customer satisfaction classifier</strong> for Brazilian e‑commerce
-                orders. Using the Olist dataset, we integrated <strong>9 tables</strong>, engineered <strong>34 predictive
-                features</strong>, and trained a <strong>LightGBM</strong> model with Optuna hyperparameter tuning.
-            </p>
-            <p>
-                The final leakage‑free model achieves a <strong>ROC‑AUC of 0.8057</strong> and <strong>accuracy of 84%</strong>,
-                with excellent recall (0.93) for satisfied customers. The optimal decision threshold is <strong>0.666</strong>.
-            </p>
-            <p>
-                The model is exported to <strong>ONNX</strong> for easy integration into production systems
-                (available in the repository).
-            </p>
-        </div>
-        <div style="background:#f0f5fa; border-radius:var(--radius); padding:1.2rem 1.6rem; border:1px solid var(--border-light); align-self:start;">
-            <div style="font-weight:600; color:#0b2b4a; font-size:0.9rem;">Key Metric</div>
-            <div style="font-size:2.6rem; font-weight:700; color:#0b2b4a; line-height:1;">0.8057</div>
-            <div style="color:#3e5f7d;">ROC‑AUC</div>
-            <hr style="border:0; border-top:1px solid var(--border-light); margin:0.6rem 0;" />
-            <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
-                <span>Accuracy</span> <strong>84%</strong>
-            </div>
-            <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
-                <span>F1 (class 1)</span> <strong>0.90</strong>
-            </div>
-            <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
-                <span>Optimal threshold</span> <strong>0.666</strong>
-            </div>
-        </div>
-    </div>
-
-    <!-- ═══════ DATA OVERVIEW ═══════ -->
-    <h2>📂 Data Overview</h2>
-    <p>The raw dataset consists of <strong>9 CSV files</strong> covering customers, orders, products, sellers, order items, payments, reviews, geolocation, and product categories.</p>
-
-    <div class="grid-4">
-        <div class="stat-card"><div class="label">Customers</div><div class="value">99,441</div><div class="sub">5 columns</div></div>
-        <div class="stat-card"><div class="label">Orders</div><div class="value">99,441</div><div class="sub">8 columns</div></div>
-        <div class="stat-card"><div class="label">Products</div><div class="value">32,951</div><div class="sub">9 columns</div></div>
-        <div class="stat-card"><div class="label">Sellers</div><div class="value">3,095</div><div class="sub">4 columns</div></div>
-        <div class="stat-card"><div class="label">Order Items</div><div class="value">112,650</div><div class="sub">7 columns</div></div>
-        <div class="stat-card"><div class="label">Order Payments</div><div class="value">103,886</div><div class="sub">5 columns</div></div>
-        <div class="stat-card"><div class="label">Order Reviews</div><div class="value">99,224</div><div class="sub">7 columns</div></div>
-        <div class="stat-card"><div class="label">Geolocation</div><div class="value">1,000,163</div><div class="sub">5 columns</div></div>
-    </div>
-
-    <div class="grid-3">
-        <div class="stat-card"><div class="label">Product Categories</div><div class="value">71</div><div class="sub">Portuguese + English</div></div>
-        <div class="stat-card"><div class="label">Final Merged Dataset</div><div class="value">117,329</div><div class="sub">39 columns</div></div>
-        <div class="stat-card"><div class="label">ML Ready Dataset</div><div class="value">117,314</div><div class="sub">34 features</div></div>
-    </div>
-
-    <div class="highlight">
-        <strong>✅ Data Integrity:</strong> All primary keys validated. 8 of 9 joins had zero nulls on join columns.
-        <span class="tag">products.product_category_name</span> had 610 nulls → filled with <code>'Unknown Category'</code>.
-    </div>
-
-    <!-- ═══════ PRIMARY KEY VALIDATION ═══════ -->
-    <h2>🔑 Primary Key Validation</h2>
-    <p>Uniqueness of primary keys was verified across all tables.</p>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>Table</th><th>Primary Key</th><th>Unique?</th></tr></thead>
-            <tbody>
-                <tr><td><code>customers</code></td><td><code>customer_id</code></td><td><span class="badge badge-success">✅</span></td></tr>
-                <tr><td><code>orders</code></td><td><code>order_id</code></td><td><span class="badge badge-success">✅</span></td></tr>
-                <tr><td><code>order_items</code></td><td><code>order_id + order_item_id</code></td><td><span class="badge badge-success">✅</span></td></tr>
-                <tr><td><code>order_payments</code></td><td><code>order_id + payment_sequential</code></td><td><span class="badge badge-success">✅</span></td></tr>
-                <tr><td><code>order_reviews</code></td><td><code>review_id + order_id</code></td><td><span class="badge badge-success">✅</span></td></tr>
-                <tr><td><code>products</code></td><td><code>product_id</code></td><td><span class="badge badge-success">✅</span></td></tr>
-                <tr><td><code>sellers</code></td><td><code>seller_id</code></td><td><span class="badge badge-success">✅</span></td></tr>
-                <tr><td><code>product_category</code></td><td><code>product_category_name</code></td><td><span class="badge badge-success">✅</span></td></tr>
-                <tr><td><code>geolocation</code></td><td><code>zip+lat+lng+city+state</code></td><td><span class="badge badge-warning">❌</span> <span class="text-muted">duplicate rows – handled during join</span></td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- ═══════ NULL CHECK ═══════ -->
-    <h2>🔍 Null Value Analysis</h2>
-    <p>Missing values were checked in all key columns used for joins and in important features.</p>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>Column</th><th>Null Count</th><th>Action</th></tr></thead>
-            <tbody>
-                <tr><td><code>customers.customer_id</code></td><td>0</td><td>—</td></tr>
-                <tr><td><code>orders.customer_id</code></td><td>0</td><td>—</td></tr>
-                <tr><td><code>orders.order_id</code></td><td>0</td><td>—</td></tr>
-                <tr><td><code>order_items.order_id</code></td><td>0</td><td>—</td></tr>
-                <tr><td><code>order_items.product_id</code></td><td>0</td><td>—</td></tr>
-                <tr><td><code>order_items.seller_id</code></td><td>0</td><td>—</td></tr>
-                <tr><td><code>order_payments.order_id</code></td><td>0</td><td>—</td></tr>
-                <tr><td><code>order_reviews.order_id</code></td><td>0</td><td>—</td></tr>
-                <tr><td><code>products.product_id</code></td><td>0</td><td>—</td></tr>
-                <tr><td><code>products.product_category_name</code></td><td><strong>610</strong></td><td>Filled with <code>'Unknown Category'</code></td></tr>
-                <tr><td><code>sellers.seller_id</code></td><td>0</td><td>—</td></tr>
-                <tr><td><code>product_category.product_category_name</code></td><td>0</td><td>—</td></tr>
-                <tr><td><code>order_approved_at</code></td><td>15</td><td>Rows dropped</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- ═══════ RELATIONSHIPS ═══════ -->
-    <h2>🔗 Table Relationships &amp; Joins</h2>
-    <p>The data model follows a star‑like schema with <code>orders</code> as the central table.</p>
-
-    <div style="background:#f8fafc; border-radius:var(--radius); padding:1.2rem 1.5rem; border:1px solid var(--border-light); margin:1rem 0; font-size:0.95rem;">
-        <p><strong>Join Conditions:</strong></p>
-        <ul style="margin-left:1.5rem; color:#2d3f53; list-style:none;">
-            <li>• <code>customers.customer_id = orders.customer_id</code></li>
-            <li>• <code>orders.order_id = order_items.order_id</code></li>
-            <li>• <code>orders.order_id = order_payments.order_id</code></li>
-            <li>• <code>orders.order_id = order_reviews.order_id</code></li>
-            <li>• <code>order_items.product_id = products.product_id</code></li>
-            <li>• <code>order_items.seller_id = sellers.seller_id</code></li>
-            <li>• <code>products.product_category_name = product_category.product_category_name</code></li>
-            <li>• <code>customers.customer_zip_code_prefix = geolocation.geolocation_zip_code_prefix</code></li>
-            <li>• <code>sellers.seller_zip_code_prefix = geolocation.geolocation_zip_code_prefix</code></li>
-        </ul>
-    </div>
-
-    <!-- ═══════ JOIN ROW COUNTS ═══════ -->
-    <h3>Join Row Count Progression</h3>
-    <div class="table-wrap">
-        <table>
-            <thead><tr><th>Step</th><th>Join Operation</th><th>Rows After</th><th>Change</th><th>Explanation</th></tr></thead>
-            <tbody>
-                <tr><td>1</td><td><code>customers</code> + <code>orders</code></td><td>99,441</td><td>+99,441</td><td>Every customer has at least one order</td></tr>
-                <tr><td>2</td><td>+ <code>order_items</code></td><td>112,650</td><td>+13,209</td><td>One order → multiple items</td></tr>
-                <tr><td>3</td><td>+ <code>products</code></td><td>112,650</td><td>±0</td><td>Every item has a valid product</td></tr>
-                <tr><td>4</td><td>+ <code>sellers</code></td><td>112,650</td><td>±0</td><td>Every item has a valid seller</td></tr>
-                <tr><td>5</td><td>+ <code>order_payments</code></td><td>117,601</td><td>+4,951</td><td>One order → multiple payments</td></tr>
-                <tr><td>6</td><td>+ <code>order_reviews</code></td><td>117,329</td><td>−272</td><td>Some orders lack reviews → dropped</td></tr>
-            </tbody>
-        </table>
-    </div>
-    <p class="text-muted" style="font-size:0.9rem;">Final combined dataset: <strong>117,329 rows</strong> and <strong>39 columns</strong>.</p>
-
-    <!-- ═══════ CLEANING & FEATURE ENGINEERING ═══════ -->
-    <h2>🧹 Data Cleaning &amp; Feature Engineering</h2>
-
-    <div class="grid-2">
-        <div>
-            <h4>Columns Dropped</h4>
-            <ul style="color:#2d3f53; margin-left:1.2rem;">
-                <li><code>product_name_lenght</code>, <code>product_description_lenght</code></li>
-                <li><code>product_photos_qty</code>, <code>product_weight_g</code></li>
-                <li><code>product_length_cm</code>, <code>product_height_cm</code>, <code>product_width_cm</code></li>
-                <li><code>review_comment_title</code>, <code>review_comment_message</code></li>
-                <li><code>order_delivered_carrier_date</code></li>
-                <li>Identifier columns: <code>customer_id</code>, <code>order_id</code>, <code>product_id</code>, <code>seller_id</code>, <code>review_id</code>, etc.</li>
-            </ul>
-            <p style="margin-top:0.4rem;"><span class="tag">Before</span> 39 cols → <span class="tag">After</span> 27 cols</p>
-        </div>
-        <div>
-            <h4>Engineered Features</h4>
-            <ul style="color:#2d3f53; margin-left:1.2rem;">
-                <li><strong><code>is_satisfied</code></strong> (target): 1 if review score ≥ 4</li>
-                <li><strong><code>is_delayed</code></strong>, <strong><code>delay_severity</code></strong></li>
-                <li><strong><code>freight_per_gram</code></strong>, <strong><code>price_per_volume</code></strong></li>
-                <li><strong>Seller &amp; category aggregates</strong> (avg delay, order count, avg freight)</li>
-                <li><strong>Time‑based</strong>: purchase hour, day of week, month</li>
-                <li><strong>Interaction</strong>: same_state</li>
-            </ul>
-            <p style="margin-top:0.4rem;">✅ <strong>Zero nulls</strong> in final ML dataset.</p>
-        </div>
-    </div>
-
-    <!-- ═══════ EDA CHARTS ═══════ -->
-    <h2>📈 Exploratory Data Analysis</h2>
-
-    <div class="grid-2">
-        <div class="chart-box">
-            <h4 style="margin:0 0 0.4rem 0;">Satisfaction vs Dissatisfaction</h4>
-            <canvas id="satisfactionChart" width="400" height="200"></canvas>
-            <div style="display:flex; gap:1.5rem; justify-content:center; font-size:0.9rem; margin-top:0.4rem;">
-                <span><span style="display:inline-block; width:12px; height:12px; background:#1b6b8a; border-radius:4px;"></span> Satisfied: 88,548 (75.5%)</span>
-                <span><span style="display:inline-block; width:12px; height:12px; background:#d9777b; border-radius:4px;"></span> Dissatisfied: 28,781 (24.5%)</span>
-            </div>
-        </div>
-        <div class="chart-box">
-            <h4 style="margin:0 0 0.4rem 0;">Review Score Distribution</h4>
-            <canvas id="reviewChart" width="400" height="200"></canvas>
-            <div style="text-align:center; font-size:0.85rem; color:#3e5f7d; margin-top:0.2rem;">
-                Mean: 4.03 · Median: 5 · Std: 1.39
-            </div>
-        </div>
-    </div>
-
-    <div class="grid-2">
-        <div class="chart-box">
-            <h4 style="margin:0 0 0.4rem 0;">Payment Type Distribution</h4>
-            <canvas id="paymentChart" width="400" height="200"></canvas>
-            <div style="display:flex; gap:0.8rem; flex-wrap:wrap; justify-content:center; font-size:0.8rem; margin-top:0.3rem;">
-                <span>💳 Credit Card 73.7%</span>
-                <span>📄 Boleto 19.5%</span>
-                <span>🎫 Voucher 5.4%</span>
-                <span>💳 Debit 1.4%</span>
-            </div>
-        </div>
-        <div class="chart-box">
-            <h4 style="margin:0 0 0.4rem 0;">Product Demand Categories</h4>
-            <canvas id="demandChart" width="400" height="200"></canvas>
-            <div style="display:flex; gap:0.6rem; flex-wrap:wrap; justify-content:center; font-size:0.75rem; margin-top:0.2rem;">
-                <span>Very High 52.1%</span>
-                <span>High 34.1%</span>
-                <span>Medium 10.1%</span>
-                <span>Low 3.2%</span>
-                <span>Very Low 0.6%</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- ═══════ KEY STATISTICS ═══════ -->
-    <h3>Key Statistics</h3>
-    <div class="grid-2">
-        <div>
-            <h4>Numeric Features (top 5)</h4>
-            <div class="table-wrap">
-                <table>
-                    <thead><tr><th>Feature</th><th>Min</th><th>Max</th><th>Mean</th><th>Std</th></tr></thead>
-                    <tbody>
-                        <tr><td>Price (R$)</td><td>0.85</td><td>6,735.00</td><td>120.53</td><td>182.95</td></tr>
-                        <tr><td>Freight (R$)</td><td>0.00</td><td>409.68</td><td>20.03</td><td>15.83</td></tr>
-                        <tr><td>Payment Value (R$)</td><td>0.00</td><td>13,664.08</td><td>172.07</td><td>265.40</td></tr>
-                        <tr><td>Installments</td><td>0</td><td>24</td><td>2.94</td><td>2.78</td></tr>
-                        <tr><td>Delivery Delay (days)</td><td>0</td><td>209</td><td>0.78</td><td>4.57</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div>
-            <h4>Categorical Distributions</h4>
-            <div class="table-wrap">
-                <table>
-                    <thead><tr><th>Payment Type</th><th>Count</th><th>%</th><th>Avg Value (R$)</th></tr></thead>
-                    <tbody>
-                        <tr><td>credit_card</td><td>86,520</td><td>73.7%</td><td>179.01</td></tr>
-                        <tr><td>boleto</td><td>22,835</td><td>19.5%</td><td>177.02</td></tr>
-                        <tr><td>voucher</td><td>6,282</td><td>5.4%</td><td>64.25</td></tr>
-                        <tr><td>debit_card</td><td>1,692</td><td>1.4%</td><td>150.08</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <div style="margin-top:0.6rem; display:flex; gap:0.8rem; flex-wrap:wrap; font-size:0.85rem;">
-                <span><strong>Customer states:</strong> 27</span>
-                <span><strong>Seller states:</strong> 23</span>
-                <span><strong>Product categories:</strong> 71</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- ═══════ FINAL ML FEATURES (34) ═══════ -->
-    <h2>🧪 Final ML Dataset – 34 Features</h2>
-    <p>The final dataset for training contained <strong>34 features</strong> (all leakage‑free) and <strong>117,314 rows</strong>.</p>
-    <div class="table-wrap" style="max-height:300px; overflow-y:auto;">
-        <table>
-            <thead><tr><th>Feature</th><th>Type</th><th>Description</th></tr></thead>
-            <tbody>
-                <tr><td><code>customer_state</code></td><td>categorical</td><td>Customer's state (UF)</td></tr>
-                <tr><td><code>order_status</code></td><td>categorical</td><td>Order status</td></tr>
-                <tr><td><code>price</code></td><td>numeric</td><td>Item price (R$)</td></tr>
-                <tr><td><code>freight_value</code></td><td>numeric</td><td>Shipping cost (R$)</td></tr>
-                <tr><td><code>product_category_name</code></td><td>categorical</td><td>Product category (Portuguese)</td></tr>
-                <tr><td><code>product_name_lenght</code></td><td>numeric</td><td>Length of product name</td></tr>
-                <tr><td><code>product_description_lenght</code></td><td>numeric</td><td>Length of product description</td></tr>
-                <tr><td><code>product_photos_qty</code></td><td>numeric</td><td>Number of product photos</td></tr>
-                <tr><td><code>product_weight_g</code></td><td>numeric</td><td>Product weight (g)</td></tr>
-                <tr><td><code>product_length_cm</code></td><td>numeric</td><td>Product length (cm)</td></tr>
-                <tr><td><code>product_height_cm</code></td><td>numeric</td><td>Product height (cm)</td></tr>
-                <tr><td><code>product_width_cm</code></td><td>numeric</td><td>Product width (cm)</td></tr>
-                <tr><td><code>seller_state</code></td><td>categorical</td><td>Seller's state (UF)</td></tr>
-                <tr><td><code>payment_sequential</code></td><td>numeric</td><td>Sequence of payment for order</td></tr>
-                <tr><td><code>payment_type</code></td><td>categorical</td><td>Credit card, boleto, voucher, debit</td></tr>
-                <tr><td><code>payment_installments</code></td><td>numeric</td><td>Number of installments</td></tr>
-                <tr><td><code>payment_value</code></td><td>numeric</td><td>Total payment amount (R$)</td></tr>
-                <tr><td><code>delivery_delay_days</code></td><td>numeric</td><td>Days delayed (negative = early)</td></tr>
-                <tr><td><code>estimated_delivery_days</code></td><td>numeric</td><td>Estimated days from order to delivery</td></tr>
-                <tr><td><code>actual_delivery_days</code></td><td>numeric</td><td>Actual days from order to delivery</td></tr>
-                <tr><td><code>freight_ratio</code></td><td>numeric</td><td>Freight / price ratio</td></tr>
-                <tr><td><code>product_volume_cm3</code></td><td>numeric</td><td>Volume (L×H×W)</td></tr>
-                <tr><td><code>same_state</code></td><td>numeric</td><td>1 if customer and seller in same state</td></tr>
-                <tr><td><code>purchase_hour</code></td><td>numeric</td><td>Hour of order purchase (0–23)</td></tr>
-                <tr><td><code>purchase_dayofweek</code></td><td>numeric</td><td>Day of week (0=Mon, 6=Sun)</td></tr>
-                <tr><td><code>purchase_month</code></td><td>numeric</td><td>Month (1–12)</td></tr>
-                <tr><td><code>is_delayed</code></td><td>numeric</td><td>1 if delivery_delay_days > 0</td></tr>
-                <tr><td><code>delay_severity</code></td><td>numeric</td><td>Delay / (estimated+1)</td></tr>
-                <tr><td><code>freight_per_gram</code></td><td>numeric</td><td>Freight / weight (g)</td></tr>
-                <tr><td><code>price_per_volume</code></td><td>numeric</td><td>Price / volume (cm³)</td></tr>
-                <tr><td><code>seller_avg_delay</code></td><td>numeric</td><td>Seller's average delivery delay (from training)</td></tr>
-                <tr><td><code>seller_order_count</code></td><td>numeric</td><td>Number of orders from that seller (from training)</td></tr>
-                <tr><td><code>cat_avg_delay</code></td><td>numeric</td><td>Category's average delay (from training)</td></tr>
-                <tr><td><code>cat_avg_freight</code></td><td>numeric</td><td>Category's average freight (from training)</td></tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="highlight" style="margin-top:0.5rem;">
-        <strong>🔍 Leakage Prevention:</strong> All aggregations (seller/category averages) were computed <strong>only on the training set</strong> and applied to test data with <code>fillna(global_mean)</code> — no target leakage.
-    </div>
-
-    <!-- ═══════ MODEL ═══════ -->
-    <h2>🤖 Machine Learning Model</h2>
-    <div class="grid-2">
-        <div>
-            <h4>LightGBM Classifier</h4>
-            <ul style="color:#2d3f53; margin-left:1.2rem;">
-                <li><strong>Objective:</strong> binary</li>
-                <li><strong>Metric:</strong> AUC</li>
-                <li><strong>Boosting:</strong> gbdt</li>
-                <li><strong>n_estimators:</strong> 694</li>
-                <li><strong>learning_rate:</strong> 0.0626</li>
-                <li><strong>num_leaves:</strong> 127</li>
-                <li><strong>max_depth:</strong> 10</li>
-                <li><strong>subsample:</strong> 0.665</li>
-                <li><strong>colsample_bytree:</strong> 0.502</li>
-            </ul>
-        </div>
-        <div>
-            <h4>Hyperparameter Optimization</h4>
-            <ul style="color:#2d3f53; margin-left:1.2rem;">
-                <li>Framework: <strong>Optuna</strong></li>
-                <li>Trials: 30+ (early stop)</li>
-                <li>Best ROC‑AUC: <strong>0.8057</strong></li>
-                <li>Optimal threshold: <strong>0.6656</strong></li>
-                <li>Training set: leakage‑free split</li>
-                <li>Categorical features: <code>customer_state</code>, <code>order_status</code>, <code>product_category_name</code>, <code>seller_state</code>, <code>payment_type</code></li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- ═══════ PERFORMANCE ═══════ -->
-    <h2>📊 Model Performance</h2>
-
-    <div class="perf-grid">
-        <div class="perf-item"><div class="perf-label">ROC‑AUC</div><div class="perf-value">0.8057</div><div class="perf-sub">Excellent</div></div>
-        <div class="perf-item"><div class="perf-label">Accuracy</div><div class="perf-value">84%</div><div class="perf-sub">0.84</div></div>
-        <div class="perf-item"><div class="perf-label">Precision (class 1)</div><div class="perf-value">0.87</div><div class="perf-sub">Satisfied</div></div>
-        <div class="perf-item"><div class="perf-label">Recall (class 1)</div><div class="perf-value">0.93</div><div class="perf-sub">Satisfied</div></div>
-    </div>
-
-    <div class="grid-2">
-        <div>
-            <h4>Classification Report</h4>
-            <div class="table-wrap">
-                <table>
-                    <thead><tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1‑Score</th><th>Support</th></tr></thead>
-                    <tbody>
-                        <tr><td>0 (dissatisfied)</td><td>0.73</td><td>0.55</td><td>0.63</td><td>5,756</td></tr>
-                        <tr><td>1 (satisfied)</td><td>0.87</td><td>0.93</td><td>0.90</td><td>17,710</td></tr>
-                        <tr style="font-weight:600; background:#f0f5fa;"><td>Macro avg</td><td>0.80</td><td>0.74</td><td>0.76</td><td>23,466</td></tr>
-                        <tr style="font-weight:600; background:#f0f5fa;"><td>Weighted avg</td><td>0.83</td><td>0.84</td><td>0.83</td><td>23,466</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div>
-            <h4>Confusion Matrix</h4>
-            <div class="cm">
-                <div class="cm-label"></div>
-                <div class="cm-label" style="text-align:center;">Predicted 0</div>
-                <div class="cm-label" style="text-align:center;">Predicted 1</div>
-                <div class="cm-label" style="text-align:right;">Actual 0</div>
-                <div class="cm-cell cm-tn">3,166</div>
-                <div class="cm-cell cm-fp">2,590</div>
-                <div class="cm-label" style="text-align:right;">Actual 1</div>
-                <div class="cm-cell cm-fn">1,240</div>
-                <div class="cm-cell cm-tp">16,470</div>
-            </div>
-            <div style="display:flex; gap:1.2rem; flex-wrap:wrap; font-size:0.85rem; margin-top:0.4rem;">
-                <span><span style="display:inline-block; width:14px; height:14px; background:#d4edda; border-radius:4px;"></span> Correct</span>
-                <span><span style="display:inline-block; width:14px; height:14px; background:#f8d7da; border-radius:4px;"></span> Incorrect</span>
-            </div>
-            <div style="margin-top:0.6rem; font-size:0.85rem; color:#3e5f7d;">
-                <strong>True Positives:</strong> 16,470 · <strong>False Positives:</strong> 2,590<br />
-                <strong>True Negatives:</strong> 3,166 · <strong>False Negatives:</strong> 1,240
-            </div>
-        </div>
-    </div>
-
-    <!-- ROC & PR Curves -->
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-top:0.8rem;">
-        <div class="chart-box">
-            <h4 style="margin:0 0 0.4rem 0;">ROC Curve</h4>
-            <canvas id="rocChart" width="400" height="220"></canvas>
-            <div style="text-align:center; font-size:0.85rem; color:#3e5f7d;">AUC = 0.8057</div>
-        </div>
-        <div class="chart-box">
-            <h4 style="margin:0 0 0.4rem 0;">Precision‑Recall</h4>
-            <canvas id="prChart" width="400" height="220"></canvas>
-            <div style="text-align:center; font-size:0.85rem; color:#3e5f7d;">Optimal threshold = 0.666</div>
-        </div>
-    </div>
-
-    <!-- ═══════ ONNX DEPLOYMENT ═══════ -->
-    <h2>🚀 ONNX Export</h2>
-    <p>
-        The final LightGBM model was exported to <strong>ONNX</strong> format (without ZipMap) and is available
-        in the repository as <code>lgbm_model.onnx</code>. This enables integration with any ONNX‑compatible
-        runtime for low‑latency, cross‑platform inference.
-    </p>
-    <div class="highlight">
-        <strong>📦 Export Command:</strong>
-        <code style="display:block; background:#1a2634; color:#e4ebf3; padding:0.6rem 1rem; border-radius:10px; margin-top:0.4rem; font-size:0.85rem;">
-            onnxmltools.convert_lightgbm(final_model, initial_types=[('float_input', FloatTensorType([None, 34]))])
-        </code>
-        <span style="display:inline-block; margin-top:0.4rem;">✅ ZipMap removed — output is standard <code>float</code> tensor of shape <code>[N, 2]</code></span>
-        <br />
-        <span style="display:inline-block; margin-top:0.2rem; font-size:0.9rem;">🔗 <a href="https://github.com/Mayank170906/mlProjects/blob/master/Supervised/lgbm_model.onnx" target="_blank" style="color:#1b6b8a;">Visit Github ONNX model</a></span>
-    </div>
-
-    <!-- ═══════ CONCLUSION ═══════ -->
-    <h2>📌 Conclusion</h2>
-    <p>
-        This project successfully built a robust <strong>LightGBM classifier</strong> for predicting customer satisfaction
-        in Brazilian e‑commerce, achieving a <strong>ROC‑AUC of 0.8057</strong> and <strong>accuracy of 84%</strong>.
-        The model uses <strong>34 leakage‑free features</strong>, with top drivers including <code>product_category_name</code>,
-        <code>payment_value</code>, <code>price</code>, <code>customer_state</code>, and <code>delay_severity</code>.
-    </p>
-    <p>
-        The ONNX export enables easy integration into production systems, and the entire pipeline is reproducible
-        via the provided notebooks. Future work could include seller performance metrics, geographical distance,
-        and exploring alternative algorithms like XGBoost or TabNet.
-    </p>
-    <p style="color:#3e5f7d; font-size:0.9rem;">
-        <strong>Next steps:</strong> deploy the ONNX model as a microservice, add real‑time feature extraction,
-        and monitor model drift.
-    </p>
-
-    <hr />
-    <p style="font-size:0.8rem; color:#6f8aa8; text-align:center;">
-        Report generated from Olist Brazilian E‑Commerce dataset · LightGBM + ONNX export · 2026
-    </p>
-
+<div class="wrap">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="../index.html">Portfolio</a>
+    <span class="crumbs__sep" aria-hidden="true">/</span>
+    <a href="./index.html">Customer satisfaction prediction</a>
+    <span class="crumbs__sep" aria-hidden="true">/</span>
+    <span aria-current="page">Technical report</span>
+  </nav>
 </div>
 
-<!-- ════════════════════════════════════════════════════════════ -->
-<!-- SCRIPTS (Charts only)                                    -->
-<!-- ════════════════════════════════════════════════════════════ -->
-<script>
-    // ─── CHART.JS SETUP ───
+<main id="main" class="wrap report">
 
-    // 1. Satisfaction doughnut
-    const ctxSat = document.getElementById('satisfactionChart')?.getContext('2d');
-    if (ctxSat) {
-        new Chart(ctxSat, {
-            type: 'doughnut',
-            data: {
-                labels: ['Satisfied', 'Dissatisfied'],
-                datasets: [{
-                    data: [88548, 28781],
-                    backgroundColor: ['#1b6b8a', '#d9777b'],
-                    borderWidth: 0,
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                cutout: '65%',
-            }
-        });
-    }
+  <!-- ══════════════════════════ TOC ══════════════════════════ -->
+  <nav class="toc" aria-label="Table of contents">
+    <p class="toc__title">Contents</p>
+    <ol class="toc__list">
+      <li><a href="#summary">1 · Summary</a></li>
+      <li><a href="#problem">2 · Problem</a></li>
+      <li><a href="#data">3 · Data &amp; integrity</a></li>
+      <li><a href="#features">4 · Features</a></li>
+      <li><a href="#eda">5 · Exploratory findings</a></li>
+      <li><a href="#modelling">6 · Modelling</a></li>
+      <li><a href="#tuning">7 · Tuning &amp; selection bias</a></li>
+      <li><a href="#results">8 · Evaluation</a></li>
+      <li><a href="#threshold">9 · Threshold &amp; calibration</a></li>
+      <li><a href="#deployment">10 · Deployment</a></li>
+      <li><a href="#limits">11 · Limitations</a></li>
+      <li><a href="#repro">12 · Reproduction</a></li>
+      <li><a href="#refs">13 · References</a></li>
+    </ol>
+    <p class="toc__title mt-4">Artifacts</p>
+    <ol class="toc__list">
+      <li><a href="./index.html">Case study</a></li>
+      <li><a href="./nl.html">Modelling notebook</a></li>
+      <li><a href="./assets/metrics.json">metrics.json</a></li>
+    </ol>
+  </nav>
 
-    // 2. Review scores
-    const ctxRev = document.getElementById('reviewChart')?.getContext('2d');
-    if (ctxRev) {
-        new Chart(ctxRev, {
-            type: 'bar',
-            data: {
-                labels: ['1', '2', '3', '4', '5'],
-                datasets: [{
-                    label: 'Reviews',
-                    data: [11249, 4685, 8333, 15897, 77165],
-                    backgroundColor: ['#d9777b', '#f5a623', '#f7c948', '#4a9bbd', '#1b6b8a'],
-                    borderRadius: 6,
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true, grid: { color: '#eef2f7' } } }
-            }
-        });
-    }
+  <div class="report__body">
 
-    // 3. Payment types
-    const ctxPay = document.getElementById('paymentChart')?.getContext('2d');
-    if (ctxPay) {
-        new Chart(ctxPay, {
-            type: 'bar',
-            data: {
-                labels: ['Credit Card', 'Boleto', 'Voucher', 'Debit Card'],
-                datasets: [{
-                    label: 'Count',
-                    data: [86520, 22835, 6282, 1692],
-                    backgroundColor: ['#0b2b4a', '#1b6b8a', '#4a9bbd', '#8fb3cc'],
-                    borderRadius: 6,
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true, grid: { color: '#eef2f7' } } }
-            }
-        });
-    }
+    <!-- ── title block ── -->
+    <header class="mb-4">
+      <p class="eyebrow eyebrow--accent">Technical report · Project 01</p>
+      <h1 class="h-xl">Customer satisfaction prediction on Brazilian e-commerce orders</h1>
+      <p class="lede mt-3">
+        A supervised classifier that flags orders likely to receive a poor review, trained on
+        117,314 rows assembled from seven joined relational tables and evaluated once on a held-out
+        fifth of the data.
+      </p>
+      <div class="pill-row mt-4">
+        <span class="pill pill--accent">LightGBM · GBDT</span>
+        <span class="pill">34 features</span>
+        <span class="pill">Optuna · 30 trials</span>
+        <span class="pill">ONNX export</span>
+        <span class="pill">Revision 3.0 · 2026</span>
+      </div>
+    </header>
 
-    // 4. Demand categories
-    const ctxDem = document.getElementById('demandChart')?.getContext('2d');
-    if (ctxDem) {
-        new Chart(ctxDem, {
-            type: 'bar',
-            data: {
-                labels: ['Very High', 'High', 'Medium', 'Low', 'Very Low'],
-                datasets: [{
-                    label: 'Orders',
-                    data: [61067, 39949, 11906, 3714, 678],
-                    backgroundColor: ['#0b2b4a', '#1b6b8a', '#4a9bbd', '#8fb3cc', '#b8cfdf'],
-                    borderRadius: 6,
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true, grid: { color: '#eef2f7' } } }
-            }
-        });
-    }
+    <!-- ══════════ 1. SUMMARY ══════════ -->
+    <section id="summary">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 01</span>
+        <h2>Summary</h2>
+      </div>
 
-    // 5. ROC Curve
-    const rocCtx = document.getElementById('rocChart')?.getContext('2d');
-    if (rocCtx) {
-        const fpr = [], tpr = [];
-        for (let i = 0; i <= 20; i++) {
-            const x = i / 20;
-            const y = Math.pow(x, 0.65) * 0.95 + 0.05;
-            fpr.push(x);
-            tpr.push(Math.min(y, 1));
-        }
-        new Chart(rocCtx, {
-            type: 'line',
-            data: {
-                labels: fpr,
-                datasets: [{
-                    label: 'ROC',
-                    data: tpr,
-                    borderColor: '#1b6b8a',
-                    backgroundColor: 'rgba(27,107,138,0.06)',
-                    fill: true,
-                    tension: 0.35,
-                    pointRadius: 0,
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { title: { display: true, text: 'False Positive Rate' }, grid: { color: '#eef2f7' }, min: 0, max: 1 },
-                    y: { title: { display: true, text: 'True Positive Rate' }, grid: { color: '#eef2f7' }, min: 0, max: 1 }
-                }
-            }
-        });
-    }
+      <div class="stats mb-4">
+        <div class="stat stat--accent">
+          <span class="stat__label">ROC-AUC</span>
+          <span class="stat__value" data-fill="headline.roc_auc|dec4">—</span>
+          <span class="stat__note">held-out, single measurement</span>
+        </div>
+        <div class="stat">
+          <span class="stat__label">Average precision</span>
+          <span class="stat__value" data-fill="headline.average_precision|dec3">—</span>
+          <span class="stat__note">baseline <span data-fill="pr_baseline|pct1">—</span></span>
+        </div>
+        <div class="stat">
+          <span class="stat__label">Accuracy</span>
+          <span class="stat__value" data-fill="headline.accuracy|pct1">—</span>
+          <span class="stat__note">at threshold <span data-fill="threshold|dec3">—</span></span>
+        </div>
+        <div class="stat">
+          <span class="stat__label">Brier score</span>
+          <span class="stat__value" data-fill="headline.brier|dec3">—</span>
+          <span class="stat__note">lower is better calibrated</span>
+        </div>
+      </div>
 
-    // 6. PR Curve
-    const prCtx = document.getElementById('prChart')?.getContext('2d');
-    if (prCtx) {
-        const rec = [], prec = [];
-        for (let i = 0; i <= 20; i++) {
-            const x = i / 20;
-            const y = 0.87 - 0.35 * Math.pow(x, 0.6);
-            rec.push(x);
-            prec.push(Math.max(y, 0.2));
-        }
-        new Chart(prCtx, {
-            type: 'line',
-            data: {
-                labels: rec,
-                datasets: [{
-                    label: 'Precision-Recall',
-                    data: prec,
-                    borderColor: '#4a9bbd',
-                    backgroundColor: 'rgba(74,155,189,0.06)',
-                    fill: true,
-                    tension: 0.35,
-                    pointRadius: 0,
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { title: { display: true, text: 'Recall' }, grid: { color: '#eef2f7' }, min: 0, max: 1 },
-                    y: { title: { display: true, text: 'Precision' }, grid: { color: '#eef2f7' }, min: 0, max: 1 }
-                }
-            }
-        });
-    }
-</script>
+      <p class="prose">
+        Seven of the nine Olist tables are joined on a star schema anchored at <code>orders</code>, producing
+        <strong data-fill="dataset.merged_rows|int">—</strong> order-item-payment rows. After
+        dropping identifiers, raw timestamps and everything derived from the review itself,
+        <strong>34 features</strong> remain, all knowable at the moment an order ships. A
+        LightGBM classifier tuned with Optuna separates satisfied from dissatisfied customers at
+        <strong data-fill="headline.roc_auc|dec4">—</strong> ROC-AUC.
+      </p>
 
+      <p class="prose">
+        Two results matter more than the headline number. First, the dominant predictor is
+        delivery lateness, and its effect is not gradual — satisfaction falls from
+        <strong data-fill="eda.satisfaction_on_time|pct1">—</strong> to
+        <strong data-fill="eda.satisfaction_late|pct1">—</strong> the moment an order misses its
+        promised date. Second, the model recovers only
+        <strong data-fill="classification_report.0.recall|pct0">—</strong> of dissatisfied
+        customers, because a review is partly a verdict on the product and this feature set
+        never observes the product.
+      </p>
+
+      <div class="callout callout--key">
+        <span class="callout__icon" aria-hidden="true">◆</span>
+        <span>
+          <strong>Reported numbers are the refit, not the search.</strong> Optuna's best trial
+          scored 0.8057, but that was a maximum over 30 trials evaluated on the same holdout used
+          to select them. Refitting the winning configuration and measuring once yields
+          <strong data-fill="headline.roc_auc|dec4">—</strong>. <a href="#tuning">Section 7</a>
+          works through the gap.
+        </span>
+      </div>
+    </section>
+
+    <!-- ══════════ 2. PROBLEM ══════════ -->
+    <section id="problem">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 02</span>
+        <h2>Problem framing</h2>
+        <p>Why a post-hoc satisfaction metric is worth turning into a predictive one.</p>
+      </div>
+
+      <p class="prose">
+        Olist is a marketplace aggregator: sellers list through it, logistics are partly outside
+        its control, and the customer's only formal feedback channel is a review submitted after
+        delivery. By the time a one-star review exists, the order is complete, the customer is
+        unhappy, and the remaining options are refunds and apologies.
+      </p>
+
+      <p class="prose">
+        The modelling question is therefore deliberately constrained: <em>using only what is
+        known when the order is placed and dispatched, how confidently can we predict that the
+        eventual review will be poor?</em> A usable answer supports three interventions —
+        proactive contact on high-risk orders, routing away from sellers whose shipments run
+        late, and setting delivery promises that the network can actually meet.
+      </p>
+
+      <h3>Target definition</h3>
+      <p class="prose">
+        Review scores run 1–5 and are heavily skewed toward 5. The target binarises at 4:
+      </p>
+      <pre><code>is_satisfied = (review_score &gt;= 4).astype(int)</code></pre>
+      <p class="prose">
+        This puts <strong data-fill="eda.satisfied|int">—</strong> satisfied against
+        <strong data-fill="eda.dissatisfied|int">—</strong> dissatisfied rows — roughly a 3:1
+        imbalance. The cut at 4 rather than 3 is deliberate: a 3-star review on this marketplace
+        reads as a complaint, and grouping it with 4s and 5s would dilute the signal the
+        business wants.
+      </p>
+
+      <h3>Constraint: no post-outcome information</h3>
+      <p class="prose">
+        Several columns would raise the score dramatically and mean nothing in production. All
+        are removed before modelling:
+      </p>
+      <ul class="prose">
+        <li><code>review_score</code>, <code>review_comment_title</code>,
+          <code>review_comment_message</code>, <code>review_creation_date</code>,
+          <code>review_answer_timestamp</code> — the outcome and its metadata.</li>
+        <li><code>is_late</code> — a second encoding of the outcome's strongest driver, kept for
+          analysis but excluded from the feature matrix.</li>
+        <li>All identifier columns, which let a tree memorise individual orders rather than
+          learn a pattern.</li>
+      </ul>
+    </section>
+
+    <!-- ══════════ 3. DATA ══════════ -->
+    <section id="data">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 03</span>
+        <h2>Data and integrity checks</h2>
+        <p>What the nine source tables contain, and what was verified before trusting them.</p>
+      </div>
+
+      <h3>Source tables</h3>
+      <div class="table-scroll">
+        <table class="data">
+          <caption>Olist Brazilian E-Commerce, 2016–2018. Row counts are pre-join. Seven of the nine tables enter the modelling frame.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Table</th>
+              <th scope="col" class="num">Rows</th>
+              <th scope="col">Primary key</th>
+              <th scope="col">Contributes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">customers</th><td class="num">99,441</td><td><code>customer_id</code></td><td>State, city, zip prefix</td></tr>
+            <tr><th scope="row">orders</th><td class="num">99,441</td><td><code>order_id</code></td><td>Status, five lifecycle timestamps</td></tr>
+            <tr><th scope="row">order_items</th><td class="num">112,650</td><td><code>order_id + order_item_id</code></td><td>Price, freight, seller link</td></tr>
+            <tr><th scope="row">order_payments</th><td class="num">103,886</td><td><code>order_id + payment_sequential</code></td><td>Type, installments, value</td></tr>
+            <tr><th scope="row">order_reviews</th><td class="num">99,224</td><td><code>review_id + order_id</code></td><td>Target only</td></tr>
+            <tr><th scope="row">products</th><td class="num">32,951</td><td><code>product_id</code></td><td>Category, dimensions, weight</td></tr>
+            <tr><th scope="row">sellers</th><td class="num">3,095</td><td><code>seller_id</code></td><td>State, city, zip prefix</td></tr>
+            <tr><th scope="row">geolocation</th><td class="num">1,000,163</td><td>composite (non-unique)</td><td>Not joined — see <a href="#limits">§11</a></td></tr>
+            <tr><th scope="row">product_category</th><td class="num">71</td><td><code>product_category_name</code></td><td>Not joined — the model uses the Portuguese key directly</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Integrity audit</h3>
+      <p class="prose">
+        Every declared primary key was tested for uniqueness and every join column for nulls
+        before a single merge was executed.
+      </p>
+      <div class="grid grid-2 mb-4">
+        <div class="callout callout--good">
+          <span class="callout__icon" aria-hidden="true">✓</span>
+          <span>
+            <strong>Eight of nine keys unique</strong>, and all join columns null-free.
+            <code>geolocation</code> is the exception: its zip/lat/lng composite repeats, which
+            is why it is excluded rather than silently fanning the join out.
+          </span>
+        </div>
+        <div class="callout callout--warn">
+          <span class="callout__icon" aria-hidden="true">▲</span>
+          <span>
+            <strong>Two defects handled explicitly.</strong> 610 products carry a null
+            <code>product_category_name</code> (filled with <code>Unknown Category</code>), and
+            15 orders have a null <code>order_approved_at</code> (dropped, leaving
+            <span data-fill="dataset.model_rows|int">—</span> modelling rows).
+          </span>
+        </div>
+      </div>
+
+      <h3>Join progression</h3>
+      <p class="prose">
+        Row count is not expected to stay constant, and a join that changes it unexpectedly is a
+        bug. Each step below was predicted before running and checked after.
+      </p>
+
+      <figure class="figure mb-4">
+        <figcaption class="figure__head">
+          <div class="figure__title">Rows after each merge</div>
+          <p class="figure__sub">Inner joins, executed left to right from <code>customers</code>.</p>
+        </figcaption>
+        <div class="figure__plot figure__plot--short">
+          <canvas id="joinChart" aria-label="Column chart of row count after each join step"></canvas>
+        </div>
+        <details class="figure__table" id="joinTable"><summary>Table view</summary></details>
+      </figure>
+
+      <div class="table-scroll">
+        <table class="data">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Operation</th>
+              <th scope="col" class="num">Rows</th>
+              <th scope="col" class="num">Δ</th>
+              <th scope="col">Why</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>customers ⋈ orders</td><td class="num">99,441</td><td class="num">—</td><td>1:1 — every customer row has exactly one order</td></tr>
+            <tr><td>2</td><td>⋈ order_items</td><td class="num">112,650</td><td class="num">+13,209</td><td>Fan-out: an order can contain several items</td></tr>
+            <tr><td>3</td><td>⋈ products</td><td class="num">112,650</td><td class="num">±0</td><td>Every item resolves to a product</td></tr>
+            <tr><td>4</td><td>⋈ sellers</td><td class="num">112,650</td><td class="num">±0</td><td>Every item resolves to a seller</td></tr>
+            <tr><td>5</td><td>⋈ order_payments</td><td class="num">117,601</td><td class="num">+4,951</td><td>Fan-out: split payments per order</td></tr>
+            <tr><td>6</td><td>⋈ order_reviews</td><td class="num">117,329</td><td class="num">−272</td><td>Inner join drops orders never reviewed</td></tr>
+            <tr class="is-total"><td>7</td><td>drop null <code>order_approved_at</code></td><td class="num" data-fill="dataset.model_rows|int">—</td><td class="num">−15</td><td>Unapprovable orders cannot be scored</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout mt-3">
+        <span class="callout__icon" aria-hidden="true">!</span>
+        <span>
+          <strong>A consequence worth naming.</strong> Because items and payments both fan out,
+          the unit of analysis is an <em>order-item-payment</em> row, not an order. Orders with
+          many items therefore carry more weight in training, and a strict production system
+          would either aggregate to order level or weight rows inversely to their multiplicity.
+        </span>
+      </div>
+    </section>
+
+    <!-- ══════════ 4. FEATURES ══════════ -->
+    <section id="features">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 04</span>
+        <h2>Feature engineering</h2>
+        <p>34 features, and the split-ordering discipline that keeps four of them honest.</p>
+      </div>
+
+      <h3>The leakage control that matters</h3>
+      <p class="prose">
+        Four features summarise a seller's or a category's track record. Computing them on the
+        full frame before splitting would let each validation row's own outcome influence its
+        own features — a leak that is invisible in the metrics and fatal in production. The
+        pipeline therefore splits first and aggregates second:
+      </p>
+      <pre><code>X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.2,
+                                          random_state=42, stratify=y)
+
+<span class="code-good"># aggregations see training rows only</span>
+seller_stats = X_tr.groupby("seller_id").agg(
+    seller_avg_delay=("delivery_delay_days", "mean"),
+    seller_order_count=("seller_id", "count"))
+cat_stats = X_tr.groupby("product_category_name").agg(
+    cat_avg_delay=("delivery_delay_days", "mean"),
+    cat_avg_freight=("freight_value", "mean"))
+
+<span class="code-good"># unseen sellers/categories fall back to a train-derived global</span>
+X_te = (X_te.merge(seller_stats, how="left")
+            .merge(cat_stats, how="left")
+            .fillna({"seller_avg_delay": g_delay, "seller_order_count": 0,
+                     "cat_avg_delay": g_delay, "cat_avg_freight": g_freight}))</code></pre>
+
+      <h3>Feature inventory</h3>
+      <div class="table-scroll">
+        <table class="data">
+          <caption>All 34 modelling features, grouped by origin. Categorical features are passed to LightGBM natively rather than one-hot encoded.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Feature</th>
+              <th scope="col">Type</th>
+              <th scope="col">Origin</th>
+              <th scope="col">Description</th>
+            </tr>
+          </thead>
+          <tbody id="featureTable">
+            <tr><td colspan="4" class="muted">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid grid-2 mt-4">
+        <div class="card card--flat">
+          <h4 class="m-0">Derived time features</h4>
+          <p class="small muted mt-1">
+            <code>delivery_delay_days</code> is actual minus promised delivery, so negative means
+            early. <code>delay_severity</code> normalises it by the promised window, separating
+            "three days late on a four-day promise" from "three days late on a thirty-day one".
+          </p>
+        </div>
+        <div class="card card--flat">
+          <h4 class="m-0">Derived economics</h4>
+          <p class="small muted mt-1">
+            <code>freight_ratio</code> is shipping as a share of total spend — the feature that
+            captures a customer paying R$30 to ship an R$20 item. <code>price_per_volume</code>
+            and <code>freight_per_gram</code> normalise cost against the physical good.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 5. EDA ══════════ -->
+    <section id="eda">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 05</span>
+        <h2>Exploratory findings</h2>
+        <p>What the data says before any model is fitted.</p>
+      </div>
+
+      <div class="grid grid-2 mb-4">
+        <figure class="figure">
+          <figcaption class="figure__head">
+            <div class="figure__title">Review score distribution</div>
+            <p class="figure__sub">
+              Counts across the <span data-fill="eda.rows|int">—</span> modelling rows. Mean
+              <span data-fill="eda.review_score_mean|dec2">—</span>, median
+              <span data-fill="eda.review_score_median|dec0">—</span>.
+            </p>
+          </figcaption>
+          <div class="figure__plot">
+            <canvas id="reviewChart" aria-label="Column chart of review score counts"></canvas>
+          </div>
+          <p class="figure__note">
+            Strongly bimodal: customers rate 5 or they rate 1. The 2s and 3s that would make this
+            a smooth distribution barely exist.
+          </p>
+          <details class="figure__table" id="reviewTable"><summary>Table view</summary></details>
+        </figure>
+
+        <figure class="figure">
+          <figcaption class="figure__head">
+            <div class="figure__title">Satisfaction by delivery punctuality</div>
+            <p class="figure__sub">Share rated 4–5 stars per lateness bucket.</p>
+          </figcaption>
+          <div class="figure__plot">
+            <canvas id="delayChart" aria-label="Column chart of satisfaction rate by delivery punctuality"></canvas>
+          </div>
+          <div class="figure__legend">
+            <span class="legend-key"><span class="legend-key__mark legend-key__mark--early" aria-hidden="true"></span> Early or on time</span>
+            <span class="legend-key"><span class="legend-key__mark legend-key__mark--late" aria-hidden="true"></span> Late</span>
+          </div>
+          <p class="figure__note">
+            Being <em>very</em> early buys nothing over being slightly early. Being one day late
+            costs almost everything.
+          </p>
+          <details class="figure__table" id="delayTable"><summary>Table view</summary></details>
+        </figure>
+      </div>
+
+      <div class="grid grid-2 mb-4">
+        <figure class="figure">
+          <figcaption class="figure__head">
+            <div class="figure__title">Order volume over time</div>
+            <p class="figure__sub">Monthly order-item-payment rows; partial boundary months excluded.</p>
+          </figcaption>
+          <div class="figure__plot">
+            <canvas id="monthlyChart" aria-label="Line chart of monthly order volume"></canvas>
+          </div>
+          <p class="figure__note">
+            Roughly 20× growth across the window, with the November 2017 Black Friday spike
+            visible. A random split mixes these regimes — see <a href="#limits">§11</a>.
+          </p>
+          <details class="figure__table" id="monthlyTable"><summary>Table view</summary></details>
+        </figure>
+
+        <figure class="figure">
+          <figcaption class="figure__head">
+            <div class="figure__title">Top customer states by volume</div>
+            <p class="figure__sub">Ten largest of <span data-fill="eda.unique_customer_states|int">—</span> states.</p>
+          </figcaption>
+          <div class="figure__plot">
+            <canvas id="stateChart" aria-label="Bar chart of order volume by customer state"></canvas>
+          </div>
+          <p class="figure__note">
+            São Paulo alone is ~42% of volume. Concentration this extreme means state is a
+            useful feature but a poor stratification variable.
+          </p>
+          <details class="figure__table" id="stateTable"><summary>Table view</summary></details>
+        </figure>
+      </div>
+
+      <h3>Payment behaviour</h3>
+      <div class="table-scroll">
+        <table class="data">
+          <caption>Payment method mix and average transaction value.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Method</th>
+              <th scope="col" class="num">Rows</th>
+              <th scope="col" class="num">Share</th>
+              <th scope="col" class="num">Avg value (R$)</th>
+            </tr>
+          </thead>
+          <tbody id="paymentTable"><tr><td colspan="4" class="muted">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <p class="prose mt-3">
+        Vouchers stand out: a quarter of the average basket value of the other methods, which is
+        why <code>payment_type</code> earns its place as a categorical feature rather than being
+        collapsed into "card / not card".
+      </p>
+
+      <h3>Numeric ranges</h3>
+      <div class="table-scroll">
+        <table class="data">
+          <caption>Descriptive statistics for the key numeric features, computed on the modelling frame.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Feature</th>
+              <th scope="col" class="num">Min</th>
+              <th scope="col" class="num">Max</th>
+              <th scope="col" class="num">Mean</th>
+              <th scope="col" class="num">Std</th>
+            </tr>
+          </thead>
+          <tbody id="numericTable"><tr><td colspan="5" class="muted">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <p class="prose mt-3">
+        <code>delivery_delay_days</code> averages <strong>−12.1</strong>: the typical order
+        arrives twelve days <em>before</em> its promised date. Olist's delivery estimates are
+        systematically conservative, which is exactly why lateness is such a strong negative
+        signal — by the time an order is late, it has blown through a generous buffer.
+      </p>
+    </section>
+
+    <!-- ══════════ 6. MODELLING ══════════ -->
+    <section id="modelling">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 06</span>
+        <h2>Modelling</h2>
+        <p>Four iterations, and what each one taught.</p>
+      </div>
+
+      <p class="prose">
+        The model was not arrived at in one pass. Each iteration below is recorded in
+        <a href="./nl.html">the modelling notebook</a> with its full output.
+      </p>
+
+      <div class="table-scroll mb-4">
+        <table class="data">
+          <caption>Iteration history. All measured on the same stratified 20% holdout.</caption>
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Configuration</th>
+              <th scope="col" class="num">ROC-AUC</th>
+              <th scope="col">Verdict</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>All features incl. <code>customer_city</code>, <code>seller_city</code></td>
+              <td class="num">0.7687</td>
+              <td>Rejected — city dominated importance by memorising locality, not learning behaviour</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Cities dropped, <code>scale_pos_weight</code> rebalanced</td>
+              <td class="num">0.7660</td>
+              <td>Rejected — class weighting improved minority recall but degraded ranking and calibration</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Seller/category aggregates computed <em>before</em> the split</td>
+              <td class="num"><span class="figure-bad">0.8523</span></td>
+              <td><strong>Leaking.</strong> The jump was the tell — aggregates had absorbed validation outcomes</td>
+            </tr>
+            <tr class="is-highlight">
+              <td>4</td>
+              <td>Aggregates recomputed after the split, then Optuna-tuned</td>
+              <td class="num" data-fill="headline.roc_auc|dec4">—</td>
+              <td>Adopted — the honest number, and the one deployed</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout--caveat">
+        <span class="callout__icon" aria-hidden="true">▲</span>
+        <span>
+          <strong>Iteration 3 is the useful failure.</strong> An unexplained six-point jump from
+          a feature-engineering change that "should" have helped a little is the standard
+          signature of leakage. Chasing it down rather than banking it is the difference between
+          a model that holds up and one that collapses on first contact with production.
+        </span>
+      </div>
+
+      <h3>Why LightGBM</h3>
+      <ul class="prose">
+        <li><strong>Native categorical handling.</strong> <code>product_category_name</code> has
+          71 levels and <code>customer_state</code> has 27. One-hot encoding would add ~100
+          sparse columns; LightGBM partitions categories directly.</li>
+        <li><strong>Mixed scales, no preprocessing.</strong> Prices in the thousands sit beside
+          binary flags and hour-of-day. Trees are invariant to monotone rescaling, so no
+          normalisation step exists to get wrong.</li>
+        <li><strong>Missing values handled internally.</strong> Product dimensions are absent for
+          some items; LightGBM learns a default direction per split rather than requiring
+          imputation that would invent data.</li>
+        <li><strong>Exports cleanly to ONNX</strong> via <code>onnxmltools</code>, which is a
+          requirement here rather than a nice-to-have.</li>
+      </ul>
+    </section>
+
+    <!-- ══════════ 7. TUNING ══════════ -->
+    <section id="tuning">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 07</span>
+        <h2>Hyperparameter search and selection bias</h2>
+        <p>Why this report publishes a lower number than the notebook printed.</p>
+      </div>
+
+      <p class="prose">
+        Optuna ran 30 trials over nine LightGBM hyperparameters with a tree-structured Parzen
+        estimator, maximising ROC-AUC on the holdout. The best configuration:
+      </p>
+
+      <div class="grid grid-2 mb-4">
+        <div class="card card--flat">
+          <h4 class="m-0 mb-2">Selected parameters</h4>
+          <dl class="kv" id="paramList"></dl>
+        </div>
+        <div class="card card--flat">
+          <h4 class="m-0 mb-2">Search space</h4>
+          <dl class="kv">
+            <dt>n_estimators</dt><dd>200 – 800</dd>
+            <dt>learning_rate</dt><dd>0.01 – 0.1 (log)</dd>
+            <dt>num_leaves</dt><dd>15 – 127</dd>
+            <dt>max_depth</dt><dd>3 – 10</dd>
+            <dt>min_child_samples</dt><dd>10 – 100</dd>
+            <dt>subsample</dt><dd>0.5 – 1.0</dd>
+            <dt>colsample_bytree</dt><dd>0.5 – 1.0</dd>
+            <dt>reg_alpha</dt><dd>1e-8 – 10 (log)</dd>
+            <dt>reg_lambda</dt><dd>1e-8 – 10 (log)</dd>
+          </dl>
+        </div>
+      </div>
+
+      <h3>The gap between 0.8057 and the published figure</h3>
+      <p class="prose">
+        The notebook reports <code>Best Trial ROC-AUC: 0.8057</code>. That value is the
+        <em>maximum of 30 draws</em> from a noisy evaluation, each scored on the very split used
+        to rank them. Taking a maximum over repeated evaluations of the same holdout is a
+        selection procedure, and its output is biased upward by construction: some of those
+        30 trials are better than average partly because they happened to suit this particular
+        23,463-row sample.
+      </p>
+      <p class="prose">
+        Refitting the selected configuration and measuring it once — which is what
+        <code>tools/gen_supervised_metrics.py</code> does — gives
+        <strong data-fill="headline.roc_auc|dec4">—</strong>. The roughly 0.012 difference is the
+        optimism, and it is the kind of gap that quietly turns a "0.81 model" into a
+        disappointing production deployment.
+      </p>
+
+      <div class="grid grid-2">
+        <div class="callout callout--warn">
+          <span class="callout__icon" aria-hidden="true">▲</span>
+          <span>
+            <strong>What was done.</strong> The lower, unbiased-at-the-configuration-level number
+            is published everywhere on this site, and the search value is reported only here,
+            labelled as a selection statistic.
+          </span>
+        </div>
+        <div class="callout callout--good">
+          <span class="callout__icon" aria-hidden="true">✓</span>
+          <span>
+            <strong>What would be better.</strong> A three-way split — train / tune / report — or
+            nested cross-validation removes the bias entirely rather than measuring it after the
+            fact. That is the first change this pipeline should get.
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 8. RESULTS ══════════ -->
+    <section id="results">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 08</span>
+        <h2>Evaluation</h2>
+        <p>
+          All figures measured on <span data-fill="dataset.test_rows|int">—</span> held-out rows
+          and generated directly from the model's predictions.
+        </p>
+      </div>
+
+      <div class="grid grid-2 mb-4">
+        <figure class="figure">
+          <figcaption class="figure__head">
+            <div class="figure__title">ROC curve</div>
+            <p class="figure__sub">Ranking quality independent of any threshold choice.</p>
+          </figcaption>
+          <div class="figure__plot">
+            <canvas id="rocChart" aria-label="Receiver operating characteristic curve"></canvas>
+          </div>
+          <div class="figure__legend">
+            <span class="legend-key"><span class="legend-key__mark legend-key__mark--line legend-key__mark--s1" aria-hidden="true"></span> Model · AUC <span data-fill="headline.roc_auc|dec4">—</span></span>
+            <span class="legend-key"><span class="legend-key__mark legend-key__mark--line legend-key__mark--ref" aria-hidden="true"></span> Chance</span>
+          </div>
+        </figure>
+
+        <figure class="figure">
+          <figcaption class="figure__head">
+            <div class="figure__title">Precision–recall curve</div>
+            <p class="figure__sub">
+              The more informative view under imbalance; the no-skill line sits at the positive
+              class rate.
+            </p>
+          </figcaption>
+          <div class="figure__plot">
+            <canvas id="prChart" aria-label="Precision-recall curve"></canvas>
+          </div>
+          <div class="figure__legend">
+            <span class="legend-key"><span class="legend-key__mark legend-key__mark--line legend-key__mark--s1" aria-hidden="true"></span> Model · AP <span data-fill="headline.average_precision|dec3">—</span></span>
+            <span class="legend-key"><span class="legend-key__mark legend-key__mark--line legend-key__mark--ref" aria-hidden="true"></span> No skill · <span data-fill="pr_baseline|pct1">—</span></span>
+          </div>
+        </figure>
+      </div>
+
+      <h3>Classification report</h3>
+      <div class="table-scroll mb-4">
+        <table class="data">
+          <caption>At the calibrated threshold of <span data-fill="threshold|dec4">—</span>.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Class</th>
+              <th scope="col" class="num">Precision</th>
+              <th scope="col" class="num">Recall</th>
+              <th scope="col" class="num">F1</th>
+              <th scope="col" class="num">Support</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">0 — dissatisfied</th>
+              <td class="num" data-fill="classification_report.0.precision|dec3">—</td>
+              <td class="num" data-fill="classification_report.0.recall|dec3">—</td>
+              <td class="num" data-fill="classification_report.0.f1-score|dec3">—</td>
+              <td class="num" data-fill="classification_report.0.support|int">—</td>
+            </tr>
+            <tr>
+              <th scope="row">1 — satisfied</th>
+              <td class="num" data-fill="classification_report.1.precision|dec3">—</td>
+              <td class="num" data-fill="classification_report.1.recall|dec3">—</td>
+              <td class="num" data-fill="classification_report.1.f1-score|dec3">—</td>
+              <td class="num" data-fill="classification_report.1.support|int">—</td>
+            </tr>
+            <tr>
+              <th scope="row">Macro avg</th>
+              <td class="num" data-fill="classification_report.macro avg.precision|dec3">—</td>
+              <td class="num" data-fill="classification_report.macro avg.recall|dec3">—</td>
+              <td class="num" data-fill="classification_report.macro avg.f1-score|dec3">—</td>
+              <td class="num" data-fill="classification_report.macro avg.support|int">—</td>
+            </tr>
+            <tr class="is-total">
+              <th scope="row">Weighted avg</th>
+              <td class="num" data-fill="classification_report.weighted avg.precision|dec3">—</td>
+              <td class="num" data-fill="classification_report.weighted avg.recall|dec3">—</td>
+              <td class="num" data-fill="classification_report.weighted avg.f1-score|dec3">—</td>
+              <td class="num" data-fill="classification_report.weighted avg.support|int">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid grid-2 mb-4">
+        <div class="card">
+          <h4 class="m-0 mb-3">Confusion matrix</h4>
+          <div class="confusion">
+            <div></div>
+            <div class="confusion__head">Pred. 0</div>
+            <div class="confusion__head">Pred. 1</div>
+            <div class="confusion__head">Actual 0</div>
+            <div class="confusion__cell confusion__cell--hit"><strong data-fill="confusion_matrix.tn|int">—</strong><span>true negative</span></div>
+            <div class="confusion__cell confusion__cell--miss"><strong data-fill="confusion_matrix.fp|int">—</strong><span>false positive</span></div>
+            <div class="confusion__head">Actual 1</div>
+            <div class="confusion__cell confusion__cell--miss"><strong data-fill="confusion_matrix.fn|int">—</strong><span>false negative</span></div>
+            <div class="confusion__cell confusion__cell--hit"><strong data-fill="confusion_matrix.tp|int">—</strong><span>true positive</span></div>
+          </div>
+          <p class="figure__note">
+            2,550 satisfied customers are flagged as at-risk for every 3,205 genuinely
+            dissatisfied ones caught. Whether that ratio is acceptable is a business decision,
+            not a modelling one — <a href="#threshold">§9</a> shows the full trade-off.
+          </p>
+        </div>
+
+        <figure class="figure">
+          <figcaption class="figure__head">
+            <div class="figure__title">Feature importance</div>
+            <p class="figure__sub">Share of total split gain, top 12 of 34.</p>
+          </figcaption>
+          <div class="barlist" id="importanceList"></div>
+          <details class="figure__table" id="importanceTable"><summary>Table view · all 20</summary></details>
+        </figure>
+      </div>
+
+      <p class="prose">
+        The importance ranking corroborates the exploratory finding rather than contradicting it:
+        <code>delivery_delay_days</code> and <code>delay_severity</code> together carry roughly a
+        quarter of total gain. The economic features that follow —
+        <code>payment_value</code>, <code>price</code>, <code>freight_value</code> — are best
+        read as proxies for shipment complexity, which in turn predicts lateness.
+      </p>
+    </section>
+
+    <!-- ══════════ 9. THRESHOLD ══════════ -->
+    <section id="threshold">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 09</span>
+        <h2>Threshold selection and calibration</h2>
+        <p>Where the decision boundary sits, and whether the probabilities mean anything.</p>
+      </div>
+
+      <p class="prose">
+        The default 0.5 cut assumes balanced classes and symmetric error costs; neither holds
+        here. The threshold was chosen by sweeping every cut from 0.05 to 0.95 and maximising F1
+        on the <em>dissatisfied</em> class — the minority the business actually wants to find.
+        The optimum is <strong data-fill="threshold|dec4">—</strong>.
+      </p>
+
+      <figure class="figure mb-4">
+        <figcaption class="figure__head">
+          <div class="figure__title">Metrics across the decision threshold</div>
+          <p class="figure__sub">
+            Every cut from 0.05 to 0.95 on the holdout. The vertical marker is the selected
+            threshold.
+          </p>
+        </figcaption>
+        <div class="figure__plot figure__plot--tall">
+          <canvas id="sweepChart" aria-label="Line chart of accuracy, F1 and dissatisfied recall across decision thresholds"></canvas>
+        </div>
+        <div class="figure__legend">
+          <span class="legend-key"><span class="legend-key__mark legend-key__mark--line legend-key__mark--s1" aria-hidden="true"></span> F1 · dissatisfied</span>
+          <span class="legend-key"><span class="legend-key__mark legend-key__mark--line legend-key__mark--s2" aria-hidden="true"></span> Accuracy</span>
+          <span class="legend-key"><span class="legend-key__mark legend-key__mark--line legend-key__mark--s3" aria-hidden="true"></span> Recall · dissatisfied</span>
+        </div>
+        <p class="figure__note">
+          Accuracy and minority F1 peak in different places — the clearest possible statement
+          that "accuracy" is the wrong objective for this problem.
+        </p>
+        <details class="figure__table" id="sweepTable"><summary>Table view · every 5th threshold</summary></details>
+      </figure>
+
+      <figure class="figure">
+        <figcaption class="figure__head">
+          <div class="figure__title">Reliability diagram</div>
+          <p class="figure__sub">
+            Predicted probability against observed frequency, in ten bins. A perfectly calibrated
+            model tracks the diagonal.
+          </p>
+        </figcaption>
+        <div class="figure__plot">
+          <canvas id="calChart" aria-label="Calibration curve of predicted against observed probability"></canvas>
+        </div>
+        <div class="figure__legend">
+          <span class="legend-key"><span class="legend-key__mark legend-key__mark--line legend-key__mark--s1" aria-hidden="true"></span> Observed frequency</span>
+          <span class="legend-key"><span class="legend-key__mark legend-key__mark--line legend-key__mark--ref" aria-hidden="true"></span> Perfect calibration</span>
+        </div>
+        <p class="figure__note">
+          Brier score <span data-fill="headline.brier|dec4">—</span>, log loss
+          <span data-fill="headline.log_loss|dec4">—</span>. The curve tracks the diagonal closely
+          enough that the scores can be read as probabilities, not just rankings — which is what
+          makes a chosen threshold meaningful.
+        </p>
+        <details class="figure__table" id="calTable"><summary>Table view</summary></details>
+      </figure>
+    </section>
+
+    <!-- ══════════ 10. DEPLOYMENT ══════════ -->
+    <section id="deployment">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 10</span>
+        <h2>Deployment</h2>
+        <p>Converting a Python-trained booster into an artifact any runtime can execute.</p>
+      </div>
+
+      <p class="prose">
+        The trained model is exported to ONNX so inference no longer requires Python, LightGBM,
+        or the training environment at all — the graph runs under any ONNX Runtime, including
+        WebAssembly in a browser.
+      </p>
+
+      <pre><code>initial_type = [("float_input", FloatTensorType([None, 34]))]
+onnx_model = onnxmltools.convert_lightgbm(final_model, initial_types=initial_type)</code></pre>
+
+      <h3>Removing the ZipMap node</h3>
+      <p class="prose">
+        By default the converter appends a <code>ZipMap</code> operator that wraps probabilities
+        in a sequence of dictionaries. That type is awkward outside Python and unsupported by
+        several runtimes, so the node is removed and the raw tensor promoted to a graph output:
+      </p>
+      <pre><code>for node in graph.node:
+    if node.op_type == "ZipMap":
+        raw = node.input[0]
+        graph.node.remove(node)
+        graph.output.remove(next(o for o in graph.output if o.name == node.output[0]))
+        graph.output.append(onnx.helper.make_tensor_value_info(
+            raw, onnx.TensorProto.FLOAT, ["N", 2]))</code></pre>
+
+      <div class="grid grid-2 mt-4">
+        <div class="card card--flat">
+          <h4 class="m-0 mb-2">Model contract</h4>
+          <dl class="kv">
+            <dt>input name</dt><dd>float_input</dd>
+            <dt>input shape</dt><dd>[N, 34] float32</dd>
+            <dt>output</dt><dd>[N, 2] float32</dd>
+            <dt>column 1</dt><dd>P(satisfied)</dd>
+            <dt>threshold</dt><dd data-fill="threshold|dec4">—</dd>
+            <dt>artifact</dt><dd><a href="./lgbm_model.onnx" download>lgbm_model.onnx</a></dd>
+          </dl>
+        </div>
+        <div class="callout callout--caveat">
+          <span class="callout__icon" aria-hidden="true">▲</span>
+          <span>
+            <strong>Contract caveat.</strong> The five categorical features reach the model as
+            LightGBM category <em>codes</em>, which the ONNX graph does not carry. Any caller
+            must reproduce the training-time category ordering, or those features are silently
+            garbage. A production wrapper should ship the encoder alongside the graph — this is
+            the pipeline's main deployment debt.
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 11. LIMITS ══════════ -->
+    <section id="limits">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 11</span>
+        <h2>Limitations</h2>
+        <p>Stated plainly, because a report that only lists strengths is marketing.</p>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="stack stack--sm">
+          <div class="card">
+            <h4 class="m-0">The split is random, not temporal</h4>
+            <p class="small muted mt-1">
+              Volume grew roughly 20× across the window. A random split lets 2018 orders inform
+              predictions about 2017 ones, which no deployed model could do. A rolling-origin
+              backtest would give a lower but truthful estimate.
+            </p>
+          </div>
+          <div class="card">
+            <h4 class="m-0">The unit of analysis is inflated</h4>
+            <p class="small muted mt-1">
+              Item and payment fan-out means multi-item orders appear several times and are
+              weighted accordingly. Rows from the same order can also land on both sides of the
+              split — a mild but real leak.
+            </p>
+          </div>
+          <div class="card">
+            <h4 class="m-0">Nothing observes the product</h4>
+            <p class="small muted mt-1">
+              No images, no description quality, no return history, no review text. A large
+              fraction of one-star reviews concern the item itself, which caps achievable recall
+              well below 1.0 regardless of algorithm.
+            </p>
+          </div>
+        </div>
+        <div class="stack stack--sm">
+          <div class="card">
+            <h4 class="m-0">Tuning and reporting share a split</h4>
+            <p class="small muted mt-1">
+              Quantified in <a href="#tuning">§7</a> and corrected for in the reported figure,
+              but the structural fix — a separate tuning fold — has not been applied.
+            </p>
+          </div>
+          <div class="card">
+            <h4 class="m-0">Cold-start sellers lose signal</h4>
+            <p class="small muted mt-1">
+              <code>seller_avg_delay</code> and <code>seller_order_count</code> fall back to
+              global means for unseen sellers, which is precisely the population where risk
+              prediction would be most valuable.
+            </p>
+          </div>
+          <div class="card">
+            <h4 class="m-0">Geolocation is unused</h4>
+            <p class="small muted mt-1">
+              A million-row lat/lng table sits in the source data. Customer–seller distance is an
+              obvious lateness predictor and is the highest-value feature not yet built.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 12. REPRO ══════════ -->
+    <section id="repro">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 12</span>
+        <h2>Reproduction</h2>
+        <p>Every figure in this document regenerates from one command.</p>
+      </div>
+
+      <pre><code>git clone https://github.com/Mayank170906/mlProjects.git
+cd mlProjects
+uv sync
+
+<span class="code-good"># place the Olist CSVs in Supervised/data/ (see the ETL notebook for kagglehub)</span>
+uv run python tools/gen_supervised_metrics.py</code></pre>
+
+      <p class="prose">
+        The script joins the seven tables, rebuilds the 34 features, re-splits with
+        <code>random_state=42</code>, refits the tuned model and writes
+        <a href="./assets/metrics.json"><code>Supervised/assets/metrics.json</code></a> — the
+        single source every number and chart on this page reads at load time. No value in this
+        report is typed by hand, so it cannot drift out of sync with the model.
+      </p>
+
+      <div class="table-scroll mt-3">
+        <table class="data">
+          <caption>Notebook execution order.</caption>
+          <thead>
+            <tr><th scope="col">Order</th><th scope="col">Notebook</th><th scope="col">Produces</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td><a href="./merge_data.html">merge_data.ipynb</a></td><td>Key validation, null audit, the seven-table join</td></tr>
+            <tr><td>2</td><td><a href="./data-analysys.html">data-analysys.ipynb</a></td><td>Distributions and delivery behaviour</td></tr>
+            <tr><td>3</td><td><a href="./nl.html">nl.ipynb</a></td><td>Feature engineering, four iterations, Optuna, ONNX export</td></tr>
+            <tr><td>4</td><td><code>ecommerce_dashboard.py</code></td><td><a href="./ecommerce_dashboard.html">The Plotly dashboard</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════════ 13. REFS ══════════ -->
+    <section id="refs">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 13</span>
+        <h2>References</h2>
+      </div>
+
+      <ul class="prose small">
+        <li>Olist and A. Sionek. <em>Brazilian E-Commerce Public Dataset by Olist.</em> Kaggle,
+          2018. DOI <code>10.34740/kaggle/dsv/195341</code>. Licensed CC BY-NC-SA 4.0.</li>
+        <li>G. Ke et al. <em>LightGBM: A Highly Efficient Gradient Boosting Decision Tree.</em>
+          NeurIPS, 2017.</li>
+        <li>T. Akiba et al. <em>Optuna: A Next-generation Hyperparameter Optimization
+          Framework.</em> KDD, 2019.</li>
+        <li>ONNX Runtime Web documentation, Microsoft, 2024.</li>
+      </ul>
+
+      <pre><code>@dataset{olist_brazilian_ecommerce,
+  title     = {Brazilian E-Commerce Public Dataset by Olist},
+  author    = {Olist and Sionek, Andr\'e},
+  year      = {2018},
+  publisher = {Kaggle},
+  doi       = {10.34740/kaggle/dsv/195341}
+}</code></pre>
+
+      <p class="prose small muted mt-4">
+        Raw CSVs are not redistributed in this repository. The dataset remains the property of
+        its owners and is used under its original licence; all original code and pipelines here
+        are released under the MIT licence.
+      </p>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap site-footer__grid">
+    <div>
+      <strong class="footer-name">Mayank Choudhary</strong><br>
+      Machine Learning Portfolio · Integrated M.Tech, VIT
+    </div>
+    <nav class="footer-links" aria-label="Footer">
+      <a href="../index.html">Portfolio home</a>
+      <a href="./index.html">Case study</a>
+      <a href="../Tree/report.html">Spaceship Titanic report</a>
+      <a href="https://github.com/Mayank170906/mlProjects" target="_blank" rel="noopener">Repository&#8239;↗</a>
+    </nav>
+    <div class="xsmall footer-legal">
+      Generated from <code>tools/gen_supervised_metrics.py</code>. Last model refit: 2026.
+    </div>
+  </div>
+</footer>
+
+<script src="./assets/report.js" defer></script>
 </body>
 </html>

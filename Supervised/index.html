@@ -1,221 +1,560 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Commerce ML Project Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Satisfaction Prediction — Case Study</title>
+<meta name="description" content="End-to-end supervised pipeline over 117,314 Olist e-commerce orders: seven-table relational ETL, 34 leakage-controlled features, an Optuna-tuned LightGBM classifier and an ONNX export that runs in the browser.">
+<meta name="author" content="Mayank Choudhary">
+<link rel="canonical" href="https://mayank170906.github.io/mlProjects/Supervised/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Predicting customer dissatisfaction before the review lands">
+<meta property="og:description" content="117,314 orders, 7 joined relational tables, 34 leakage-controlled features, LightGBM + Optuna, exported to ONNX.">
+<meta name="theme-color" content="#b4512f">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../assets/css/site.css">
+<script src="../assets/js/site.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+<script src="../assets/js/charts.js" defer></script>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased p-4 md:p-10">
-<nav class="portfolio-nav" aria-label="Page navigation" style="max-width:1152px;margin:0 auto 18px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font:700 12px 'Trebuchet MS',Arial,sans-serif"><a href="../index.html" style="padding:9px 13px;border:1px solid #d9ded7;border-radius:7px;background:#fffdf8;color:#843c2c;text-decoration:none">&#8962; Home</a><button type="button" onclick="if (history.length > 1) history.back(); else window.location.href='../index.html';" style="padding:9px 13px;border:1px solid #d9ded7;border-radius:7px;background:transparent;color:#63716c;cursor:pointer;font:inherit">&#8592; Back</button></nav>
-<style>
-:root { --portfolio-ink:#17221f; --portfolio-muted:#63716c; --portfolio-paper:#f4f2ec; --portfolio-accent:#be5b3e; --portfolio-line:#d9ded7; }
-body { background:radial-gradient(circle at 90% 0%, #eadfd1 0, transparent 30%),var(--portfolio-paper) !important; color:var(--portfolio-ink); }
-body::before { content:'Mayank Choudhary  /  Integrated M.Tech, 4th year, VIT  /  Machine Learning Portfolio'; display:block; max-width:1152px; margin:0 auto 18px; padding:10px 18px; border-bottom:1px solid var(--portfolio-line); color:var(--portfolio-muted); font:600 11px/1.4 'Trebuchet MS',Arial,sans-serif; letter-spacing:.08em; text-transform:uppercase; }
-.max-w-6xl { max-width:1152px; } .rounded-xl,.rounded-2xl { border-radius:6px; } a:hover { transform:translateY(-2px); } section { border-color:var(--portfolio-line) !important; }
-@media (max-width:600px) { body::before { font-size:9px; } }
-</style>
-<div class="max-w-6xl mx-auto space-y-8">
-    
-    <header class="text-center py-6">
-        <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Brazilian E-Commerce Machine Learning</h1>
-        <p class="text-slate-600 mt-2 text-lg">Predictive satisfaction modeling & analytics powered by LightGBM and ONNX Web.</p>
-        <div class="mt-4 flex justify-center items-center gap-3">
-            <a href="https://github.com/Mayank170906/mlProjects/tree/master/Supervised" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-semibold hover:bg-slate-800 transition shadow-sm">
-                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                View Repository on GitHub
-            </a>
-        </div>
-    </header>
+<body>
 
-    <section>
-        <h2 class="text-xl font-bold text-slate-800 mb-4">Project Artifacts & Notebooks</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            
-            <a href="./ecommerce_dashboard.html" class="p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-500 hover:shadow-md transition flex flex-col justify-between">
-                <div>
-                    <span class="text-2xl">📊</span>
-                    <h3 class="font-semibold text-slate-900 mt-2">Analytics Dashboard</h3>
-                    <p class="text-xs text-slate-500 mt-1">Operational & sales performance.</p>
-                </div>
-                <span class="text-[11px] font-semibold text-blue-600 mt-3 block">Dashboard &rarr;</span>
-            </a>
+<a class="skip-link" href="#main">Skip to content</a>
 
-            <a href="./merge_data.html" class="p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-500 hover:shadow-md transition flex flex-col justify-between">
-                <div>
-                    <span class="text-2xl">🔗</span>
-                    <h3 class="font-semibold text-slate-900 mt-2">Data Merging</h3>
-                    <p class="text-xs text-slate-500 mt-1">Multi-table pipeline consolidation.</p>
-                </div>
-                <span class="text-[11px] font-semibold text-blue-600 mt-3 block">Data Pipeline &rarr;</span>
-            </a>
+<header class="masthead">
+  <div class="wrap masthead__inner">
+    <a class="brand" href="../index.html">
+      <span class="brand__mark" aria-hidden="true">M</span>
+      Mayank Choudhary
+      <span class="brand__sub">· ML Portfolio</span>
+    </a>
+    <nav class="masthead__nav" aria-label="Primary">
+      <a class="navlink" href="../index.html">Home</a>
+      <a class="navlink" href="./report.html">Report</a>
+      <a class="navlink navlink--optional" href="./ecommerce_dashboard.html">Dashboard</a>
+      <a class="navlink navlink--optional" href="https://github.com/Mayank170906/mlProjects/tree/master/Supervised" target="_blank" rel="noopener">Source&#8239;↗</a>
+      <button class="theme-toggle" type="button" aria-label="Switch theme"></button>
+    </nav>
+  </div>
+</header>
 
-            <a href="./data-analysys.html" class="p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-500 hover:shadow-md transition flex flex-col justify-between">
-                <div>
-                    <span class="text-2xl">📈</span>
-                    <h3 class="font-semibold text-slate-900 mt-2">EDA & Cleaning</h3>
-                    <p class="text-xs text-slate-500 mt-1">Feature distributions & cleaning.</p>
-                </div>
-                <span class="text-[11px] font-semibold text-blue-600 mt-3 block">View EDA &rarr;</span>
-            </a>
-
-            <a href="./nl.html" class="p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-500 hover:shadow-md transition flex flex-col justify-between">
-                <div>
-                    <span class="text-2xl">⚙️</span>
-                    <h3 class="font-semibold text-slate-900 mt-2">Training Pipeline</h3>
-                    <p class="text-xs text-slate-500 mt-1">LightGBM & Optuna notebook.</p>
-                </div>
-                <span class="text-[11px] font-semibold text-blue-600 mt-3 block">Notebook &rarr;</span>
-            </a>
-
-            <a href="./report.html" class="p-5 bg-white rounded-xl border border-indigo-200 bg-indigo-50/20 shadow-sm hover:border-indigo-500 hover:shadow-md transition flex flex-col justify-between">
-                <div>
-                    <span class="text-2xl">📝</span>
-                    <h3 class="font-semibold text-slate-900 mt-2">ONNX Report</h3>
-                    <p class="text-xs text-slate-500 mt-1">Conversion, ZipMap removal & metrics.</p>
-                </div>
-                <span class="text-[11px] font-semibold text-indigo-600 mt-3 block">View Report &rarr;</span>
-            </a>
-
-            <a href="./lgbm_model.onnx" download class="p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-emerald-500 hover:shadow-md transition flex flex-col justify-between">
-                <div>
-                    <span class="text-2xl">🧠</span>
-                    <h3 class="font-semibold text-slate-900 mt-2">ONNX Weights</h3>
-                    <p class="text-xs text-slate-500 mt-1">Trained model (No ZipMap format).</p>
-                </div>
-                <span class="text-[11px] font-semibold text-emerald-600 mt-3 block">Download .onnx &darr;</span>
-            </a>
-
-        </div>
-    </section>
-
-    <section class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
-        <h2 class="text-xl font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">Model Pipeline & Performance</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-            <div>
-                <h4 class="font-semibold text-slate-900 mb-1">1. Relational Engineering</h4>
-                <p class="text-slate-600">Unified 9 Olist datasets (~117k records) into 34 predictive features spanning logistical, product, and temporal parameters.</p>
-            </div>
-            <div>
-                <h4 class="font-semibold text-slate-900 mb-1">2. LightGBM & Optuna</h4>
-                <p class="text-slate-600">GBDT binary classifier optimized via Optuna (694 estimators, 127 leaves, depth 10, learning rate 0.062) for ROC-AUC.</p>
-            </div>
-            <div>
-                <h4 class="font-semibold text-slate-900 mb-1">3. Precision-Recall Calibration</h4>
-                <p class="text-slate-600">Exported to ONNX with <code>zipmap=False</code>. Decision threshold calibrated at <strong>0.6656</strong> for optimal F1-score classification.</p>
-            </div>
-        </div>
-    </section>
-
+<div class="wrap">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="../index.html">Portfolio</a>
+    <span class="crumbs__sep" aria-hidden="true">/</span>
+    <span aria-current="page">Customer satisfaction prediction</span>
+  </nav>
 </div>
 
-<script>
-let session = null;
-const FEATURE_COUNT = 34;
-const OPTIMAL_THRESHOLD = 0.6656; // Optuna-tuned decision boundary
+<main id="main">
 
-function updateStatusBadge(status) {
-    const badge = document.getElementById('model-badge');
-    if (status === 'loading') {
-        badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-200';
-        badge.textContent = '⏳ Loading Model...';
-    } else if (status === 'ready') {
-        badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200';
-        badge.textContent = '● Model Loaded (34 Features)';
-    } else if (status === 'error') {
-        badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700 border border-rose-200';
-        badge.textContent = '✖ Load Failed';
-    }
-}
+  <!-- ══════════════════════════ HEADER ══════════════════════════ -->
+  <section class="section section--tight">
+    <div class="wrap">
+      <p class="eyebrow eyebrow--accent">Project 01 · Supervised learning</p>
+      <h1 class="display">Predicting customer dissatisfaction before the review lands.</h1>
+      <p class="lede mt-4">
+        A marketplace learns an order went wrong when the one-star review arrives — days after
+        anything could have been done about it. This pipeline scores every order using only
+        signals available <em>before</em> the customer writes anything, turning a
+        post-mortem metric into an operational queue.
+      </p>
 
-async function initModel() {
-    if (!session) {
-        updateStatusBadge('loading');
-        session = await ort.InferenceSession.create('./lgbm_model.onnx');
-        updateStatusBadge('ready');
-    }
-    return session;
-}
+      <div class="stats mt-6">
+        <div class="stat stat--accent">
+          <span class="stat__label">ROC-AUC</span>
+          <span class="stat__value" data-fill="headline.roc_auc|dec4">—</span>
+          <span class="stat__note">23,463 held-out orders</span>
+        </div>
+        <div class="stat">
+          <span class="stat__label">Accuracy</span>
+          <span class="stat__value" data-fill="headline.accuracy|pct1">—</span>
+          <span class="stat__note">at the calibrated threshold</span>
+        </div>
+        <div class="stat">
+          <span class="stat__label">Dissatisfaction recall</span>
+          <span class="stat__value" data-fill="classification_report.0.recall|dec2">—</span>
+          <span class="stat__note">the class the business cares about</span>
+        </div>
+        <div class="stat">
+          <span class="stat__label">Rows modelled</span>
+          <span class="stat__value" data-fill="dataset.model_rows|int">—</span>
+          <span class="stat__note">from 7 joined tables</span>
+        </div>
+      </div>
 
-async function loadModelExplicitly() {
-    const loadBtn = document.getElementById('load-btn');
-    const outputDiv = document.getElementById('output');
-    loadBtn.disabled = true;
+      <div class="btn-row mt-5">
+        <a class="btn btn--primary" href="./report.html">
+          Full technical report
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a class="btn" href="./ecommerce_dashboard.html">Interactive dashboard</a>
+        <a class="btn" href="./lgbm_model.onnx" download>Download model (.onnx)</a>
+      </div>
+    </div>
+  </section>
 
-    try {
-        await initModel();
-        outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-emerald-50 border border-emerald-200 text-emerald-900 block';
-        outputDiv.innerHTML = `<strong>Success:</strong> <code>lgbm_model.onnx</code> loaded into WebAssembly memory. Ready for 34-feature inputs.`;
-    } catch (err) {
-        console.error(err);
-        updateStatusBadge('error');
-        outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-rose-50 border border-rose-200 text-rose-800 block';
-        outputDiv.innerHTML = `<strong>Error loading model:</strong> ${err.message}. Ensure <code>lgbm_model.onnx</code> is present in the same directory.`;
-    } finally {
-        loadBtn.disabled = false;
-    }
-}
+  <!-- ══════════════════════════ AT A GLANCE ══════════════════════════ -->
+  <section class="section section--tight">
+    <div class="wrap">
+      <div class="grid grid-4">
+        <div>
+          <p class="eyebrow">Dataset</p>
+          <p class="small">Olist Brazilian E-Commerce<br><span class="muted">100k+ orders, 2016–2018</span></p>
+        </div>
+        <div>
+          <p class="eyebrow">Task</p>
+          <p class="small">Binary classification<br><span class="muted">review score ≥ 4 → satisfied</span></p>
+        </div>
+        <div>
+          <p class="eyebrow">Model</p>
+          <p class="small">LightGBM (GBDT)<br><span class="muted">Optuna-tuned, 694 trees</span></p>
+        </div>
+        <div>
+          <p class="eyebrow">Deployment</p>
+          <p class="small">ONNX, ZipMap stripped<br><span class="muted">float tensor [N, 2] output</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-async function predictSatisfaction() {
-    const outputDiv = document.getElementById('output');
-    const submitBtn = document.getElementById('submit-btn');
+  <!-- ══════════════════════════ THE FINDING ══════════════════════════ -->
+  <section class="section">
+    <div class="wrap">
+      <p class="eyebrow">The finding</p>
+      <h2 class="h-xl">Lateness is not one factor among many. It is the factor.</h2>
+      <p class="lede mt-3">
+        Every feature in the model competes to explain a review score. One wins by a wide
+        margin, and it is the one operations can actually control.
+      </p>
 
-    outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-slate-100 text-slate-700 block';
-    outputDiv.innerHTML = "Executing inference on 34-feature input vector...";
-    submitBtn.disabled = true;
+      <div class="grid grid-2 mt-6">
+        <figure class="figure">
+          <figcaption class="figure__head">
+            <div class="figure__title">Satisfaction rate by delivery punctuality</div>
+            <p class="figure__sub">
+              Share of orders rated 4–5 stars, bucketed by days between the promised and actual
+              delivery date. Negative buckets delivered early.
+            </p>
+          </figcaption>
+          <div class="figure__plot">
+            <canvas id="delayChart" aria-label="Bar chart of satisfaction rate by delivery punctuality bucket"></canvas>
+          </div>
+          <div class="figure__legend">
+            <span class="legend-key"><span class="legend-key__mark legend-key__mark--early" aria-hidden="true"></span> Delivered early or on time</span>
+            <span class="legend-key"><span class="legend-key__mark legend-key__mark--late" aria-hidden="true"></span> Delivered late</span>
+          </div>
+          <p class="figure__note">
+            The cliff is between the last early bucket and the first late one — a single day past
+            the promise costs roughly 39 points of satisfaction.
+          </p>
+          <details class="figure__table" id="delayTable">
+            <summary>Table view</summary>
+          </details>
+        </figure>
 
-    try {
-        const model = await initModel();
+        <div class="stack">
+          <div class="card">
+            <p class="eyebrow">On-time deliveries</p>
+            <div class="hero-figure">
+              <span class="hero-figure__value" data-fill="eda.satisfaction_on_time|pct1">—</span>
+              <span class="hero-figure__label">rated 4–5 stars</span>
+            </div>
+          </div>
+          <div class="card">
+            <p class="eyebrow">Late deliveries</p>
+            <div class="hero-figure">
+              <span class="hero-figure__value figure-bad" data-fill="eda.satisfaction_late|pct1">—</span>
+              <span class="hero-figure__label">rated 4–5 stars</span>
+            </div>
+          </div>
+          <div class="callout callout--key">
+            <span class="callout__icon" aria-hidden="true">◆</span>
+            <span>
+              <strong>What this buys you.</strong> The model does not need to guess at sentiment.
+              It needs to combine a reliable lateness signal with the seller, category and freight
+              context that predicts <em>which</em> shipments will run late — which is exactly what
+              the top features do.
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        // Read all 34 inputs directly
-        const features = new Float32Array(FEATURE_COUNT);
-        for (let i = 0; i < FEATURE_COUNT; i++) {
-            const inputElem = document.getElementById(`f_${i}`);
-            features[i] = inputElem ? parseFloat(inputElem.value) || 0.0 : 0.0;
-        }
+  <!-- ══════════════════════════ APPROACH ══════════════════════════ -->
+  <section class="section">
+    <div class="wrap">
+      <p class="eyebrow">Approach</p>
+      <h2 class="h-xl">Five stages, each with a decision worth defending.</h2>
 
-        const inputTensor = new ort.Tensor('float32', features, [1, FEATURE_COUNT]);
-        const feeds = { float_input: inputTensor };
+      <div class="grid grid-2 mt-6 row--gap-lg">
+        <div class="steps">
+          <div class="step">
+            <div class="step__num" aria-hidden="true"></div>
+            <div>
+              <h3 class="step__title">Relational ETL across seven tables</h3>
+              <p class="step__body">
+                Customers, orders, items, products, sellers, payments and reviews joined on a
+                star schema with <code>orders</code> at the centre. Row count moves at every
+                step and each move is explained: items fan an order out, payments fan it out
+                again, missing reviews contract it.
+              </p>
+              <div class="step__meta">
+                <span class="pill">99,441 → <span data-fill="dataset.merged_rows|int">—</span> rows</span>
+                <span class="pill">39 columns</span>
+              </div>
+            </div>
+          </div>
 
-        // Execute inference across output nodes
-        const results = await model.run(feeds);
+          <div class="step">
+            <div class="step__num" aria-hidden="true"></div>
+            <div>
+              <h3 class="step__title">Target definition without leakage</h3>
+              <p class="step__body">
+                <code>is_satisfied = review_score &gt;= 4</code>. Everything derived from the
+                review — its text, its title, its timestamps — is dropped, along with
+                <code>order_delivered_carrier_date</code> and the raw score itself. What remains
+                is knowable at dispatch.
+              </p>
+              <div class="step__meta">
+                <span class="pill pill--good">Reviews-derived columns dropped</span>
+              </div>
+            </div>
+          </div>
 
-        // Probability tensor name is at index 1 (standard ONNX ML pipeline output without ZipMap)
-        const probaOutputName = model.outputNames[1] || model.outputNames[0];
-        const probaData = results[probaOutputName].data;
-        
-        // Probability of Class 1 (Satisfied) vs Class 0 (Unsatisfied)
-        const probaSatisfied = probaData.length > 1 ? probaData[1] : probaData[0];
-        const probaUnsatisfied = probaData.length > 1 ? probaData[0] : (1.0 - probaSatisfied);
+          <div class="step">
+            <div class="step__num" aria-hidden="true"></div>
+            <div>
+              <h3 class="step__title">34 features, aggregates fitted post-split</h3>
+              <p class="step__body">
+                Row-level engineering (delay severity, freight ratio, price per volume, purchase
+                hour) is safe anywhere. Seller and category track records are not: they are
+                computed on training rows only, then joined onto validation rows with a
+                train-derived fallback for unseen keys.
+              </p>
+              <div class="step__meta">
+                <span class="pill">34 features</span>
+                <span class="pill">5 native categoricals</span>
+              </div>
+            </div>
+          </div>
 
-        // Decision thresholding against 0.6656
-        if (probaSatisfied >= OPTIMAL_THRESHOLD) {
-            outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-emerald-50 border border-emerald-200 text-emerald-900 block';
-            outputDiv.innerHTML = `
-                <strong>Result:</strong> Satisfied Customer (Class 1)<br>
-                <span class="text-xs text-emerald-700">
-                    Satisfaction Score: <strong>${(probaSatisfied * 100).toFixed(2)}%</strong> (Threshold: ${(OPTIMAL_THRESHOLD * 100).toFixed(2)}%)
-                </span>
-            `;
-        } else {
-            outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-amber-50 border border-amber-200 text-amber-900 block';
-            outputDiv.innerHTML = `
-                <strong>Result:</strong> Unsatisfied Customer (Class 0)<br>
-                <span class="text-xs text-amber-800">
-                    Satisfaction Score: <strong>${(probaSatisfied * 100).toFixed(2)}%</strong> (Threshold: ${(OPTIMAL_THRESHOLD * 100).toFixed(2)}%) | Dissatisfaction Risk: <strong>${(probaUnsatisfied * 100).toFixed(2)}%</strong>
-                </span>
-            `;
-        }
+          <div class="step">
+            <div class="step__num" aria-hidden="true"></div>
+            <div>
+              <h3 class="step__title">Optuna search, then an honest refit</h3>
+              <p class="step__body">
+                30 trials over nine LightGBM hyperparameters maximising held-out ROC-AUC. The
+                best trial reported 0.8057 — but that is a maximum over 30 attempts scored on
+                the same split. Refitting those parameters and measuring once gives
+                <strong data-fill="headline.roc_auc|dec4">—</strong>, and that is the number
+                published here.
+              </p>
+              <div class="step__meta">
+                <span class="pill pill--warn">Selection bias documented</span>
+              </div>
+            </div>
+          </div>
 
-    } catch (err) {
-        console.error(err);
-        outputDiv.className = 'mt-6 p-4 rounded-xl text-sm bg-rose-50 border border-rose-200 text-rose-800 block';
-        outputDiv.innerHTML = `<strong>Inference Error:</strong> ${err.message}`;
-    } finally {
-        submitBtn.disabled = false;
-    }
-}
-</script>
+          <div class="step">
+            <div class="step__num" aria-hidden="true"></div>
+            <div>
+              <h3 class="step__title">Threshold calibration and ONNX export</h3>
+              <p class="step__body">
+                The decision cut is swept to maximise F1 on the dissatisfied class, landing at
+                <strong data-fill="threshold|dec3">—</strong> rather than 0.5. The model converts
+                to ONNX with the <code>ZipMap</code> node stripped so the output is a plain
+                <code>float32[N, 2]</code> tensor any runtime can read.
+              </p>
+              <div class="step__meta">
+                <span class="pill">onnxmltools</span>
+                <span class="pill">ONNX Runtime Web</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <figure class="figure">
+            <figcaption class="figure__head">
+              <div class="figure__title">Where the model gets its signal</div>
+              <p class="figure__sub">Share of total split gain, top 10 of 34 features.</p>
+            </figcaption>
+            <div class="barlist" id="importanceList"></div>
+            <p class="figure__note">
+              Delay-derived features take the top two slots. Product and payment context follows,
+              acting largely as a proxy for which shipments run late.
+            </p>
+          </figure>
+
+          <figure class="figure">
+            <figcaption class="figure__head">
+              <div class="figure__title">Row count through the join</div>
+              <p class="figure__sub">
+                Fan-out and contraction at each merge, from customers to the final frame.
+              </p>
+            </figcaption>
+            <div class="figure__plot figure__plot--short">
+              <canvas id="joinChart" aria-label="Column chart of row counts after each join step"></canvas>
+            </div>
+            <details class="figure__table" id="joinTable">
+              <summary>Table view</summary>
+            </details>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════ RESULTS ══════════════════════════ -->
+  <section class="section">
+    <div class="wrap">
+      <p class="eyebrow">Results</p>
+      <h2 class="h-xl">Measured once, on data the model never saw.</h2>
+      <p class="lede mt-3">
+        Curves below are drawn from the model's own predictions on the 23,463-row holdout.
+        <a href="./report.html#results">The report</a> covers calibration, the full threshold
+        sweep and the per-class breakdown.
+      </p>
+
+      <div class="grid grid-2 mt-6">
+        <figure class="figure">
+          <figcaption class="figure__head">
+            <div class="figure__title">ROC curve</div>
+            <p class="figure__sub">True positive rate against false positive rate across all thresholds.</p>
+          </figcaption>
+          <div class="figure__plot">
+            <canvas id="rocChart" aria-label="Receiver operating characteristic curve"></canvas>
+          </div>
+          <div class="figure__legend">
+            <span class="legend-key"><span class="legend-key__mark legend-key__mark--line legend-key__mark--s1" aria-hidden="true"></span> Model · AUC <span data-fill="headline.roc_auc|dec4">—</span></span>
+            <span class="legend-key"><span class="legend-key__mark legend-key__mark--line legend-key__mark--ref" aria-hidden="true"></span> Chance</span>
+          </div>
+        </figure>
+
+        <figure class="figure">
+          <figcaption class="figure__head">
+            <div class="figure__title">Precision–recall curve</div>
+            <p class="figure__sub">
+              The honest view on an imbalanced target: 75.5% of orders are satisfied, so the
+              no-skill baseline is already high.
+            </p>
+          </figcaption>
+          <div class="figure__plot">
+            <canvas id="prChart" aria-label="Precision-recall curve"></canvas>
+          </div>
+          <div class="figure__legend">
+            <span class="legend-key"><span class="legend-key__mark legend-key__mark--line legend-key__mark--s1" aria-hidden="true"></span> Model · AP <span data-fill="headline.average_precision|dec3">—</span></span>
+            <span class="legend-key"><span class="legend-key__mark legend-key__mark--line legend-key__mark--ref" aria-hidden="true"></span> No-skill baseline</span>
+          </div>
+        </figure>
+      </div>
+
+      <div class="grid grid-2 mt-4">
+        <div class="card">
+          <div class="figure__title mb-3">Confusion matrix at threshold <span data-fill="threshold|dec3">—</span></div>
+          <div class="confusion">
+            <div></div>
+            <div class="confusion__head">Pred. dissatisfied</div>
+            <div class="confusion__head">Pred. satisfied</div>
+            <div class="confusion__head">Actual dissat.</div>
+            <div class="confusion__cell confusion__cell--hit"><strong data-fill="confusion_matrix.tn|int">—</strong><span>true negative</span></div>
+            <div class="confusion__cell confusion__cell--miss"><strong data-fill="confusion_matrix.fp|int">—</strong><span>false positive</span></div>
+            <div class="confusion__head">Actual sat.</div>
+            <div class="confusion__cell confusion__cell--miss"><strong data-fill="confusion_matrix.fn|int">—</strong><span>false negative</span></div>
+            <div class="confusion__cell confusion__cell--hit"><strong data-fill="confusion_matrix.tp|int">—</strong><span>true positive</span></div>
+          </div>
+          <p class="figure__note">
+            The model catches roughly <span data-fill="classification_report.0.recall|pct0">—</span>
+            of dissatisfied customers. That is the honest ceiling here: a review score is partly
+            about the product itself, and nothing in these 34 features observes it.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="figure__title mb-3">Per-class performance</div>
+          <div class="table-scroll">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th scope="col">Class</th>
+                  <th scope="col" class="num">Precision</th>
+                  <th scope="col" class="num">Recall</th>
+                  <th scope="col" class="num">F1</th>
+                  <th scope="col" class="num">Support</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Dissatisfied (0)</th>
+                  <td class="num" data-fill="classification_report.0.precision|dec2">—</td>
+                  <td class="num" data-fill="classification_report.0.recall|dec2">—</td>
+                  <td class="num" data-fill="classification_report.0.f1-score|dec2">—</td>
+                  <td class="num" data-fill="classification_report.0.support|int">—</td>
+                </tr>
+                <tr>
+                  <th scope="row">Satisfied (1)</th>
+                  <td class="num" data-fill="classification_report.1.precision|dec2">—</td>
+                  <td class="num" data-fill="classification_report.1.recall|dec2">—</td>
+                  <td class="num" data-fill="classification_report.1.f1-score|dec2">—</td>
+                  <td class="num" data-fill="classification_report.1.support|int">—</td>
+                </tr>
+                <tr class="is-total">
+                  <th scope="row">Macro average</th>
+                  <td class="num" data-fill="classification_report.macro avg.precision|dec2">—</td>
+                  <td class="num" data-fill="classification_report.macro avg.recall|dec2">—</td>
+                  <td class="num" data-fill="classification_report.macro avg.f1-score|dec2">—</td>
+                  <td class="num" data-fill="classification_report.macro avg.support|int">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="figure__note">
+            Weighted accuracy <span data-fill="headline.accuracy|pct1">—</span> · log loss
+            <span data-fill="headline.log_loss|dec3">—</span> · Brier
+            <span data-fill="headline.brier|dec3">—</span>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════ ARTIFACTS ══════════════════════════ -->
+  <section class="section">
+    <div class="wrap">
+      <p class="eyebrow">Artifacts</p>
+      <h2 class="h-xl">Everything behind the numbers.</h2>
+      <p class="lede mt-3">
+        The executed notebooks are published as rendered HTML, so the code, outputs and warnings
+        are all inspectable without cloning anything.
+      </p>
+
+      <div class="tiles mt-5">
+        <a class="tile" href="./report.html">
+          <span class="tile__kind">Document</span>
+          <span class="tile__name">Technical report</span>
+          <span class="tile__desc">Data audit, feature table, tuning, calibration, deployment and limitations.</span>
+          <span class="tile__go">Read →</span>
+        </a>
+        <a class="tile" href="./ecommerce_dashboard.html">
+          <span class="tile__kind">Interactive</span>
+          <span class="tile__name">Analytics dashboard</span>
+          <span class="tile__desc">Revenue, delivery and review trends across the full order history.</span>
+          <span class="tile__go">Open →</span>
+        </a>
+        <a class="tile" href="./merge_data.html">
+          <span class="tile__kind">Notebook</span>
+          <span class="tile__name">Relational ETL</span>
+          <span class="tile__desc">Key validation, null audit and the seven-table join, step by step.</span>
+          <span class="tile__go">View →</span>
+        </a>
+        <a class="tile" href="./data-analysys.html">
+          <span class="tile__kind">Notebook</span>
+          <span class="tile__name">Exploratory analysis</span>
+          <span class="tile__desc">Distributions, delivery behaviour and category-level patterns.</span>
+          <span class="tile__go">View →</span>
+        </a>
+        <a class="tile" href="./nl.html">
+          <span class="tile__kind">Notebook</span>
+          <span class="tile__name">Modelling &amp; tuning</span>
+          <span class="tile__desc">Four model iterations, the leakage fix, Optuna search and ONNX export.</span>
+          <span class="tile__go">View →</span>
+        </a>
+        <a class="tile" href="./lgbm_model.onnx" download>
+          <span class="tile__kind">Model</span>
+          <span class="tile__name">lgbm_model.onnx</span>
+          <span class="tile__desc">Trained classifier, ZipMap stripped, 34 float32 inputs.</span>
+          <span class="tile__go">Download ↓</span>
+        </a>
+        <a class="tile" href="./assets/metrics.json">
+          <span class="tile__kind">Data</span>
+          <span class="tile__name">metrics.json</span>
+          <span class="tile__desc">Every figure on this page, as generated by the evaluation script.</span>
+          <span class="tile__go">Inspect →</span>
+        </a>
+        <a class="tile" href="https://github.com/Mayank170906/mlProjects/tree/master/Supervised" target="_blank" rel="noopener">
+          <span class="tile__kind">Source</span>
+          <span class="tile__name">GitHub</span>
+          <span class="tile__desc">Notebooks, dashboard generator and evaluation scripts.</span>
+          <span class="tile__go">Open ↗</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════ LIMITS ══════════════════════════ -->
+  <section class="section">
+    <div class="wrap">
+      <div class="grid grid-2">
+        <div>
+          <p class="eyebrow">Honest limits</p>
+          <h2 class="h-lg">What this model cannot do.</h2>
+          <ul class="prose mt-3 small">
+            <li><strong>It cannot see the product.</strong> No image, no description quality, no
+              returns history. A large share of one-star reviews are about the item itself and
+              are structurally invisible here.</li>
+            <li><strong>Dissatisfaction recall is
+              <span data-fill="classification_report.0.recall|dec2">—</span>.</strong> Close to
+              half of unhappy customers are still missed at the published threshold; moving the
+              cut trades that against a much larger false-positive queue.</li>
+            <li><strong>The split is random, not temporal.</strong> Orders from 2018 can inform
+              predictions about 2017. A production system should be validated forward in time.</li>
+            <li><strong>Seller aggregates are cold-start fragile.</strong> New sellers fall back
+              to the global mean and lose the model's most useful contextual signal.</li>
+          </ul>
+        </div>
+        <div>
+          <p class="eyebrow">Next</p>
+          <h2 class="h-lg">Where it goes from here.</h2>
+          <ul class="prose mt-3 small">
+            <li>Replace the random split with a rolling time-based backtest and report the drift.</li>
+            <li>Add geodesic customer–seller distance from the geolocation table, currently unused.</li>
+            <li>Mine the Portuguese review text of historical orders into a seller-level quality
+              prior — legitimate, since it uses prior orders rather than the current one.</li>
+            <li>Wrap the ONNX model in a scoring service and monitor the prediction distribution
+              against the training-time distribution.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout mt-6 flush">
+        <span class="callout__icon" aria-hidden="true">§</span>
+        <span>
+          <strong>Dataset.</strong>
+          <a href="https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce" target="_blank" rel="noopener">Brazilian E-Commerce Public Dataset by Olist</a>
+          (Olist and André Sionek, Kaggle, 2018), DOI <code>10.34740/kaggle/dsv/195341</code>,
+          licensed CC BY-NC-SA 4.0. Raw CSVs are not redistributed in this repository; the
+          <a href="./merge_data.html">ETL notebook</a> downloads them via <code>kagglehub</code>.
+        </span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap site-footer__grid">
+    <div>
+      <strong class="footer-name">Mayank Choudhary</strong><br>
+      Machine Learning Portfolio · Integrated M.Tech, VIT
+    </div>
+    <nav class="footer-links" aria-label="Footer">
+      <a href="../index.html">Portfolio home</a>
+      <a href="./report.html">Technical report</a>
+      <a href="../Tree/index.html">Spaceship Titanic</a>
+      <a href="https://github.com/Mayank170906/mlProjects" target="_blank" rel="noopener">Repository&#8239;↗</a>
+    </nav>
+    <div class="xsmall footer-legal">
+      Figures on this page are generated by <code>tools/gen_supervised_metrics.py</code> from the
+      model's own held-out predictions.
+    </div>
+  </div>
+</footer>
+
+<script src="./assets/case-study.js" defer></script>
 </body>
 </html>

@@ -1,339 +1,879 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spaceship Titanic — Report</title>
-
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #000;
-            color: #fff;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: auto;
-            padding: 50px 20px;
-        }
-
-        a {
-            color: #aaa;
-            text-decoration: none;
-        }
-
-        a:hover {
-            color: #fff;
-        }
-
-        h1 {
-            font-size: 42px;
-            margin-bottom: 5px;
-        }
-
-        h2 {
-            margin-top: 45px;
-            border-bottom: 1px solid #333;
-            padding-bottom: 8px;
-        }
-
-        h3 {
-            margin-top: 30px;
-        }
-
-        p, li {
-            color: #bbb;
-        }
-
-        code {
-            background: #111;
-            padding: 2px 5px;
-            border-radius: 3px;
-        }
-
-        pre {
-            background: #111;
-            border: 1px solid #222;
-            padding: 15px;
-            overflow-x: auto;
-            color: #ccc;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-
-        th, td {
-            text-align: left;
-            padding: 10px;
-            border-bottom: 1px solid #222;
-        }
-
-        th {
-            color: #fff;
-        }
-
-        td {
-            color: #aaa;
-        }
-
-        .highlight {
-            border: 1px solid #333;
-            padding: 18px;
-            margin: 20px 0;
-        }
-
-        .back {
-            display: inline-block;
-            margin-bottom: 35px;
-        }
-
-        footer {
-            margin-top: 60px;
-            padding-top: 20px;
-            border-top: 1px solid #222;
-            color: #666;
-            font-size: 14px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spaceship Titanic — Technical Report</title>
+<meta name="description" content="Technical report: preprocessing decisions, a nine-model tree-based benchmark, randomised hyperparameter search, threshold optimisation, calibration analysis and ONNX export for Kaggle's Spaceship Titanic.">
+<meta name="author" content="Mayank Choudhary">
+<link rel="canonical" href="https://mayank170906.github.io/mlProjects/Tree/report.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spaceship Titanic — Technical Report">
+<meta property="og:description" content="Nine tree-based classifiers on one split, randomised search, threshold optimisation and an ONNX export.">
+<meta name="theme-color" content="#b4512f">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../assets/css/site.css">
+<script src="../assets/js/site.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+<script src="../assets/js/charts.js" defer></script>
 </head>
-
 <body>
-<nav class="portfolio-nav" aria-label="Page navigation" style="max-width:900px;margin:0 auto 18px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font:700 12px 'Trebuchet MS',Arial,sans-serif"><a href="../index.html" style="padding:9px 13px;border:1px solid #d9ded7;border-radius:7px;background:#fffdf8;color:#843c2c;text-decoration:none">&#8962; Home</a><button type="button" onclick="if (history.length > 1) history.back(); else window.location.href='../index.html';" style="padding:9px 13px;border:1px solid #d9ded7;border-radius:7px;background:transparent;color:#63716c;cursor:pointer;font:inherit">&#8592; Back</button></nav>
-<style>
-:root { --portfolio-ink:#17221f; --portfolio-muted:#63716c; --portfolio-paper:#f4f2ec; --portfolio-accent:#be5b3e; --portfolio-line:#d9ded7; }
-body { background:radial-gradient(circle at 90% 0%, #eadfd1 0, transparent 30%),var(--portfolio-paper); color:var(--portfolio-ink); }
-body::before { content:'Mayank Choudhary  /  Integrated M.Tech, 4th year, VIT  /  Machine Learning Portfolio'; display:block; max-width:900px; margin:0 auto; padding:10px 20px; border-bottom:1px solid var(--portfolio-line); color:var(--portfolio-muted); font:600 11px/1.4 'Trebuchet MS',Arial,sans-serif; letter-spacing:.08em; text-transform:uppercase; }
-.container { max-width:1000px; background:#fffdf8; border:1px solid var(--portfolio-line); box-shadow:0 18px 50px rgba(35,47,41,.08); } a { color:var(--portfolio-accent); } h2 { border-color:var(--portfolio-line); } p,li,td { color:var(--portfolio-muted); } pre,code { background:#eef1eb; color:#35443d; border-color:var(--portfolio-line); } .highlight { background:#fffaf5; border-color:#d9b8aa; } @media (max-width:600px) { body::before { font-size:9px; } }
-</style>
 
-<div class="container">
+<a class="skip-link" href="#main">Skip to content</a>
 
-    <a class="back" href="index.html">← Back to project</a>
+<header class="masthead">
+  <div class="wrap masthead__inner">
+    <a class="brand" href="../index.html">
+      <span class="brand__mark" aria-hidden="true">M</span>
+      Mayank Choudhary
+      <span class="brand__sub">· ML Portfolio</span>
+    </a>
+    <nav class="masthead__nav" aria-label="Primary">
+      <a class="navlink" href="../index.html">Home</a>
+      <a class="navlink" href="./index.html">Case study</a>
+      <a class="navlink navlink--optional" href="./onnx_model.html">Live predictor</a>
+      <a class="navlink navlink--optional" href="https://github.com/Mayank170906/mlProjects/tree/master/Tree" target="_blank" rel="noopener">Source&#8239;↗</a>
+      <button class="theme-toggle" type="button" aria-label="Switch theme"></button>
+    </nav>
+  </div>
+</header>
 
-    <h1>Spaceship Titanic</h1>
-    <p>Passenger transportation prediction using tree-based classification models.</p>
-
-    <div class="highlight">
-        <strong>Best result:</strong> 78.18% validation accuracy after
-        LightGBM hyperparameter tuning and probability threshold optimization.
-        <br>
-        <strong>Selected threshold:</strong> 0.42
-    </div>
-
-    <h2>1. Dataset</h2>
-
-    <p>
-        The project uses the Kaggle Spaceship Titanic dataset.
-        The training data contains 8,693 rows and 14 columns, while the
-        test data contains 4,277 rows and 13 columns.
-    </p>
-
-    <p>
-        The target variable is <code>Transported</code>, which represents
-        whether a passenger was transported.
-    </p>
-
-    <h2>2. Data Preprocessing</h2>
-
-    <p>The original dataset contained categorical, numerical and high-cardinality features.</p>
-
-    <h3>Missing Values</h3>
-
-    <ul>
-        <li>Categorical columns were filled with <code>Unknown</code>.</li>
-        <li>Numerical columns were filled using the median.</li>
-        <li>Rows with remaining missing values in the training data were removed.</li>
-    </ul>
-
-    <h3>Removed Features</h3>
-
-    <ul>
-        <li><code>Cabin</code> was removed because cabin information was shared by passengers.</li>
-        <li><code>Name</code> was removed because most names were unique and unlikely to generalize.</li>
-    </ul>
-
-    <p>
-        The categorical features were converted into numerical dummy variables
-        using one-hot encoding.
-    </p>
-
-    <p>
-        Final model features included passenger age, spending in Room Service,
-        Food Court, Shopping Mall, Spa and VR Deck, along with encoded
-        Home Planet, CryoSleep, Destination and VIP information.
-    </p>
-
-    <h2>3. Model Comparison</h2>
-
-    <table>
-        <tr>
-            <th>Model</th>
-            <th>Validation Accuracy</th>
-        </tr>
-
-        <tr>
-            <td>Decision Tree</td>
-            <td>73.37%</td>
-        </tr>
-
-        <tr>
-            <td>Random Forest</td>
-            <td>77.29%</td>
-        </tr>
-
-        <tr>
-            <td>LightGBM</td>
-            <td>77.70%</td>
-        </tr>
-
-        <tr>
-            <td>Gradient Boosting</td>
-            <td>78.05%</td>
-        </tr>
-
-        <tr>
-            <td>XGBoost</td>
-            <td>76.81%</td>
-        </tr>
-
-        <tr>
-            <td>Hard Voting</td>
-            <td>77.29%</td>
-        </tr>
-
-        <tr>
-            <td>Soft Voting</td>
-            <td>77.49%</td>
-        </tr>
-
-        <tr>
-            <td>Weighted Hard Voting</td>
-            <td>77.77%</td>
-        </tr>
-
-        <tr>
-            <td>Weighted Soft Voting</td>
-            <td>77.70%</td>
-        </tr>
-    </table>
-
-    <h2>4. Hyperparameter Tuning</h2>
-
-    <p>
-        Gradient Boosting was first tuned using <code>GridSearchCV</code>.
-        The best cross-validation accuracy was approximately
-        <strong>80.23%</strong>, but its validation accuracy was
-        approximately <strong>77.15%</strong>.
-    </p>
-
-    <p>
-        LightGBM was then tuned using <code>RandomizedSearchCV</code>
-        with 30 parameter combinations and 5-fold cross-validation.
-    </p>
-
-    <p>The best LightGBM parameters were:</p>
-
-    <pre>{
-    "subsample": 1.0,
-    "reg_lambda": 0.1,
-    "reg_alpha": 0.0,
-    "num_leaves": 31,
-    "n_estimators": 100,
-    "min_child_samples": 20,
-    "max_depth": -1,
-    "learning_rate": 0.05,
-    "colsample_bytree": 1.0
-}</pre>
-
-    <p>
-        The best cross-validation score was approximately
-        <strong>80.49%</strong>, with a validation accuracy of
-        <strong>77.84%</strong>.
-    </p>
-
-    <h2>5. Classification Threshold</h2>
-
-    <p>
-        Instead of directly using the default probability threshold of
-        0.50, prediction probabilities were obtained using
-        <code>predict_proba()</code>.
-    </p>
-
-    <pre>probs = model.predict_proba(X_val)[:, 1]</pre>
-
-    <p>
-        Thresholds from 0.01 to 0.99 were tested. The threshold producing
-        the highest validation accuracy was:
-    </p>
-
-    <div class="highlight">
-        <strong>Threshold = 0.42</strong><br>
-        Validation Accuracy = <strong>78.18%</strong>
-    </div>
-
-    <p>
-        The final binary prediction is therefore based on whether the
-        probability of <code>Transported = True</code> is at least 0.42.
-    </p>
-
-    <pre>predictions = test_probs >= 0.42</pre>
-
-    <h2>6. Final Prediction</h2>
-
-    <p>
-        The tuned LightGBM model was used to generate probabilities for
-        the test dataset. The optimized threshold was then applied to
-        convert those probabilities into True/False predictions.
-    </p>
-
-    <p>
-        The resulting predictions were combined with <code>PassengerId</code>
-        and saved as:
-    </p>
-
-    <pre>./cdata/predictions.csv</pre>
-
-    <h2>7. Final Pipeline</h2>
-
-    <p>
-        The overall workflow was:
-    </p>
-
-    <ol>
-        <li>Load the Spaceship Titanic dataset.</li>
-        <li>Analyze missing values and feature types.</li>
-        <li>Handle categorical and numerical missing values.</li>
-        <li>Remove Cabin and Name.</li>
-        <li>One-hot encode categorical features.</li>
-        <li>Compare multiple tree-based classifiers.</li>
-        <li>Tune Gradient Boosting and LightGBM.</li>
-        <li>Select the best LightGBM model.</li>
-        <li>Optimize the classification threshold.</li>
-        <li>Generate test predictions.</li>
-        <li>Save predictions to CSV.</li>
-    </ol>
-
-    <h2>8. Result</h2>
-
-    <div class="highlight">
-        <strong>Model:</strong> Tuned LightGBM<br>
-        <strong>Threshold:</strong> 0.42<br>
-        <strong>Validation Accuracy:</strong> 78.18%
-    </div>
-
-    <footer>
-        Spaceship Titanic ML Project ·
-        <a href="https://github.com/Mayank170906/mlProjects/tree/master/Tree"
-           target="_blank">GitHub Repository ↗</a>
-    </footer>
-
+<div class="wrap">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="../index.html">Portfolio</a>
+    <span class="crumbs__sep" aria-hidden="true">/</span>
+    <a href="./index.html">Spaceship Titanic</a>
+    <span class="crumbs__sep" aria-hidden="true">/</span>
+    <span aria-current="page">Technical report</span>
+  </nav>
 </div>
 
+<main id="main" class="wrap report">
+
+  <nav class="toc" aria-label="Table of contents">
+    <p class="toc__title">Contents</p>
+    <ol class="toc__list">
+      <li><a href="#summary">1 · Summary</a></li>
+      <li><a href="#data">2 · Dataset</a></li>
+      <li><a href="#preprocessing">3 · Preprocessing</a></li>
+      <li><a href="#benchmark">4 · Model benchmark</a></li>
+      <li><a href="#tuning">5 · Hyperparameter search</a></li>
+      <li><a href="#threshold">6 · Threshold optimisation</a></li>
+      <li><a href="#evaluation">7 · Evaluation</a></li>
+      <li><a href="#deployment">8 · ONNX deployment</a></li>
+      <li><a href="#limits">9 · Limitations</a></li>
+      <li><a href="#repro">10 · Reproduction</a></li>
+      <li><a href="#refs">11 · References</a></li>
+    </ol>
+    <p class="toc__title mt-4">Artifacts</p>
+    <ol class="toc__list">
+      <li><a href="./index.html">Case study</a></li>
+      <li><a href="./onnx_model.html">Live predictor</a></li>
+      <li><a href="./assets/metrics.json">metrics.json</a></li>
+    </ol>
+  </nav>
+
+  <div class="report__body">
+
+    <header class="mb-4">
+      <p class="eyebrow eyebrow--accent">Technical report · Project 02</p>
+      <h1 class="h-xl">Tree-based classification on the Spaceship Titanic dataset</h1>
+      <p class="lede mt-3">
+        A controlled comparison of five tree learners and four voting ensembles, followed by
+        randomised hyperparameter search, threshold optimisation and ONNX export of the winner.
+      </p>
+      <div class="pill-row mt-4">
+        <span class="pill pill--accent">LightGBM</span>
+        <span class="pill">9 models compared</span>
+        <span class="pill">RandomizedSearchCV · 30 draws</span>
+        <span class="pill">ONNX export</span>
+        <span class="pill">Revision 2.0 · 2026</span>
+      </div>
+    </header>
+
+    <!-- ══════════ 1 ══════════ -->
+    <section id="summary">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 01</span>
+        <h2>Summary</h2>
+      </div>
+
+      <div class="stats mb-4">
+        <div class="stat stat--accent">
+          <span class="stat__label">ROC-AUC</span>
+          <span class="stat__value" data-fill="headline.roc_auc|dec4">—</span>
+          <span class="stat__note">held-out validation</span>
+        </div>
+        <div class="stat">
+          <span class="stat__label">Accuracy</span>
+          <span class="stat__value" data-fill="headline.accuracy|pct2">—</span>
+          <span class="stat__note">at threshold <span data-fill="threshold|dec2">—</span></span>
+        </div>
+        <div class="stat">
+          <span class="stat__label">F1</span>
+          <span class="stat__value" data-fill="headline.f1|dec3">—</span>
+          <span class="stat__note">balanced target</span>
+        </div>
+        <div class="stat">
+          <span class="stat__label">Log loss</span>
+          <span class="stat__value" data-fill="headline.log_loss|dec3">—</span>
+          <span class="stat__note">probability quality</span>
+        </div>
+      </div>
+
+      <p class="prose">
+        Kaggle's Spaceship Titanic provides 8,693 labelled passengers and asks whether each was
+        transported to an alternate dimension. After a preprocessing pass that fills missing
+        values explicitly and drops two columns on principle,
+        <span data-fill="split.n_features|int">16</span> features remain. Nine models were
+        evaluated on one stratified 20% split; gradient boosting led the untuned field at 78.05%
+        and LightGBM followed at 77.70%.
+      </p>
+
+      <p class="prose">
+        LightGBM was carried forward because it tuned better: randomised search lifted it to
+        77.84% on the holdout, and a threshold sweep added a further 0.34 points to reach
+        <strong data-fill="headline.accuracy|pct2">—</strong>. Measured on the same split, the
+        tuned model reaches <strong data-fill="headline.roc_auc|dec4">—</strong> ROC-AUC — a
+        considerably better result than the accuracy figure alone suggests.
+      </p>
+
+      <div class="grid grid-2">
+        <div class="callout callout--key">
+          <span class="callout__icon" aria-hidden="true">◆</span>
+          <span>
+            <strong>No ensemble beat its best member.</strong> All four voting schemes landed
+            between 77.29% and 77.77%, under gradient boosting's 78.05% alone. Correlated errors
+            leave nothing to average away.
+          </span>
+        </div>
+        <div class="callout callout--warn">
+          <span class="callout__icon" aria-hidden="true">▲</span>
+          <span>
+            <strong>Cross-validation overstated performance by 2.7–3.1 points</strong> in both
+            tuned configurations, because the search selects its winner on that very score.
+            <a href="#tuning">Section 5</a> quantifies it.
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 2 ══════════ -->
+    <section id="data">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 02</span>
+        <h2>Dataset</h2>
+        <p>What the competition provides and what the target looks like.</p>
+      </div>
+
+      <div class="table-scroll mb-4">
+        <table class="data">
+          <caption>Spaceship Titanic, Kaggle 2022.</caption>
+          <thead>
+            <tr><th scope="col">Split</th><th scope="col" class="num">Rows</th><th scope="col" class="num">Columns</th><th scope="col">Target present</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">train.csv</th><td class="num">8,693</td><td class="num">14</td><td>Yes — <code>Transported</code></td></tr>
+            <tr><th scope="row">test.csv</th><td class="num">4,277</td><td class="num">13</td><td>No — competition holdout</td></tr>
+            <tr><th scope="row">after cleaning</th><td class="num">7,265</td><td class="num" data-fill="split.n_features|int">—</td><td>1,428 rows (16.4%) dropped — see §3</td></tr>
+            <tr class="is-total"><th scope="row">Modelling split</th><td class="num" data-fill="split.train_rows|int">—</td><td class="num" data-fill="split.n_features|int">—</td><td>Stratified 80/20, plus <span data-fill="split.val_rows|int">—</span> validation</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="prose">
+        The target is close to balanced — <span data-fill="split.positive_rate_train|pct1">—</span>
+        positive in training and <span data-fill="split.positive_rate_val|pct1">—</span> in
+        validation. That balance is the reason plain accuracy is an acceptable objective here,
+        and it is the key structural difference from
+        <a href="../Supervised/report.html">the e-commerce project</a>, where a 3:1 imbalance
+        makes accuracy actively misleading.
+      </p>
+
+      <h3>Source columns</h3>
+      <div class="table-scroll">
+        <table class="data">
+          <thead>
+            <tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Disposition</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row"><code>PassengerId</code></th><td>Identifier</td><td>Kept only to label submissions; never a feature</td></tr>
+            <tr><th scope="row"><code>HomePlanet</code></th><td>Categorical</td><td>One-hot encoded</td></tr>
+            <tr><th scope="row"><code>CryoSleep</code></th><td>Boolean</td><td>One-hot encoded with an <code>Unknown</code> level</td></tr>
+            <tr><th scope="row"><code>Cabin</code></th><td>Composite string</td><td><span class="figure-bad">Dropped</span> — shared across passengers, see §3</td></tr>
+            <tr><th scope="row"><code>Destination</code></th><td>Categorical</td><td>One-hot encoded</td></tr>
+            <tr><th scope="row"><code>Age</code></th><td>Numeric</td><td>Median-imputed</td></tr>
+            <tr><th scope="row"><code>VIP</code></th><td>Boolean</td><td>One-hot encoded</td></tr>
+            <tr><th scope="row"><code>RoomService</code></th><td>Numeric</td><td>Median-imputed</td></tr>
+            <tr><th scope="row"><code>FoodCourt</code></th><td>Numeric</td><td>Median-imputed</td></tr>
+            <tr><th scope="row"><code>ShoppingMall</code></th><td>Numeric</td><td>Median-imputed</td></tr>
+            <tr><th scope="row"><code>Spa</code></th><td>Numeric</td><td>Median-imputed</td></tr>
+            <tr><th scope="row"><code>VRDeck</code></th><td>Numeric</td><td>Median-imputed</td></tr>
+            <tr><th scope="row"><code>Name</code></th><td>Free text</td><td><span class="figure-bad">Dropped</span> — near-unique</td></tr>
+            <tr><th scope="row"><code>Transported</code></th><td>Boolean</td><td><strong>Target</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════════ 3 ══════════ -->
+    <section id="preprocessing">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 03</span>
+        <h2>Preprocessing</h2>
+        <p>Three decisions, each with a reason and one with a failed experiment behind it.</p>
+      </div>
+
+      <h3>Missing values</h3>
+      <p class="prose">
+        Every feature is missing roughly 2% of its values, and the gaps are spread thin — most
+        rows are missing at most one field. Two strategies were considered.
+      </p>
+
+      <div class="grid grid-2 mb-4">
+        <div class="card card--flat">
+          <h4 class="m-0">Tried: model-based imputation</h4>
+          <p class="small muted mt-1">
+            A classifier was trained to predict the missing categorical values from the observed
+            ones. It reached <strong>72.3%</strong> accuracy — meaning more than a quarter of
+            imputed values would have been wrong, and confidently so.
+          </p>
+          <p class="small muted mt-2">
+            <strong>Rejected.</strong> Filling 2% of cells with 28% error injects noise that the
+            downstream model cannot distinguish from signal.
+          </p>
+        </div>
+        <div class="card card--flat">
+          <h4 class="m-0">Adopted: explicit sentinels</h4>
+          <p class="small muted mt-1">
+            Categoricals are filled with the literal value <code>Unknown</code>, which survives
+            one-hot encoding as its own indicator column. Numerics take the median.
+          </p>
+          <p class="small muted mt-2">
+            <strong>Why it is better.</strong> The tree can split on <code>Unknown</code>
+            directly, so if missingness itself carries information the model is free to use it
+            rather than having it papered over.
+          </p>
+        </div>
+      </div>
+
+      <div class="callout callout--caveat mb-4">
+        <span class="callout__icon" aria-hidden="true">▲</span>
+        <span>
+          <strong>The bigger cost was row removal, not imputation.</strong> After filling, rows
+          that still carried a missing value were dropped, taking training from 8,693 to
+          <strong>7,265</strong> — <strong>1,428 rows, 16.4% of the labelled data</strong>. On a
+          dataset this small that is the most questionable decision in the pipeline: the same
+          <code>Unknown</code>-sentinel logic that justified keeping partially-missing rows
+          should have been extended to cover them. The test set was not filtered this way, so
+          training and inference also see slightly different distributions.
+        </span>
+      </div>
+
+      <h3>Dropped columns</h3>
+      <ul class="prose">
+        <li>
+          <strong><code>Cabin</code></strong> — formatted <code>deck/num/side</code>, and
+          multiple passengers share a cabin. Used raw it is high-cardinality; used as-is across
+          a random split it leaks group membership between train and validation. It was dropped
+          rather than decomposed, which <a href="#limits">§9</a> records as the main missed
+          opportunity.
+        </li>
+        <li>
+          <strong><code>Name</code></strong> — almost every value is unique, so any split on it
+          memorises individuals. No surname-group feature was derived.
+        </li>
+      </ul>
+
+      <h3>Encoding</h3>
+      <p class="prose">
+        Remaining categoricals were one-hot encoded with <code>pd.get_dummies</code>, dropping
+        the first level to avoid collinearity, yielding the
+        <span data-fill="split.n_features|int">16</span>-column matrix the model consumes:
+      </p>
+      <pre><code>Age  RoomService  FoodCourt  ShoppingMall  Spa  VRDeck
+HomePlanet_Europa  HomePlanet_Mars  HomePlanet_Unknown
+CryoSleep_True  CryoSleep_Unknown
+Destination_PSO J318.5-22  Destination_TRAPPIST-1e  Destination_Unknown
+VIP_True  VIP_Unknown</code></pre>
+      <p class="prose">
+        This exact column order is part of the deployed model's contract —
+        see <a href="#deployment">§8</a> and <a href="https://github.com/Mayank170906/mlProjects/blob/master/Tree/onnx.md" target="_blank" rel="noopener">onnx.md&#8239;↗</a>.
+      </p>
+    </section>
+
+    <!-- ══════════ 4 ══════════ -->
+    <section id="benchmark">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 04</span>
+        <h2>Model benchmark</h2>
+        <p>Nine candidates, one split, default hyperparameters.</p>
+      </div>
+
+      <p class="prose">
+        All nine models were fit on the same stratified 80/20 split with library defaults, so the
+        comparison isolates the learner rather than the tuning effort. The four ensembles vote
+        over the five base learners.
+      </p>
+
+      <figure class="figure mb-4">
+        <figcaption class="figure__head">
+          <div class="figure__title">Validation accuracy by model</div>
+          <p class="figure__sub">
+            Untuned defaults, identical data. Axis starts at 70% to make the ~4.7-point spread
+            readable; see the table view for exact values.
+          </p>
+        </figcaption>
+        <div class="figure__plot figure__plot--tall">
+          <canvas id="benchChart" aria-label="Bar chart of validation accuracy for nine models"></canvas>
+        </div>
+        <div class="figure__legend">
+          <span class="legend-key"><span class="legend-key__mark legend-key__mark--s1" aria-hidden="true"></span> Single model</span>
+          <span class="legend-key"><span class="legend-key__mark legend-key__mark--s2" aria-hidden="true"></span> Voting ensemble</span>
+        </div>
+        <details class="figure__table" id="benchTable"><summary>Table view</summary></details>
+      </figure>
+
+      <h3>What the benchmark says</h3>
+      <ul class="prose">
+        <li>
+          <strong>Boosting beats bagging beats a single tree.</strong> Decision tree 73.37% →
+          random forest 77.29% → gradient boosting 78.05%. The ordering is textbook, which is
+          mild evidence the pipeline is behaving.
+        </li>
+        <li>
+          <strong>XGBoost underperformed LightGBM</strong> (76.81% vs 77.70%) at defaults. This
+          is a statement about default hyperparameters, not about the libraries — XGBoost's
+          defaults are more conservative on a dataset this small.
+        </li>
+        <li>
+          <strong>No ensemble beat its best member.</strong> The best, weighted hard voting at
+          77.77%, is 0.28 points <em>below</em> gradient boosting alone. Voting helps when
+          members err on different rows; here five tree models trained on identical features
+          make correlated mistakes, so averaging preserves them.
+        </li>
+        <li>
+          <strong>The spread is 4.68 points, but the top six sit within 0.8.</strong> On a
+          1,453-row validation set that band is roughly the width of sampling noise, so "which
+          of the top six is best" is not a question this split can answer. LightGBM was carried
+          forward on tuning headroom and export support, not on a claimed win.
+        </li>
+      </ul>
+    </section>
+
+    <!-- ══════════ 5 ══════════ -->
+    <section id="tuning">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 05</span>
+        <h2>Hyperparameter search</h2>
+        <p>Two searches, and the gap between cross-validation and reality.</p>
+      </div>
+
+      <h3>Gradient boosting — exhaustive grid</h3>
+      <p class="prose">
+        <code>GridSearchCV</code> over 162 combinations with 5-fold CV reached
+        <strong>80.23%</strong> cross-validated accuracy but only <strong>77.15%</strong> on the
+        holdout — worse than its own untuned 78.05%. Tuning made it fit the folds better and the
+        unseen data worse.
+      </p>
+
+      <h3>LightGBM — randomised search</h3>
+      <p class="prose">
+        The LightGBM grid has 26,244 combinations, so an exhaustive sweep is impractical.
+        <code>RandomizedSearchCV</code> drew 30 configurations with 5-fold CV, which is the
+        efficient choice when only a few hyperparameters matter: random draws sample many
+        distinct values along the important axes rather than exhausting the unimportant ones.
+      </p>
+
+      <div class="grid grid-2 mb-4">
+        <div class="card card--flat">
+          <h4 class="m-0 mb-2">Selected parameters</h4>
+          <dl class="kv" id="paramList"></dl>
+        </div>
+        <div class="card card--flat">
+          <h4 class="m-0 mb-2">Search space</h4>
+          <dl class="kv">
+            <dt>num_leaves</dt><dd>31, 63, 127</dd>
+            <dt>max_depth</dt><dd>−1, 5, 10</dd>
+            <dt>learning_rate</dt><dd>0.01, 0.03, 0.05, 0.1</dd>
+            <dt>n_estimators</dt><dd>100, 300, 600</dd>
+            <dt>subsample</dt><dd>0.6, 0.8, 1.0</dd>
+            <dt>colsample_bytree</dt><dd>0.6, 0.8, 1.0</dd>
+            <dt>min_child_samples</dt><dd>10, 20, 50</dd>
+            <dt>reg_alpha</dt><dd>0.0, 0.1, 1.0</dd>
+            <dt>reg_lambda</dt><dd>0.0, 0.1, 1.0</dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="callout callout--warn mb-4">
+        <span class="callout__icon" aria-hidden="true">▲</span>
+        <span>
+          <strong>The search converged on conservative settings.</strong> 100 estimators, 31
+          leaves, unbounded depth, no subsampling and almost no regularisation — essentially a
+          small, plain model. On 5,812 training rows with 16 features, extra capacity buys
+          overfitting rather than accuracy, and the search discovered that on its own.
+        </span>
+      </div>
+
+      <h3>The cross-validation gap</h3>
+      <div class="table-scroll mb-3">
+        <table class="data">
+          <caption>Cross-validated accuracy against held-out accuracy for both tuned models.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Model</th>
+              <th scope="col">Search</th>
+              <th scope="col" class="num">Best CV</th>
+              <th scope="col" class="num">Holdout</th>
+              <th scope="col" class="num">Gap</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Gradient boosting</th><td>GridSearchCV, 162 combos</td>
+              <td class="num">80.23%</td><td class="num">77.15%</td><td class="num">−3.08</td>
+            </tr>
+            <tr class="is-highlight">
+              <th scope="row">LightGBM</th><td>RandomizedSearchCV, 30 draws</td>
+              <td class="num">80.49%</td><td class="num">77.84%</td><td class="num">−2.65</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="prose">
+        Both gaps point the same way, and the reason is structural rather than accidental. The
+        search reports the CV score <em>of the configuration it chose because that score was
+        highest</em>. Across 30 (or 162) noisy estimates, the maximum is biased upward: part of
+        the winning score is genuine quality and part is a favourable fold assignment. The
+        holdout was never used for selection, so it carries no such bias, and it is the number
+        quoted throughout this site.
+      </p>
+
+      <div class="callout callout--good">
+        <span class="callout__icon" aria-hidden="true">✓</span>
+        <span>
+          <strong>The structural fix is nested cross-validation</strong> — an inner loop to
+          select, an outer loop to estimate. It costs roughly <em>k</em>× the compute and removes
+          the bias rather than measuring it after the fact. On a dataset this size that is
+          entirely affordable, and it is the first improvement this pipeline should get.
+        </span>
+      </div>
+    </section>
+
+    <!-- ══════════ 6 ══════════ -->
+    <section id="threshold">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 06</span>
+        <h2>Threshold optimisation</h2>
+        <p>Why 0.5 was not the right cut even on a balanced target.</p>
+      </div>
+
+      <p class="prose">
+        <code>predict()</code> thresholds probabilities at 0.5 by default. Sweeping every cut
+        from 0.01 to 0.99 against validation accuracy shows the optimum sits lower:
+      </p>
+      <pre><code>probs = model.predict_proba(X_val)[:, 1]
+best = max(((t / 100, accuracy_score(y_val, probs &gt;= t / 100))
+            for t in range(1, 100)), key=lambda p: p[1])
+<span class="code-good"># → threshold 0.42, accuracy 0.7818</span></code></pre>
+
+      <figure class="figure mb-4">
+        <figcaption class="figure__head">
+          <div class="figure__title">Validation accuracy across the decision threshold</div>
+          <p class="figure__sub">
+            Every cut from 0.05 to 0.95, recomputed from the persisted model. The marker is the
+            selected threshold.
+          </p>
+        </figcaption>
+        <div class="figure__plot figure__plot--tall">
+          <canvas id="sweepChart" aria-label="Line chart of accuracy against decision threshold"></canvas>
+        </div>
+        <details class="figure__table" id="sweepTable"><summary>Table view · every 5th threshold</summary></details>
+      </figure>
+
+      <div class="grid grid-2">
+        <div class="card card--flat">
+          <h4 class="m-0">What was gained</h4>
+          <dl class="kv mt-2">
+            <dt>@ 0.50</dt><dd data-fill="headline.accuracy_at_050|pct2">—</dd>
+            <dt>@ 0.42</dt><dd data-fill="headline.accuracy|pct2">—</dd>
+            <dt>gain</dt><dd>+0.34 points</dd>
+          </dl>
+          <p class="small muted mt-3">
+            Five additional correct predictions out of 1,453 — real, free, and reproducible, but
+            not a headline.
+          </p>
+        </div>
+        <div class="card card--flat">
+          <h4 class="m-0">What it means</h4>
+          <p class="small muted mt-1">
+            An optimum below 0.5 says the model systematically under-predicts the positive class.
+            The peak is also broad and flat, which matters more than its height: a sharp peak
+            would mean the threshold was fitted to validation noise and would not transfer. A
+            plateau means the choice is robust.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 7 ══════════ -->
+    <section id="evaluation">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 07</span>
+        <h2>Evaluation</h2>
+        <p>
+          Measured on <span data-fill="split.val_rows|int">—</span> held-out passengers by
+          reloading the persisted model.
+        </p>
+      </div>
+
+      <div class="grid grid-2 mb-4">
+        <figure class="figure">
+          <figcaption class="figure__head">
+            <div class="figure__title">ROC curve</div>
+            <p class="figure__sub">Threshold-independent ranking quality.</p>
+          </figcaption>
+          <div class="figure__plot">
+            <canvas id="rocChart" aria-label="Receiver operating characteristic curve"></canvas>
+          </div>
+          <div class="figure__legend">
+            <span class="legend-key"><span class="legend-key__mark legend-key__mark--line legend-key__mark--s1" aria-hidden="true"></span> Model · AUC <span data-fill="headline.roc_auc|dec4">—</span></span>
+            <span class="legend-key"><span class="legend-key__mark legend-key__mark--line legend-key__mark--ref" aria-hidden="true"></span> Chance</span>
+          </div>
+        </figure>
+
+        <figure class="figure">
+          <figcaption class="figure__head">
+            <div class="figure__title">Precision–recall curve</div>
+            <p class="figure__sub">
+              Baseline sits at the positive rate, <span data-fill="pr_baseline|pct1">—</span>.
+            </p>
+          </figcaption>
+          <div class="figure__plot">
+            <canvas id="prChart" aria-label="Precision-recall curve"></canvas>
+          </div>
+          <div class="figure__legend">
+            <span class="legend-key"><span class="legend-key__mark legend-key__mark--line legend-key__mark--s1" aria-hidden="true"></span> Model</span>
+            <span class="legend-key"><span class="legend-key__mark legend-key__mark--line legend-key__mark--ref" aria-hidden="true"></span> No skill</span>
+          </div>
+        </figure>
+      </div>
+
+      <p class="prose">
+        <strong>AUC <span data-fill="headline.roc_auc|dec4">—</span> against
+        <span data-fill="headline.accuracy|pct1">—</span> accuracy</strong> is the most
+        interesting number in this report. The model ranks passengers considerably better than
+        it labels them, which means the remaining errors are concentrated near the decision
+        boundary rather than spread across confident predictions. For any use that consumes a
+        ranked list rather than a hard label, the model is materially better than the accuracy
+        headline suggests.
+      </p>
+
+      <div class="grid grid-2 mb-4">
+        <div class="card">
+          <h4 class="m-0 mb-3">Confusion matrix</h4>
+          <div class="confusion">
+            <div></div>
+            <div class="confusion__head">Pred. false</div>
+            <div class="confusion__head">Pred. true</div>
+            <div class="confusion__head">Actual false</div>
+            <div class="confusion__cell confusion__cell--hit"><strong data-fill="confusion_matrix.tn|int">—</strong><span>true negative</span></div>
+            <div class="confusion__cell confusion__cell--miss"><strong data-fill="confusion_matrix.fp|int">—</strong><span>false positive</span></div>
+            <div class="confusion__head">Actual true</div>
+            <div class="confusion__cell confusion__cell--miss"><strong data-fill="confusion_matrix.fn|int">—</strong><span>false negative</span></div>
+            <div class="confusion__cell confusion__cell--hit"><strong data-fill="confusion_matrix.tp|int">—</strong><span>true positive</span></div>
+          </div>
+          <p class="figure__note">
+            Precision <span data-fill="headline.precision|dec3">—</span>, recall
+            <span data-fill="headline.recall|dec3">—</span>. The sub-0.5 threshold buys recall at
+            precision's expense, which is the correct trade only if false negatives are the
+            costlier error — on a Kaggle accuracy metric they are equally costly, so the gain
+            here comes from the calibration shift rather than the asymmetry.
+          </p>
+        </div>
+
+        <figure class="figure">
+          <figcaption class="figure__head">
+            <div class="figure__title">Feature importance</div>
+            <p class="figure__sub">Share of total split gain, all <span data-fill="split.n_features|int">16</span> features.</p>
+          </figcaption>
+          <div class="barlist" id="importanceList"></div>
+          <details class="figure__table" id="importanceTable"><summary>Table view · gain and split counts</summary></details>
+        </figure>
+      </div>
+
+      <p class="prose">
+        <code>CryoSleep_True</code> alone carries <strong>33.8%</strong> of total gain — more
+        than three times the next feature. The five onboard-spending columns follow and together
+        account for roughly <strong>45%</strong>, but much of that is the same signal arriving a
+        second time: a passenger in cryosleep cannot spend, so all-zero spending is a near-perfect
+        proxy for the cryosleep flag. The two blocks are substantially redundant, which is why the
+        model needs so little capacity to reach its ceiling.
+      </p>
+
+      <p class="prose">
+        Everything else is minor. <code>HomePlanet_Europa</code> at 6.4% is the only remaining
+        feature above 5%, and <code>Age</code>, <code>VIP</code> and destination contribute
+        little — consistent with the benchmark finding that all five learners converge to
+        within a point of each other.
+      </p>
+
+      <figure class="figure">
+        <figcaption class="figure__head">
+          <div class="figure__title">Reliability diagram</div>
+          <p class="figure__sub">Predicted probability against observed frequency, ten bins.</p>
+        </figcaption>
+        <div class="figure__plot">
+          <canvas id="calChart" aria-label="Calibration curve"></canvas>
+        </div>
+        <div class="figure__legend">
+          <span class="legend-key"><span class="legend-key__mark legend-key__mark--line legend-key__mark--s1" aria-hidden="true"></span> Observed frequency</span>
+          <span class="legend-key"><span class="legend-key__mark legend-key__mark--line legend-key__mark--ref" aria-hidden="true"></span> Perfect calibration</span>
+        </div>
+        <p class="figure__note">
+          Log loss <span data-fill="headline.log_loss|dec4">—</span>. Bins are small at the
+          extremes, so the tails are noisy — the middle of the curve is where the diagram is
+          informative.
+        </p>
+        <details class="figure__table" id="calTable"><summary>Table view</summary></details>
+      </figure>
+
+      <h3>Competition test set</h3>
+      <p class="prose">
+        Applying the model and its threshold to the 4,277 unlabelled competition rows yields the
+        distribution below. Its shape is a useful sanity check: a healthy bimodal spread with
+        mass at both ends means the model is committing, not hedging every prediction near 0.5.
+      </p>
+      <figure class="figure mt-3">
+        <figcaption class="figure__head">
+          <div class="figure__title">Predicted probability distribution, competition test set</div>
+          <p class="figure__sub">
+            4,277 passengers in 20 bins;
+            <span data-fill="test_prediction_distribution.transported|int">—</span> predicted
+            transported at threshold <span data-fill="threshold|dec2">—</span>.
+          </p>
+        </figcaption>
+        <div class="figure__plot">
+          <canvas id="testDistChart" aria-label="Histogram of predicted probabilities on the competition test set"></canvas>
+        </div>
+        <details class="figure__table" id="testDistTable"><summary>Table view</summary></details>
+      </figure>
+    </section>
+
+    <!-- ══════════ 8 ══════════ -->
+    <section id="deployment">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 08</span>
+        <h2>ONNX deployment</h2>
+        <p>Exporting the model so it runs without Python.</p>
+      </div>
+
+      <p class="prose">
+        The tuned model and its threshold are persisted together with <code>joblib</code>, then
+        converted to ONNX. One conversion detail is worth recording: the converter rejects
+        <code>numpy.bool_</code> class labels, so the class metadata is rewritten on a deep copy
+        before export — the copy keeps the original estimator untouched.
+      </p>
+
+      <pre><code>model_for_onnx = copy.deepcopy(rs.best_estimator_)
+model_for_onnx._classes = np.array([0, 1])   <span class="code-good"># bool_ → int64</span>
+
+onnx_model = convert_lightgbm(
+    model_for_onnx, initial_types=[("float_input", FloatTensorType([None, 16]))])</code></pre>
+
+      <div class="grid grid-2 mt-4">
+        <div class="card card--flat">
+          <h4 class="m-0 mb-2">Model contract</h4>
+          <dl class="kv">
+            <dt>input</dt><dd>float_input · [N, 16] float32</dd>
+            <dt>output 1</dt><dd>label · int64</dd>
+            <dt>output 2</dt><dd>probabilities · [N, 2] float32</dd>
+            <dt>threshold</dt><dd data-fill="threshold|dec2">—</dd>
+            <dt>artifact</dt><dd><a href="./models/final_model.onnx" download>final_model.onnx</a></dd>
+            <dt>spec</dt><dd><a href="https://github.com/Mayank170906/mlProjects/blob/master/Tree/onnx.md" target="_blank" rel="noopener">onnx.md&#8239;↗</a></dd>
+          </dl>
+        </div>
+        <div class="stack stack--sm">
+          <div class="callout callout--caveat">
+            <span class="callout__icon" aria-hidden="true">▲</span>
+            <span>
+              <strong>Column order is load-bearing.</strong> The graph accepts a bare float
+              tensor and has no knowledge of column names. Supplying the 16 features in any
+              other order produces confident nonsense rather than an error.
+              <a href="https://github.com/Mayank170906/mlProjects/blob/master/Tree/onnx.md" target="_blank" rel="noopener">onnx.md&#8239;↗</a> pins the order.
+            </span>
+          </div>
+          <div class="callout callout--good">
+            <span class="callout__icon" aria-hidden="true">✓</span>
+            <span>
+              The <a href="./onnx_model.html">live predictor</a> loads this exact file into
+              WebAssembly and runs inference in the browser — no server, no Python, no data
+              leaving the page.
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 9 ══════════ -->
+    <section id="limits">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 09</span>
+        <h2>Limitations</h2>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="stack stack--sm">
+          <div class="card">
+            <h4 class="m-0"><code>Cabin</code> was dropped, not decomposed</h4>
+            <p class="small muted mt-1">
+              Splitting it into deck, number and side is the single highest-value unexploited
+              feature on this dataset. Dropping it avoided a leakage risk but forfeited real
+              signal; decomposing it while grouping cabin-mates within a fold would get both.
+            </p>
+          </div>
+          <div class="card">
+            <h4 class="m-0">No group features</h4>
+            <p class="small muted mt-1">
+              <code>PassengerId</code> is formatted <code>gggg_pp</code> — group and position.
+              Group size, group spend and whether a travelling companion was transported are all
+              derivable and all unused.
+            </p>
+          </div>
+          <div class="card">
+            <h4 class="m-0">One split decides everything</h4>
+            <p class="small muted mt-1">
+              A single 1,453-row validation set has a standard error near one percentage point,
+              which is wider than the gap separating the top six models. Repeated stratified CV
+              would make those comparisons meaningful.
+            </p>
+          </div>
+        </div>
+        <div class="stack stack--sm">
+          <div class="card">
+            <h4 class="m-0">Ensembles were never tuned</h4>
+            <p class="small muted mt-1">
+              The voting schemes combine default-parameter learners, so their failure to beat a
+              single model is evidence about untuned ensembles only. Stacking tuned models on
+              out-of-fold predictions remains untested.
+            </p>
+          </div>
+          <div class="card">
+            <h4 class="m-0">Selection and reporting are entangled</h4>
+            <p class="small muted mt-1">
+              The threshold was chosen on the same validation set that reports the final
+              accuracy, so the 78.18% carries a small upward bias of its own — smaller than the
+              CV gap, but present.
+            </p>
+          </div>
+          <div class="card">
+            <h4 class="m-0">16.4% of training rows were discarded</h4>
+            <p class="small muted mt-1">
+              Dropping every row with a residual missing value cost 1,428 of 8,693 labelled
+              passengers. Extending the <code>Unknown</code> sentinel to those columns would
+              recover them, and on a dataset this size that is likely worth more than any
+              further tuning.
+            </p>
+          </div>
+          <div class="card">
+            <h4 class="m-0">No competition leaderboard score</h4>
+            <p class="small muted mt-1">
+              Predictions are generated for the test set but no public leaderboard result is
+              recorded here, so the true generalisation estimate is the holdout number and
+              nothing stronger.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ 10 ══════════ -->
+    <section id="repro">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 10</span>
+        <h2>Reproduction</h2>
+      </div>
+
+      <pre><code>git clone https://github.com/Mayank170906/mlProjects.git
+cd mlProjects
+uv sync
+
+<span class="code-good"># competition data is not redistributed — fetch it first</span>
+kaggle competitions download -c spaceship-titanic -p Tree/data/
+unzip Tree/data/spaceship-titanic.zip -d Tree/data/
+
+uv run python tools/gen_tree_metrics.py</code></pre>
+
+      <p class="prose">
+        The script loads <code>Tree/models/final_model.pkl</code>, reproduces the stratified
+        split with <code>random_state=42</code>, and writes
+        <a href="./assets/metrics.json"><code>Tree/assets/metrics.json</code></a>. The split
+        reproduction is verified: it recovers the notebook's 78.1831% accuracy exactly, which is
+        how we know the figures on this page describe the same model the notebook trained.
+      </p>
+
+      <div class="table-scroll mt-3">
+        <table class="data">
+          <caption>Notebook execution order.</caption>
+          <thead><tr><th scope="col">Order</th><th scope="col">Notebook</th><th scope="col">Produces</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td><a href="./data_cleaner.html">data_cleaner.ipynb</a></td><td>Missing-value handling, encoding, <code>cdata/</code></td></tr>
+            <tr><td>2</td><td><a href="./train_ensemble.html">train_ensemble.ipynb</a></td><td>Benchmark, searches, threshold sweep, ONNX export</td></tr>
+            <tr><td>3</td><td><code>model_test.ipynb</code></td><td>Runtime verification of the exported graph</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════════ 11 ══════════ -->
+    <section id="refs">
+      <div class="sec-head">
+        <span class="sec-head__num">Section 11</span>
+        <h2>References</h2>
+      </div>
+
+      <ul class="prose small">
+        <li>A. Howard, A. Chow and R. Holbrook. <em>Spaceship Titanic.</em> Kaggle, 2022.
+          Licensed CC BY 4.0.</li>
+        <li>G. Ke et al. <em>LightGBM: A Highly Efficient Gradient Boosting Decision Tree.</em>
+          NeurIPS, 2017.</li>
+        <li>J. Bergstra and Y. Bengio. <em>Random Search for Hyper-Parameter Optimization.</em>
+          JMLR 13, 2012 — the argument for randomised over grid search.</li>
+        <li>T. Chen and C. Guestrin. <em>XGBoost: A Scalable Tree Boosting System.</em> KDD, 2016.</li>
+      </ul>
+
+      <p class="prose small muted mt-4">
+        Competition data is not redistributed in this repository and remains subject to Kaggle's
+        terms. All original code here is released under the MIT licence.
+      </p>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap site-footer__grid">
+    <div>
+      <strong class="footer-name">Mayank Choudhary</strong><br>
+      Machine Learning Portfolio · Integrated M.Tech, VIT
+    </div>
+    <nav class="footer-links" aria-label="Footer">
+      <a href="../index.html">Portfolio home</a>
+      <a href="./index.html">Case study</a>
+      <a href="../Supervised/report.html">Customer satisfaction report</a>
+      <a href="https://github.com/Mayank170906/mlProjects" target="_blank" rel="noopener">Repository&#8239;↗</a>
+    </nav>
+    <div class="xsmall footer-legal">
+      Generated from <code>tools/gen_tree_metrics.py</code> against the persisted model.
+    </div>
+  </div>
+</footer>
+
+<script src="./assets/report.js" defer></script>
 </body>
 </html>
